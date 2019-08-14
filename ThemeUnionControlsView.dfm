@@ -1,0 +1,2 @@
+inherited dsgvThemeUnionControls: TdsgvThemeUnionControls
+end
