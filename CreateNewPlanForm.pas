@@ -156,7 +156,7 @@ begin
   {**** Инициализация формы обучения ****}
   FEducation := TEducation.Create(Self);
   FEducation.FieldsSynonym.Delete(0);
-  FEducation.EducationLevel.Master := FEducationLevel;
+//  FEducation.EducationLevel.Master := FEducationLevel;
   FEducation.DataSetWrap.MultiSelectDSWrap.UseInactiveStyle := False;
   FEducation.Refresh;
   FEducation.Wrap.LocateByPK(FSpecEducation.ID_Education.AsInteger);

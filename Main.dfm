@@ -42,28 +42,52 @@ object frmMain: TfrmMain
       ClientRectTop = 27
       object cxtshFirst: TcxTabSheet
         ImageIndex = 8
+        ExplicitLeft = 0
+        ExplicitTop = 0
+        ExplicitWidth = 0
+        ExplicitHeight = 0
       end
       object cxtshVO2: TcxTabSheet
         Caption = #1042#1054
         ImageIndex = 7
+        ExplicitLeft = 0
+        ExplicitTop = 0
+        ExplicitWidth = 0
+        ExplicitHeight = 0
       end
       object cxtshSPO2: TcxTabSheet
         Caption = #1057#1055#1054
         ImageIndex = 9
+        ExplicitLeft = 0
+        ExplicitTop = 0
+        ExplicitWidth = 0
+        ExplicitHeight = 0
       end
       object cxtshRetraining2: TcxTabSheet
         Caption = #1055#1077#1088#1077#1087#1086#1076#1075#1086#1090#1086#1074#1082#1072
         ImageIndex = 10
+        ExplicitLeft = 0
+        ExplicitTop = 0
+        ExplicitWidth = 0
+        ExplicitHeight = 0
       end
       object cxtshDO: TcxTabSheet
         Caption = #1044#1054
         ImageIndex = 4
         TabHint = #1044#1086#1087#1086#1083#1085#1080#1090#1077#1083#1100#1085#1086#1077' '#1086#1073#1088#1072#1079#1086#1074#1072#1085#1080#1077' '#1076#1077#1090#1077#1081' '#1080' '#1074#1079#1088#1086#1089#1083#1099#1093
+        ExplicitLeft = 0
+        ExplicitTop = 0
+        ExplicitWidth = 0
+        ExplicitHeight = 0
       end
       object cxtshNewDPO: TcxTabSheet
         Caption = #1044#1055#1054
         ImageIndex = 5
         TabHint = #1044#1086#1087#1086#1083#1085#1080#1090#1077#1083#1100#1085#1086#1077' '#1087#1088#1086#1092#1077#1089#1089#1080#1086#1085#1072#1083#1100#1085#1086#1077' '#1086#1073#1088#1072#1079#1086#1074#1072#1085#1080#1077
+        ExplicitLeft = 0
+        ExplicitTop = 0
+        ExplicitWidth = 0
+        ExplicitHeight = 0
       end
     end
   end
@@ -79,7 +103,7 @@ object frmMain: TfrmMain
     Left = 197
     Top = 236
     Bitmap = {
-      494C010107000900740218001800FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C010107000900780218001800FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000600000003000000001002000000000000048
       0000000000000000000000000000000000000000000000000000000000000000
       00000000000000000000000000000000000000006B006B006B0000006B006B00
