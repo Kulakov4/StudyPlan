@@ -109,10 +109,10 @@ function TSpecEdW.RestoreBookmark: Boolean;
 begin
   Assert(RecHolder <> nil);
 
-  TryLocate([IDSpeciality.FieldName, IDEducation2.FieldName, Period.FieldName],
+  Result := TryLocate([IDSpeciality.FieldName, IDEducation2.FieldName, Period.FieldName],
     [RecHolder.Field[IDSpeciality.FieldName],
     RecHolder.Field[IDEducation2.FieldName],
-    RecHolder.Field[Period.FieldName]]);
+    RecHolder.Field[Period.FieldName]]) > 0;
 end;
 
 constructor TQuerySpecEd.Create(AOwner: TComponent);

@@ -54,9 +54,12 @@ type
     tbLocked: TTBToolbar;
     TBControlItem4: TTBControlItem;
     cxdbcbLocked: TcxDBCheckBox;
+    actCreateStudyPlan: TAction;
+    TBItem3: TTBItem;
     procedure actCopyStudyPlanExecute(Sender: TObject);
     procedure actDeleteStudyPlanExecute(Sender: TObject);
     procedure actEditStudyPlanExecute(Sender: TObject);
+    procedure actCreateStudyPlanExecute(Sender: TObject);
     procedure cxdbelcbSpecialityPropertiesPopup(Sender: TObject);
     procedure cxdbelcbSpecialityPropertiesChange(Sender: TObject);
     procedure cxdblcbYearsPropertiesChange(Sender: TObject);
@@ -71,6 +74,7 @@ type
     procedure SetSPGroup(const Value: TSPGroup);
     { Private declarations }
   protected
+    procedure CreateStudyPlan; virtual;
     procedure EditStudyPlan; virtual;
     procedure Init; virtual;
     function IsActionsEnabled: Boolean; virtual;
@@ -179,6 +183,15 @@ end;
 procedure TViewSPMain.actEditStudyPlanExecute(Sender: TObject);
 begin
   EditStudyPlan;
+end;
+
+procedure TViewSPMain.actCreateStudyPlanExecute(Sender: TObject);
+begin
+  CreateStudyPlan;
+end;
+
+procedure TViewSPMain.CreateStudyPlan;
+begin
 end;
 
 procedure TViewSPMain.cxdbelcbSpecialityPropertiesChange(Sender: TObject);

@@ -71,6 +71,7 @@ type
     function GetYears: Integer;
     function GetMonths: Integer;
     function GetAnnotation: string;
+    function GetYear: Integer;
     function GetIDQualification: Integer;
     function GetIDStandart: Integer;
     function GetLocked: Boolean;
@@ -89,8 +90,6 @@ type
     property Annotation: string read GetAnnotation write SetAnnotation;
     property IDChair: Integer read GetIDChair write SetIDChair;
     property IDEducation2: Integer read GetIDEducation2 write SetIDEducation2;
-    property IDEducationLevel: Integer read GetIDEducationLevel
-      write SetIDEducationLevel;
     property IDQualification: Integer read GetIDQualification
       write SetIDQualification;
     property IDSpeciality: Integer read GetIDSpeciality write SetIDSpeciality;
@@ -110,6 +109,9 @@ type
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
     procedure AfterConstruction; override;
+    property IDEducationLevel: Integer read GetIDEducationLevel write
+        SetIDEducationLevel;
+    property Year: Integer read GetYear;
     property Mode: TMode read FMode write SetMode;
     { Public declarations }
   published
@@ -423,6 +425,11 @@ begin
   Result := cxteAnnotation.Text;
 end;
 
+function TfrmEditStudyPlan.GetYear: Integer;
+begin
+  Result := FSPGroup.YearDumb.W.ID.F.AsInteger;
+end;
+
 function TfrmEditStudyPlan.GetIDQualification: Integer;
 begin
   Result := FqQualificationDumb.W.ID.F.AsInteger;
@@ -477,8 +484,8 @@ end;
 
 procedure TfrmEditStudyPlan.SetMode(const Value: TMode);
 begin
-  if FMode = Value then
-    Exit;
+//  if FMode = Value then
+//    Exit;
 
   FMode := Value;
 
@@ -524,6 +531,7 @@ begin
       end;
     InsertMode:
       begin
+        // IDEducationLevel := ??? Уровень образования
         IDEducation2 := 0;
         IDChair := 0;
         IDSpeciality := 0;

@@ -359,7 +359,15 @@ begin
   qSpecEdSimple.W.Save(ASpecEdSimple, AMode,
     qSpecByChair.W.QUALIFICATION_ID.F.AsInteger);
 
-  qSpecEd.FDQuery.RefreshRecord();
+  if AMode = EditMode then
+    qSpecEd.FDQuery.RefreshRecord()
+  else
+  begin
+    // „тобы созданный план по€вилс€ в выпадающем списке
+    qSpecEd.W.RefreshQuery;
+    // ¬ыбираем созданный план
+    FSpecEdDumb.W.UpdateID(qSpecEdSimple.W.PK.AsInteger);
+  end;
 end;
 
 procedure TSPGroup.SetYear(const Value: Integer);
