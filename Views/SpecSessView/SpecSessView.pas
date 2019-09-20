@@ -128,11 +128,11 @@ procedure TViewSpecSess.actDropLevelExecute(Sender: TObject);
 var
   ALevel: Variant;
   I: Integer;
-  src: Integer;
+//  src: Integer;
 begin
   inherited;
   ALevel := MainView.Controller.SelectedRows[0].Values[clLevel.Index];
-  src := MainView.Controller.SelectedRowCount;
+//  src := MainView.Controller.SelectedRowCount;
 
   MainView.Controller.ClearSelection;
 
@@ -178,7 +178,7 @@ procedure TViewSpecSess.cxCellTextEditPropertiesEditValueChanged
 var
   AValue: Integer;
   AcxTextEdit: TcxTextEdit;
-  S: string;
+//  S: string;
 begin
   inherited;
   AcxTextEdit := Sender as TcxTextEdit;

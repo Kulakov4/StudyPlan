@@ -1,5 +1,6 @@
 inherited ViewSPO: TViewSPO
   inherited tbd1: TTBDock
+    Height = 51
     inherited tbSpecEducation: TTBToolbar
       ExplicitWidth = 1063
       inherited lbl2: TLabel
@@ -14,9 +15,25 @@ inherited ViewSPO: TViewSPO
         Width = 950
       end
     end
+    inherited tbShortSpeciality: TTBToolbar
+      Top = 26
+    end
+    inherited tbChairs: TTBToolbar
+      Top = 26
+    end
     inherited tbActions: TTBToolbar
       Left = 1207
       ExplicitLeft = 1207
+    end
+    inherited tbIDSpecEd: TTBToolbar
+      Left = 1037
+      Top = 26
+      inherited cxdblID: TcxDBLabel
+        Top = 0
+      end
+    end
+    inherited tbLocked: TTBToolbar
+      Top = 26
     end
   end
   inherited cxImageList: TcxImageList

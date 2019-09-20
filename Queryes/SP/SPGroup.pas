@@ -14,6 +14,7 @@ type
 
   TSPGroup = class(TComponent)
   private
+    FActivePlansOnly: Boolean;
     FEvents: TObjectList;
     FIDSpecialityEducation: Integer;
     FOnYearChange: TNotifyEventsEx;
@@ -48,6 +49,7 @@ type
     function GetqSpecEdBaseForm: TQrySpecEdBaseForm;
     function GetqSPStandart: TQuerySPStandart;
     function GetYear: Integer;
+    procedure SetActivePlansOnly(const Value: Boolean);
     procedure SetYear(const Value: Integer);
   public
     constructor Create(AOwner: TComponent;
@@ -60,6 +62,8 @@ type
     procedure Save(ASpecEdSimple: ISpecEdSimple; AMode: TMode);
     property OnYearChange: TNotifyEventsEx read FOnYearChange;
     property OnSpecEdChange: TNotifyEventsEx read FOnSpecEdChange;
+    property ActivePlansOnly: Boolean read FActivePlansOnly write
+        SetActivePlansOnly;
     property qEd: TQueryEd read GetqEd;
     property IDSpecialityEducation: Integer read GetIDSpecialityEducation;
     property qAreas: TQryAreas read GetqAreas;
@@ -90,6 +94,8 @@ constructor TSPGroup.Create(AOwner: TComponent;
   AYear, AIDSpecialityEducation: Integer; ASPType: TSPType);
 begin
   inherited Create(AOwner);
+
+  FActivePlansOnly := True;
 
   Assert(AYear > 0);
   FIDSpecialityEducation := AIDSpecialityEducation;
@@ -239,11 +245,11 @@ begin
 
   case FSPType of
     sptVO:
-      FqSpecEd.Search(Year, 1); // ВО;
+      FqSpecEd.Search(Year, 1, FActivePlansOnly); // ВО;
     sptSPO:
-      FqSpecEd.Search(Year, 2); // СПО;
+      FqSpecEd.Search(Year, 2, FActivePlansOnly); // СПО;
     sptRetraining:
-      FqSpecEd.SearchRetraining(Year);
+      FqSpecEd.SearchRetraining(Year, FActivePlansOnly);
   end;
 
   if OK then
@@ -360,6 +366,19 @@ begin
     qSpecByChair.W.QUALIFICATION_ID.F.AsInteger);
 
   qSpecEd.FDQuery.RefreshRecord();
+  // Если после обновления, запись исчезла (план деактивировался)
+  if qSpecEd.W.PK.AsInteger <> FSpecEdDumb.W.ID.F.AsInteger then
+  begin
+    // Выбираем другой активный план
+    FSpecEdDumb.W.UpdateID(qSpecEd.W.PK.AsInteger);
+  end;
+
+end;
+
+procedure TSPGroup.SetActivePlansOnly(const Value: Boolean);
+begin
+  FActivePlansOnly := Value;
+  qSpecEd.W.ApplyEnabledFilter(FActivePlansOnly);
 end;
 
 procedure TSPGroup.SetYear(const Value: Integer);
