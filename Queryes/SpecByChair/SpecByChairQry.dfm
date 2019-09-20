@@ -21,7 +21,7 @@ inherited QrySpecByChair: TQrySpecByChair
         'join CDB_COM_DIRECTORIES.SPECIALITYS s on SE.IDSPECIALITY = S.ID' +
         '_SPECIALITY'
       'where'
-      '    SE.ENABLE_SPECIALITYEDUCATION = 1 and'
+      '--    SE.ENABLE_SPECIALITYEDUCATION = 1 and'
       '    SE.IDEDUCATIONLEVEL = :IDEDUCATIONLEVEL and'
       '    (    '
       '        (SE.IDCHAIR = :IDCHAIR) '

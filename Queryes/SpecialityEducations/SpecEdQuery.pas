@@ -19,8 +19,9 @@ type
     { Private declarations }
   public
     constructor Create(AOwner: TComponent); override;
-    function Search(AYear, AIDEducationType: Integer): Integer;
-    function SearchRetraining(AYear: Integer): Integer;
+    function Search(AYear, AIDEducationType: Integer; AEnableOnly: Boolean):
+        Integer;
+    function SearchRetraining(AYear: Integer; AEnableOnly: Boolean): Integer;
     property W: TSpecEdW read FW;
     { Public declarations }
   end;
@@ -49,6 +50,7 @@ type
   protected
   public
     constructor Create(AOwner: TComponent); override;
+    procedure ApplyEnabledFilter(AEnableOnly: Boolean);
     function RestoreBookmark: Boolean; override;
     property Data: TFieldWrap read FData;
     property SpecialityEx: TFieldWrap read FSpecialityEx;
@@ -99,20 +101,34 @@ begin
   FEducation_Order := TFieldWrap.Create(Self, 'Education_Order');
   FAnnotation := TFieldWrap.Create(Self, 'Annotation', 'Примечание');
   FENABLE_SPECIALITYEDUCATION := TFieldWrap.Create(Self,
-    'ENABLE_SPECIALITYEDUCATION');
+    'ENABLE_SPECIALITYEDUCATION', 'Актив.');
 
   // -- Это поле не выбирается
   FIDEDUCATIONTYPE := TFieldWrap.Create(Self, 'IDEDUCATIONTYPE');
+end;
+
+procedure TSpecEdW.ApplyEnabledFilter(AEnableOnly: Boolean);
+begin
+  if AEnableOnly then
+  begin
+    DataSet.Filter := Format('%s = 1', [ENABLE_SPECIALITYEDUCATION.FieldName]);
+    DataSet.Filtered := True;
+  end
+  else
+  begin
+    DataSet.Filtered := False;
+    DataSet.Filter := '';
+  end;
 end;
 
 function TSpecEdW.RestoreBookmark: Boolean;
 begin
   Assert(RecHolder <> nil);
 
-  TryLocate([IDSpeciality.FieldName, IDEducation2.FieldName, Period.FieldName],
+  Result := TryLocate([IDSpeciality.FieldName, IDEducation2.FieldName, Period.FieldName],
     [RecHolder.Field[IDSpeciality.FieldName],
     RecHolder.Field[IDEducation2.FieldName],
-    RecHolder.Field[Period.FieldName]]);
+    RecHolder.Field[Period.FieldName]]) > 0;
 end;
 
 constructor TQuerySpecEd.Create(AOwner: TComponent);
@@ -121,7 +137,8 @@ begin
   FW := TSpecEdW.Create(FDQuery);
 end;
 
-function TQuerySpecEd.Search(AYear, AIDEducationType: Integer): Integer;
+function TQuerySpecEd.Search(AYear, AIDEducationType: Integer; AEnableOnly:
+    Boolean): Integer;
 begin
   Assert(AYear > 0);
   Assert(AIDEducationType > 0);
@@ -134,19 +151,17 @@ begin
     Format('%s=:%s', [W.IDEDUCATIONTYPE.FieldName,
     W.IDEDUCATIONTYPE.FieldName]));
 
-  FDQuery.SQL.Text := FDQuery.SQL.Text.Replace('2=2',
-    Format('%s=:%s', [W.ENABLE_SPECIALITYEDUCATION.FieldName,
-    W.ENABLE_SPECIALITYEDUCATION.FieldName]));
+  W.ApplyEnabledFilter(AEnableOnly);
 
   SetParamType(W.Year.FieldName);
   SetParamType(W.IDEDUCATIONTYPE.FieldName);
-  SetParamType(W.ENABLE_SPECIALITYEDUCATION.FieldName);
 
-  Result := W.Load([W.Year.FieldName, W.IDEDUCATIONTYPE.FieldName,
-    W.ENABLE_SPECIALITYEDUCATION.FieldName], [AYear, AIDEducationType, 1]);
+  Result := W.Load([W.Year.FieldName, W.IDEDUCATIONTYPE.FieldName],
+      [AYear, AIDEducationType]);
 end;
 
-function TQuerySpecEd.SearchRetraining(AYear: Integer): Integer;
+function TQuerySpecEd.SearchRetraining(AYear: Integer; AEnableOnly: Boolean):
+    Integer;
 begin
   Assert(AYear > 0);
 
@@ -158,16 +173,12 @@ begin
     Format('%s=:%s', [W.IDEducationLevel.FieldName,
     W.IDEducationLevel.FieldName]));
 
-  FDQuery.SQL.Text := FDQuery.SQL.Text.Replace('2=2',
-    Format('%s=:%s', [W.ENABLE_SPECIALITYEDUCATION.FieldName,
-    W.ENABLE_SPECIALITYEDUCATION.FieldName]));
+  W.ApplyEnabledFilter(AEnableOnly);
 
   SetParamType(W.Year.FieldName);
   SetParamType(W.IDEducationLevel.FieldName);
-  SetParamType(W.ENABLE_SPECIALITYEDUCATION.FieldName);
 
-  Result := W.Load([W.Year.FieldName, W.IDEducationLevel.FieldName,
-    W.ENABLE_SPECIALITYEDUCATION.FieldName], [AYear, 5, 1]);
+  Result := W.Load([W.Year.FieldName, W.IDEducationLevel.FieldName], [AYear, 5]);
   // 5 - Переподготовка !!!
 end;
 

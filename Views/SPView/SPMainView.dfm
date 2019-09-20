@@ -14,7 +14,7 @@ object ViewSPMain: TViewSPMain
     Left = 0
     Top = 0
     Width = 1387
-    Height = 56
+    Height = 51
     object tbYear: TTBToolbar
       Left = 0
       Top = 0
@@ -29,7 +29,7 @@ object ViewSPMain: TViewSPMain
       end
       object lbl1: TLabel
         Left = 0
-        Top = 4
+        Top = 2
         Width = 34
         Height = 16
         Caption = #1043#1086#1076':  '
@@ -57,7 +57,7 @@ object ViewSPMain: TViewSPMain
       end
       object lbl2: TLabel
         Left = 0
-        Top = 4
+        Top = 2
         Width = 161
         Height = 16
         Caption = #1053#1072#1087#1088#1072#1074#1083#1077#1085#1080#1077' '#1087#1086#1076#1075#1086#1090#1086#1074#1082#1080':  '
@@ -68,12 +68,13 @@ object ViewSPMain: TViewSPMain
         Properties.OnChange = cxdbelcbSpecialityPropertiesChange
         Properties.OnPopup = cxdbelcbSpecialityPropertiesPopup
         TabOrder = 0
+        OnMouseDown = cxdbelcbSpecialityMouseDown
         Width = 900
       end
     end
     object tbShortSpeciality: TTBToolbar
       Left = 0
-      Top = 28
+      Top = 26
       Caption = 'tbShortSpeciality'
       DockPos = 0
       DockRow = 1
@@ -86,7 +87,7 @@ object ViewSPMain: TViewSPMain
       end
       object Label3: TLabel
         Left = 0
-        Top = 4
+        Top = 2
         Width = 87
         Height = 16
         Caption = #1057#1086#1082#1088#1072#1097#1077#1085#1080#1077':  '
@@ -101,7 +102,7 @@ object ViewSPMain: TViewSPMain
     end
     object tbChairs: TTBToolbar
       Left = 281
-      Top = 28
+      Top = 26
       DockPos = 10
       DockRow = 1
       SystemFont = False
@@ -114,7 +115,7 @@ object ViewSPMain: TViewSPMain
       end
       object Label4: TLabel
         Left = 0
-        Top = 4
+        Top = 2
         Width = 65
         Height = 16
         Caption = #1050#1072#1092#1077#1076#1088#1072':  '
@@ -150,10 +151,10 @@ object ViewSPMain: TViewSPMain
       end
     end
     object tbIDSpecEd: TTBToolbar
-      Left = 972
-      Top = 28
+      Left = 1037
+      Top = 26
       Caption = 'tbIDSpecEd'
-      DockPos = 896
+      DockPos = 956
       DockRow = 1
       TabOrder = 5
       object TBControlItemID: TTBControlItem
@@ -161,16 +162,16 @@ object ViewSPMain: TViewSPMain
       end
       object cxdblID: TcxDBLabel
         Left = 0
-        Top = 1
+        Top = 0
         Height = 21
         Width = 41
       end
     end
     object tbLocked: TTBToolbar
       Left = 906
-      Top = 28
+      Top = 26
       Caption = 'tbLocked'
-      DockPos = 888
+      DockPos = 900
       DockRow = 1
       TabOrder = 6
       object TBControlItem4: TTBControlItem
@@ -204,6 +205,17 @@ object ViewSPMain: TViewSPMain
       Caption = #1059#1076#1072#1083#1080#1090#1100
       ImageIndex = 2
       OnExecute = actDeleteStudyPlanExecute
+    end
+    object actShowAll: TAction
+      Caption = #1042#1089#1077' '#1087#1083#1072#1085#1099
+      GroupIndex = 1
+      OnExecute = actShowAllExecute
+    end
+    object actActivePlans: TAction
+      Caption = #1040#1082#1090#1080#1074#1085#1099#1077' '#1087#1083#1072#1085#1099
+      Checked = True
+      GroupIndex = 1
+      OnExecute = actActivePlansExecute
     end
   end
   object cxImageList: TcxImageList
@@ -322,5 +334,15 @@ object ViewSPMain: TViewSPMain
           0000000000000000000000000000000000000000000000000000000000000000
           0000000000000000000000000000000000000000000000000000}
       end>
+  end
+  object PopupMenu: TPopupMenu
+    Left = 32
+    Top = 216
+    object N1: TMenuItem
+      Action = actActivePlans
+    end
+    object N2: TMenuItem
+      Action = actShowAll
+    end
   end
 end

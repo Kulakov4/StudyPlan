@@ -3,7 +3,7 @@ object frmEditStudyPlan: TfrmEditStudyPlan
   Top = 0
   BorderStyle = bsDialog
   Caption = #1048#1079#1084#1077#1085#1077#1085#1080#1077' '#1087#1072#1088#1072#1084#1077#1090#1088#1086#1074' '#1091#1095#1077#1073#1085#1086#1075#1086' '#1087#1083#1072#1085#1072
-  ClientHeight = 443
+  ClientHeight = 493
   ClientWidth = 856
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -17,7 +17,7 @@ object frmEditStudyPlan: TfrmEditStudyPlan
   OnClose = FormClose
   DesignSize = (
     856
-    443)
+    493)
   PixelsPerInch = 96
   TextHeight = 16
   object Label1: TLabel
@@ -29,63 +29,63 @@ object frmEditStudyPlan: TfrmEditStudyPlan
   end
   object Label2: TLabel
     Left = 32
-    Top = 90
+    Top = 91
     Width = 52
     Height = 16
     Caption = #1050#1072#1092#1077#1076#1088#1072
   end
   object lblSpeciality: TLabel
     Left = 32
-    Top = 146
+    Top = 140
     Width = 148
     Height = 16
     Caption = #1053#1072#1087#1088#1072#1074#1083#1077#1085#1080#1077' '#1087#1086#1076#1075#1086#1090#1086#1074#1082#1080
   end
   object Label4: TLabel
     Left = 32
-    Top = 257
+    Top = 238
     Width = 87
     Height = 16
     Caption = #1057#1088#1086#1082' '#1086#1073#1091#1095#1077#1085#1080#1103
   end
   object Label5: TLabel
     Left = 217
-    Top = 254
+    Top = 238
     Width = 27
     Height = 16
     Caption = #1051#1077#1090':'
   end
   object Label6: TLabel
     Left = 335
-    Top = 254
+    Top = 238
     Width = 56
     Height = 16
     Caption = #1052#1077#1089#1103#1094#1077#1074':'
   end
   object Label7: TLabel
     Left = 32
-    Top = 307
+    Top = 287
     Width = 72
     Height = 16
     Caption = #1055#1088#1080#1084#1077#1095#1072#1085#1080#1077
   end
   object Label8: TLabel
     Left = 32
-    Top = 205
+    Top = 189
     Width = 86
     Height = 16
     Caption = #1050#1074#1072#1083#1080#1092#1080#1082#1072#1094#1080#1103
   end
   object lblLocked: TLabel
     Left = 32
-    Top = 359
+    Top = 385
     Width = 83
     Height = 16
     Caption = #1047#1072#1073#1083#1086#1082#1080#1088#1086#1074#1072#1085
   end
   object lblShowOnPortal: TLabel
     Left = 32
-    Top = 399
+    Top = 434
     Width = 143
     Height = 16
     Caption = #1054#1090#1086#1073#1088#1072#1078#1072#1090#1100' '#1085#1072' '#1087#1086#1088#1090#1072#1083#1077
@@ -97,6 +97,13 @@ object frmEditStudyPlan: TfrmEditStudyPlan
     Height = 16
     Caption = #1057#1090#1072#1085#1076#1072#1088#1090
   end
+  object Label3: TLabel
+    Left = 32
+    Top = 336
+    Width = 48
+    Height = 16
+    Caption = #1040#1082#1090#1080#1074#1077#1085
+  end
   object cxdblcbEducations: TcxDBLookupComboBox
     Left = 217
     Top = 39
@@ -107,7 +114,7 @@ object frmEditStudyPlan: TfrmEditStudyPlan
   end
   object btnClose: TcxButton
     Left = 720
-    Top = 382
+    Top = 432
     Width = 110
     Height = 33
     Anchors = [akRight, akBottom]
@@ -117,6 +124,7 @@ object frmEditStudyPlan: TfrmEditStudyPlan
     LookAndFeel.NativeStyle = True
     ModalResult = 1
     TabOrder = 1
+    ExplicitTop = 382
   end
   object cxdblcbChairs: TcxDBLookupComboBox
     Left = 217
@@ -128,7 +136,7 @@ object frmEditStudyPlan: TfrmEditStudyPlan
   end
   object cxdbextlcbSpecialitys: TcxDBExtLookupComboBox
     Left = 217
-    Top = 143
+    Top = 136
     Properties.OnChange = cxdbextlcbSpecialitysPropertiesChange
     Properties.OnPopup = cxdbextlcbSpecialitysPropertiesPopup
     TabOrder = 3
@@ -136,40 +144,40 @@ object frmEditStudyPlan: TfrmEditStudyPlan
   end
   object cxteYears: TcxTextEdit
     Left = 257
-    Top = 251
+    Top = 234
     Properties.OnValidate = cxteYearsPropertiesValidate
     TabOrder = 4
     Width = 48
   end
   object cxteMonths: TcxTextEdit
     Left = 405
-    Top = 251
+    Top = 234
     Properties.OnValidate = cxteYearsPropertiesValidate
     TabOrder = 5
     Width = 48
   end
   object cxteAnnotation: TcxTextEdit
     Left = 217
-    Top = 304
+    Top = 283
     TabOrder = 6
     Text = 'cxteAnnotation'
     Width = 613
   end
   object cxdblcbQualifications: TcxDBLookupComboBox
     Left = 217
-    Top = 202
+    Top = 185
     Properties.ListColumns = <>
     TabOrder = 7
     Width = 613
   end
   object cxcbLocked: TcxCheckBox
     Left = 217
-    Top = 355
+    Top = 383
     TabOrder = 8
   end
   object cxcbPortal: TcxCheckBox
     Left = 217
-    Top = 394
+    Top = 432
     TabOrder = 9
   end
   object cxdblcbStandarts: TcxDBLookupComboBox
@@ -183,7 +191,7 @@ object frmEditStudyPlan: TfrmEditStudyPlan
   end
   object cxbtnAddSpeciality: TcxButton
     Left = 791
-    Top = 143
+    Top = 136
     Width = 39
     Height = 24
     Hint = #1053#1086#1074#1086#1077' '#1085#1072#1087#1088#1072#1074#1083#1077#1085#1080#1077' '#1087#1086#1076#1075#1086#1090#1086#1074#1082#1080
@@ -224,5 +232,10 @@ object frmEditStudyPlan: TfrmEditStudyPlan
     PaintStyle = bpsGlyph
     TabOrder = 11
     OnClick = cxbtnAddSpecialityClick
+  end
+  object cxcbEnabled: TcxCheckBox
+    Left = 217
+    Top = 334
+    TabOrder = 12
   end
 end

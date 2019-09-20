@@ -34,6 +34,7 @@ type
     FAnnotation: TFieldWrap;
     FPortal: TFieldWrap;
     FData: TFieldWrap;
+    FEnable_SpecialityEducation: TFieldWrap;
     FIDChair: TFieldWrap;
     FIDArea: TFieldWrap;
     FLocked: TFieldWrap;
@@ -55,6 +56,8 @@ type
     property Annotation: TFieldWrap read FAnnotation;
     property Portal: TFieldWrap read FPortal;
     property Data: TFieldWrap read FData;
+    property Enable_SpecialityEducation: TFieldWrap read
+        FEnable_SpecialityEducation;
     property IDChair: TFieldWrap read FIDChair;
     property IDArea: TFieldWrap read FIDArea;
     property Locked: TFieldWrap read FLocked;
@@ -97,6 +100,7 @@ begin
   FIDArea := TFieldWrap.Create(Self, 'IDArea');
   FLocked := TFieldWrap.Create(Self, 'Locked');
   FPortal := TFieldWrap.Create(Self, 'PORTAL');
+  FEnable_SpecialityEducation := TFieldWrap.Create(Self, 'Enable_SpecialityEducation');
 end;
 
 constructor TQuerySpecEdSimple.Create(AOwner: TComponent);
@@ -159,6 +163,7 @@ begin
   Years.F.AsInteger := ASpecEdSimple.Years;
   Months.F.AsInteger := ASpecEdSimple.Months;
   Annotation.F.AsString := ASpecEdSimple.Annotation;
+  Enable_SpecialityEducation.F.AsInteger := IfThen(ASpecEdSimple.IsEnabled, 1, 0);
   Locked.F.AsInteger := IfThen(ASpecEdSimple.Locked, 1, 0);
   Portal.F.AsInteger := IfThen(ASpecEdSimple.Portal, 1, 0);
 

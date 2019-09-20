@@ -247,7 +247,7 @@ var
   AFW: TFieldWrap;
   AOCINativeException: EOCINativeException;
   AParamWrap: TParamWrap;
-  S: string;
+//  S: string;
 begin
   inherited;
   if not(E is EOCINativeException) then

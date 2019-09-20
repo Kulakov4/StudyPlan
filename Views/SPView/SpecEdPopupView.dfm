@@ -5,13 +5,9 @@ inherited ViewSpecEdPopup: TViewSpecEdPopup
     ExplicitTop = 0
     ExplicitHeight = 472
     inherited cxGridDBBandedTableView: TcxGridDBBandedTableView
-      object clCalc: TcxGridDBBandedColumn
-        OnGetDataText = clCalcGetDataText
-        OnGetDisplayText = clCalcGetDisplayText
-        Position.BandIndex = 0
-        Position.ColIndex = 0
-        Position.RowIndex = 0
-      end
+      OnCustomDrawCell = cxGridDBBandedTableViewCustomDrawCell
+      OptionsView.FocusRect = False
+      Styles.OnGetContentStyle = cxGridDBBandedTableViewStylesGetContentStyle
     end
   end
   inherited dxBarManager: TdxBarManager
@@ -22,6 +18,10 @@ inherited ViewSpecEdPopup: TViewSpecEdPopup
   end
   inherited cxStyleRepository: TcxStyleRepository
     PixelsPerInch = 96
+    object cxDisabledStyle: TcxStyle
+      AssignedValues = [svColor]
+      Color = clSkyBlue
+    end
   end
   object dsChairs: TDataSource
     Left = 40

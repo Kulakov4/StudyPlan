@@ -18,12 +18,18 @@ uses
 type
   TViewSpecEdPopup = class(TfrmGrid)
     dsChairs: TDataSource;
-    clCalc: TcxGridDBBandedColumn;
     dsSpeciality: TDataSource;
+    cxDisabledStyle: TcxStyle;
     procedure clCalcGetDataText(Sender: TcxCustomGridTableItem;
       ARecordIndex: Integer; var AText: string);
     procedure clCalcGetDisplayText(Sender: TcxCustomGridTableItem;
       ARecord: TcxCustomGridRecord; var AText: string);
+    procedure cxGridDBBandedTableViewCustomDrawCell(Sender: TcxCustomGridTableView;
+        ACanvas: TcxCanvas; AViewInfo: TcxGridTableDataCellViewInfo; var ADone:
+        Boolean);
+    procedure cxGridDBBandedTableViewStylesGetContentStyle
+      (Sender: TcxCustomGridTableView; ARecord: TcxCustomGridRecord;
+      AItem: TcxCustomGridTableItem; var AStyle: TcxStyle);
   private
     FSPGroup: TSPGroup;
     function GetCalcColumnText(Sender: TcxCustomGridTableItem;
@@ -37,6 +43,7 @@ type
     function GetclIDSpeciality: TcxGridDBBandedColumn;
     function GetclSpeciality: TcxGridDBBandedColumn;
     function GetclPK: TcxGridDBBandedColumn;
+    function GetclEnable: TcxGridDBBandedColumn;
     function GetclSpecialityEx: TcxGridDBBandedColumn;
     function GetclYear: TcxGridDBBandedColumn;
     procedure SetSPGroup(const Value: TSPGroup);
@@ -53,6 +60,7 @@ type
     property clIDSpeciality: TcxGridDBBandedColumn read GetclIDSpeciality;
     property clSpeciality: TcxGridDBBandedColumn read GetclSpeciality;
     property clPK: TcxGridDBBandedColumn read GetclPK;
+    property clEnable: TcxGridDBBandedColumn read GetclEnable;
     property clSpecialityEx: TcxGridDBBandedColumn read GetclSpecialityEx;
     property clYear: TcxGridDBBandedColumn read GetclYear;
     property SPGroup: TSPGroup read FSPGroup write SetSPGroup;
@@ -90,6 +98,72 @@ procedure TViewSpecEdPopup.clCalcGetDisplayText(Sender: TcxCustomGridTableItem;
 begin
   inherited;
   AText := GetCalcColumnText(Sender, ARecord.RecordIndex);
+end;
+
+procedure TViewSpecEdPopup.cxGridDBBandedTableViewCustomDrawCell(Sender:
+    TcxCustomGridTableView; ACanvas: TcxCanvas; AViewInfo:
+    TcxGridTableDataCellViewInfo; var ADone: Boolean);
+var
+  ACol: TcxGridDBBandedColumn;
+  V: Variant;
+begin
+  inherited;
+  if not AViewInfo.GridRecord.IsData then Exit;
+  if AViewInfo.Selected then Exit;
+//  if AViewInfo.Focused then Exit;
+//  if AViewInfo.IsHotTracked then Exit;
+
+  ACol := AViewInfo.Item as TcxGridDBBandedColumn;
+  if ACol.Options.CellMerging then Exit;
+  V := AViewInfo.GridRecord.Values[4];
+  if VarIsNull(V) then
+    Exit;
+
+  if V = 0 then
+  begin
+    ACanvas.Brush.Color:=  cxDisabledStyle.Color;
+  end;
+end;
+
+procedure TViewSpecEdPopup.cxGridDBBandedTableViewStylesGetContentStyle
+  (Sender: TcxCustomGridTableView; ARecord: TcxCustomGridRecord;
+  AItem: TcxCustomGridTableItem; var AStyle: TcxStyle);
+{
+var
+  ACol: TcxGridDBBandedColumn;
+  AEnabled: Integer;
+  AView: TcxGridDBBandedTableView;
+  V: Variant;
+}
+begin
+  inherited;
+{
+  if ARecord = nil then
+    Exit;
+  if not ARecord.IsData then
+    Exit;
+  if Sender = nil then
+    Exit;
+  // if AItem = nil then Exit;
+  // if MainView = nil then Exit;
+
+  AView := Sender as TcxGridDBBandedTableView;
+  ACol := AView.GetColumnByFieldName
+    (FSPGroup.qSpecEd.W.ENABLE_SPECIALITYEDUCATION.FieldName);
+
+  V := ARecord.Values[ACol.Index];
+
+  if VarIsNull(V) then
+    Exit;
+
+  AEnabled := V; // ARecord.Values[clEnable.Index];
+  if AEnabled = 0 then
+  begin
+    ACol := AItem as TcxGridDBBandedColumn;
+    if ACol.DataBinding.FieldName <> SPGroup.qSpecEd.W.SpecialityEx.FieldName then
+      AStyle := cxDisabledStyle;
+  end;
+  }
 end;
 
 function TViewSpecEdPopup.GetCalcColumnText(Sender: TcxCustomGridTableItem;
@@ -161,6 +235,12 @@ begin
   Result := MainView.GetColumnByFieldName(SPGroup.qSpecEd.W.PKFieldName);
 end;
 
+function TViewSpecEdPopup.GetclEnable: TcxGridDBBandedColumn;
+begin
+  Result := MainView.GetColumnByFieldName
+    (FSPGroup.qSpecEd.W.ENABLE_SPECIALITYEDUCATION.FieldName);
+end;
+
 function TViewSpecEdPopup.GetclSpecialityEx: TcxGridDBBandedColumn;
 begin
   Result := MainView.GetColumnByFieldName
@@ -187,7 +267,7 @@ begin
 
   clYear.Visible := False;
   clData.Visible := False;
-  clCalc.Visible := False;
+  clEnable.Visible := False;
   clPK.Visible := False;
   clSpecialityEx.Visible := False;
   clSpeciality.Options.CellMerging := True;

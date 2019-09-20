@@ -15,6 +15,7 @@ uses
 type
   TfrmEditRetrainingPlan = class(TfrmEditStudyPlan, ISpecEdSimpleEx)
     cxdblcbArea: TcxDBLookupComboBox;
+    Label9: TLabel;
     procedure cxdblcbAreaPropertiesNewLookupDisplayText(Sender: TObject;
       const AText: TCaption);
   private
