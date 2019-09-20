@@ -213,7 +213,7 @@ object ViewSPMain: TViewSPMain
       Caption = #1057#1086#1079#1076#1072#1090#1100
       ImageIndex = 3
       OnExecute = actCreateStudyPlanExecute
-	end
+    end
     object actShowAll: TAction
       Caption = #1042#1089#1077' '#1087#1083#1072#1085#1099
       GroupIndex = 1
