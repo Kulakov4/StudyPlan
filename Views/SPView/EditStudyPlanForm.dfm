@@ -124,7 +124,6 @@ object frmEditStudyPlan: TfrmEditStudyPlan
     LookAndFeel.NativeStyle = True
     ModalResult = 1
     TabOrder = 1
-    ExplicitTop = 382
   end
   object cxdblcbChairs: TcxDBLookupComboBox
     Left = 217

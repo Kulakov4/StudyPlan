@@ -97,7 +97,6 @@ type
     property IDQualification: Integer read GetIDQualification
       write SetIDQualification;
     property IDSpeciality: Integer read GetIDSpeciality write SetIDSpeciality;
-    property IDStandart: Integer read GetIDStandart write SetIDStandart;
     property Locked: Boolean read GetLocked write SetLocked;
     property Months: Integer read GetMonths write SetMonths;
     property Portal: Boolean read GetPortal write SetPortal;
@@ -109,6 +108,7 @@ type
     procedure CheckQualification; virtual;
     function CreateEditSpecForm: TfrmEditSpec; virtual;
     procedure SetMode(const Value: TMode); virtual;
+    property IDStandart: Integer read GetIDStandart write SetIDStandart;
     property SPGroup: TSPGroup read FSPGroup;
   public
     constructor Create(AOwner: TComponent); override;

@@ -10,7 +10,7 @@ uses
   cxDBExtLookupComboBox, cxTextEdit, cxMaskEdit, cxDropDownEdit, cxLookupEdit,
   cxDBLookupEdit, cxDBLookupComboBox, Vcl.StdCtrls, TB2Dock, TB2Toolbar,
   System.ImageList, Vcl.ImgList, cxImageList, System.Actions, Vcl.ActnList,
-  cxLabel, cxDBLabel, cxCheckBox, cxDBEdit;
+  cxLabel, cxDBLabel, cxCheckBox, cxDBEdit, Vcl.Menus;
 
 type
   TViewRetraining = class(TViewSPMain)
@@ -21,6 +21,7 @@ type
   private
     { Private declarations }
   protected
+    procedure CreateStudyPlan; override;
     procedure EditStudyPlan; override;
     procedure Init; override;
     function IsActionsEnabled: Boolean; override;
@@ -35,6 +36,20 @@ uses
   InsertEditMode, EditRetrainingPlanForm, DBLookupComboBoxHelper, OptionsHelper;
 
 {$R *.dfm}
+
+procedure TViewRetraining.CreateStudyPlan;
+var
+  Afrm: TfrmEditRetrainingPlan;
+begin
+  Afrm := TfrmEditRetrainingPlan.Create(SPGroup);
+  try
+    Afrm.Mode := InsertMode;
+    Afrm.IDEducationLevel := 5; // Переподготовка
+    Afrm.ShowModal;
+  finally
+    FreeAndNil(Afrm);
+  end;
+end;
 
 procedure TViewRetraining.EditStudyPlan;
 var
