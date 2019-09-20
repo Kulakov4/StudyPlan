@@ -37,6 +37,8 @@ type
     lblStandart: TLabel;
     cxdblcbStandarts: TcxDBLookupComboBox;
     cxbtnAddSpeciality: TcxButton;
+    Label3: TLabel;
+    cxcbEnabled: TcxCheckBox;
     procedure cxdblcbEducationsPropertiesChange(Sender: TObject);
     procedure cxdblcbChairsPropertiesChange(Sender: TObject);
     procedure cxdbextlcbSpecialitysPropertiesPopup(Sender: TObject);
@@ -76,6 +78,7 @@ type
     function GetIDStandart: Integer;
     function GetLocked: Boolean;
     function GetPortal: Boolean;
+    function GetIsEnabled: Boolean;
     procedure SetIDChair(const Value: Integer);
     procedure SetIDSpeciality(const Value: Integer);
     procedure SetIDEducation2(const Value: Integer);
@@ -87,6 +90,7 @@ type
     procedure SetIDStandart(const Value: Integer);
     procedure SetLocked(const Value: Boolean);
     procedure SetPortal(const Value: Boolean);
+    procedure SetIsEnabled(const Value: Boolean);
     property Annotation: string read GetAnnotation write SetAnnotation;
     property IDChair: Integer read GetIDChair write SetIDChair;
     property IDEducation2: Integer read GetIDEducation2 write SetIDEducation2;
@@ -97,6 +101,7 @@ type
     property Locked: Boolean read GetLocked write SetLocked;
     property Months: Integer read GetMonths write SetMonths;
     property Portal: Boolean read GetPortal write SetPortal;
+    property IsEnabled: Boolean read GetIsEnabled write SetIsEnabled;
     property Years: Integer read GetYears write SetYears;
     { Private declarations }
   protected
@@ -450,6 +455,11 @@ begin
   Result := cxcbPortal.Checked;
 end;
 
+function TfrmEditStudyPlan.GetIsEnabled: Boolean;
+begin
+  Result := cxcbEnabled.Checked;
+end;
+
 procedure TfrmEditStudyPlan.SetIDChair(const Value: Integer);
 begin
   if IDChair = Value then
@@ -521,6 +531,7 @@ begin
             Years := W.Years.F.AsInteger;
             Months := W.Months.F.AsInteger;
             Annotation := W.Annotation.F.AsString;
+            IsEnabled := W.Enable_SpecialityEducation.F.AsInteger = 1;
             Locked := W.Locked.F.AsInteger = 1;
             Portal := W.Portal.F.AsInteger = 1;
           end;
@@ -538,7 +549,8 @@ begin
         Years := 0;
         Months := 0;
         Annotation := '';
-        Locked := True;
+        IsEnabled := True;
+        Locked := False;
         Portal := False;
         Caption := 'Новый учебный план';
       end;
@@ -584,6 +596,11 @@ end;
 procedure TfrmEditStudyPlan.SetPortal(const Value: Boolean);
 begin
   cxcbPortal.Checked := Value;
+end;
+
+procedure TfrmEditStudyPlan.SetIsEnabled(const Value: Boolean);
+begin
+  cxcbEnabled.Checked := Value;
 end;
 
 end.

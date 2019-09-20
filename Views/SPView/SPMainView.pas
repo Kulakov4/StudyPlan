@@ -13,7 +13,7 @@ uses
   cxDBExtLookupComboBox, SPGroup, SpecEdPopupView, cxGridDBBandedTableView,
   FDDumbQuery, Data.DB, cxDBLookupComboBox, NotifyEvents, SPView2,
   System.Contnrs, System.Actions, Vcl.ActnList, System.ImageList, Vcl.ImgList,
-  cxImageList, OptionsHelper;
+  cxImageList, OptionsHelper, Vcl.Menus;
 
 type
   TViewSPMain = class(TFrame)
@@ -60,6 +60,18 @@ type
     procedure actDeleteStudyPlanExecute(Sender: TObject);
     procedure actEditStudyPlanExecute(Sender: TObject);
     procedure actCreateStudyPlanExecute(Sender: TObject);
+    PopupMenu: TPopupMenu;
+    actShowAll: TAction;
+    actActivePlans: TAction;
+    N1: TMenuItem;
+    N2: TMenuItem;
+    procedure actActivePlansExecute(Sender: TObject);
+    procedure actCopyStudyPlanExecute(Sender: TObject);
+    procedure actDeleteStudyPlanExecute(Sender: TObject);
+    procedure actEditStudyPlanExecute(Sender: TObject);
+    procedure actShowAllExecute(Sender: TObject);
+    procedure cxdbelcbSpecialityMouseDown(Sender: TObject; Button: TMouseButton;
+      Shift: TShiftState; X, Y: Integer);
     procedure cxdbelcbSpecialityPropertiesPopup(Sender: TObject);
     procedure cxdbelcbSpecialityPropertiesChange(Sender: TObject);
     procedure cxdblcbYearsPropertiesChange(Sender: TObject);
@@ -92,7 +104,7 @@ type
 implementation
 
 uses
-  DBLookupComboBoxHelper, CopyPlanForm, MessageForm, DialogUnit;
+  DBLookupComboBoxHelper, CopyPlanForm, MessageForm, DialogUnit, System.Types;
 
 {$R *.dfm}
 
@@ -112,6 +124,12 @@ destructor TViewSPMain.Destroy;
 begin
   FreeAndNil(FEventList);
   inherited;
+end;
+
+procedure TViewSPMain.actActivePlansExecute(Sender: TObject);
+begin
+  actActivePlans.Checked := True;
+  SPGroup.ActivePlansOnly := True;
 end;
 
 procedure TViewSPMain.actCopyStudyPlanExecute(Sender: TObject);
@@ -194,6 +212,25 @@ procedure TViewSPMain.CreateStudyPlan;
 begin
 end;
 
+procedure TViewSPMain.actShowAllExecute(Sender: TObject);
+begin
+  actShowAll.Checked := True;
+  SPGroup.ActivePlansOnly := False;
+end;
+
+procedure TViewSPMain.cxdbelcbSpecialityMouseDown(Sender: TObject;
+  Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
+var
+  P: TPoint;
+begin
+
+  if Button = mbRight then
+  begin
+    P := cxdbelcbSpeciality.ClientToScreen(Point(X, Y));
+    PopupMenu.Popup(P.X, P.Y);
+  end;
+end;
+
 procedure TViewSPMain.cxdbelcbSpecialityPropertiesChange(Sender: TObject);
 begin
   (Sender as TcxDBExtLookupComboBox).PostEditValue;
@@ -267,7 +304,7 @@ begin
 
   // Флажок "Заблокировано"
   TDBChB.Init(cxdbcbLocked, FSPGroup.qSpecEdSimple.DataSource,
-  FSPGroup.qSpecEdSimple.W.Locked);
+    FSPGroup.qSpecEdSimple.W.Locked);
 
   // Содержимое учебного плана
   FViewSP.SetDocument(FSPGroup.SP);

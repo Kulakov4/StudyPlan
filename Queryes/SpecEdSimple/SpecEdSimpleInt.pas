@@ -13,6 +13,7 @@ type
     function GetIDSpeciality: Integer;
     function GetIDStandart: Integer;
     function GetLocked: Boolean;
+    function GetIsEnabled: Boolean;
     function GetMonths: Integer;
     function GetPortal: Boolean;
     function GetYears: Integer;
@@ -25,6 +26,7 @@ type
     property IDSpeciality: Integer read GetIDSpeciality;
     property IDStandart: Integer read GetIDStandart;
     property Locked: Boolean read GetLocked;
+    property IsEnabled: Boolean read GetIsEnabled;
     property Months: Integer read GetMonths;
     property Portal: Boolean read GetPortal;
     property Years: Integer read GetYears;

@@ -9,7 +9,7 @@ uses
   cxDBExtLookupComboBox, cxTextEdit, cxMaskEdit, cxDropDownEdit, cxLookupEdit,
   cxDBLookupEdit, cxDBLookupComboBox, Vcl.StdCtrls, TB2Dock, TB2Toolbar,
   System.ImageList, Vcl.ImgList, cxImageList, System.Actions, Vcl.ActnList,
-  cxLabel, cxDBLabel, cxCheckBox, cxDBEdit;
+  cxLabel, cxDBLabel, cxCheckBox, cxDBEdit, Vcl.Menus;
 
 type
   TViewVO = class(TViewSPMain)
