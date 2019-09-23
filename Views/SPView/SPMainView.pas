@@ -350,6 +350,7 @@ var
 begin
   OK := (FSPGroup <> nil) and (FSPGroup.qSpecEd.FDQuery.RecordCount > 0);
 
+  actCreateStudyPlan.Enabled := OK and IsActionsEnabled;
   actEditStudyPlan.Enabled := OK and IsActionsEnabled;
   actCopyStudyPlan.Enabled := OK and IsActionsEnabled;
   actDeleteStudyPlan.Enabled := OK and IsActionsEnabled;
