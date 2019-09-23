@@ -348,12 +348,12 @@ procedure TViewSPMain.UpdateView;
 var
   OK: Boolean;
 begin
-  OK := (FSPGroup <> nil) and (FSPGroup.qSpecEd.FDQuery.RecordCount > 0);
+  OK := (FSPGroup <> nil);
 
   actCreateStudyPlan.Enabled := OK and IsActionsEnabled;
-  actEditStudyPlan.Enabled := OK and IsActionsEnabled;
-  actCopyStudyPlan.Enabled := OK and IsActionsEnabled;
-  actDeleteStudyPlan.Enabled := OK and IsActionsEnabled;
+  actEditStudyPlan.Enabled := OK and (FSPGroup.qSpecEd.FDQuery.RecordCount > 0) and IsActionsEnabled;
+  actCopyStudyPlan.Enabled := OK and (FSPGroup.qSpecEd.FDQuery.RecordCount > 0) and IsActionsEnabled;
+  actDeleteStudyPlan.Enabled := OK and (FSPGroup.qSpecEd.FDQuery.RecordCount > 0) and IsActionsEnabled;
   tbActions.Visible := IsActionsEnabled;
 
   tbIDSpecEd.Visible := OK and (TOptions.SP.UserName = 'prog1');
