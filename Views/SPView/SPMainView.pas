@@ -54,15 +54,18 @@ type
     tbLocked: TTBToolbar;
     TBControlItem4: TTBControlItem;
     cxdbcbLocked: TcxDBCheckBox;
+    actCreateStudyPlan: TAction;
+    TBItem3: TTBItem;
     PopupMenu: TPopupMenu;
     actShowAll: TAction;
     actActivePlans: TAction;
     N1: TMenuItem;
     N2: TMenuItem;
-    procedure actActivePlansExecute(Sender: TObject);
     procedure actCopyStudyPlanExecute(Sender: TObject);
     procedure actDeleteStudyPlanExecute(Sender: TObject);
     procedure actEditStudyPlanExecute(Sender: TObject);
+    procedure actCreateStudyPlanExecute(Sender: TObject);
+    procedure actActivePlansExecute(Sender: TObject);
     procedure actShowAllExecute(Sender: TObject);
     procedure cxdbelcbSpecialityMouseDown(Sender: TObject; Button: TMouseButton;
       Shift: TShiftState; X, Y: Integer);
@@ -80,6 +83,7 @@ type
     procedure SetSPGroup(const Value: TSPGroup);
     { Private declarations }
   protected
+    procedure CreateStudyPlan; virtual;
     procedure EditStudyPlan; virtual;
     procedure Init; virtual;
     function IsActionsEnabled: Boolean; virtual;
@@ -194,6 +198,15 @@ end;
 procedure TViewSPMain.actEditStudyPlanExecute(Sender: TObject);
 begin
   EditStudyPlan;
+end;
+
+procedure TViewSPMain.actCreateStudyPlanExecute(Sender: TObject);
+begin
+  CreateStudyPlan;
+end;
+
+procedure TViewSPMain.CreateStudyPlan;
+begin
 end;
 
 procedure TViewSPMain.actShowAllExecute(Sender: TObject);
@@ -337,6 +350,7 @@ var
 begin
   OK := (FSPGroup <> nil) and (FSPGroup.qSpecEd.FDQuery.RecordCount > 0);
 
+  actCreateStudyPlan.Enabled := OK and IsActionsEnabled;
   actEditStudyPlan.Enabled := OK and IsActionsEnabled;
   actCopyStudyPlan.Enabled := OK and IsActionsEnabled;
   actDeleteStudyPlan.Enabled := OK and IsActionsEnabled;

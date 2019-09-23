@@ -107,6 +107,10 @@ constructor TQuerySpecEdSimple.Create(AOwner: TComponent);
 begin
   inherited;
   FW := TSpecEdSimpleW.Create(FDQuery);
+  FDQuery.UpdateOptions.CheckRequired := False;
+  FDQuery.UpdateOptions.KeyFields := W.PKFieldName;
+  FDQuery.UpdateOptions.AutoIncFields := W.PKFieldName;
+  FDQuery.UpdateOptions.RefreshMode := rmAll;
 end;
 
 procedure TQuerySpecEdSimple.FDQueryUpdateRecord(ASender: TDataSet;
@@ -148,6 +152,7 @@ begin
   else
     TryAppend;
 
+  Year.F.AsInteger := ASpecEdSimple.Year;
   IDEducation2.F.AsInteger := ASpecEdSimple.IDEducation2;
   IDEducationLevel.F.AsInteger := ASpecEdSimple.IDEducationLevel;
   IDChair.F.AsInteger := ASpecEdSimple.IDChair;
@@ -179,6 +184,7 @@ begin
 
   try
     TryPost;
+    Assert(ID_SPECIALITYEDUCATION.F.AsInteger > 0);
   except
     TryCancel;
     raise;

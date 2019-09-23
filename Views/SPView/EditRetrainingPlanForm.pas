@@ -99,6 +99,7 @@ begin
     InsertMode:
       begin
         IDArea := 0;
+        IDStandart := 3; // Без стандарта!!!
       end;
   end;
 end;

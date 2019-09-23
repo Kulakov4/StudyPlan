@@ -16,6 +16,7 @@ type
   private
     { Private declarations }
   protected
+    procedure CreateStudyPlan; override;
     procedure EditStudyPlan; override;
     function IsActionsEnabled: Boolean; override;
     function IsReadOnly: Boolean; override;
@@ -29,6 +30,20 @@ uses
   EditStudyPlanForm, InsertEditMode, OptionsHelper;
 
 {$R *.dfm}
+
+procedure TViewSPO.CreateStudyPlan;
+var
+  Afrm: TfrmEditStudyPlan;
+begin
+  Afrm := TfrmEditStudyPlan.Create(SPGroup);
+  try
+    Afrm.Mode := InsertMode;
+    Afrm.IDEducationLevel := 3; // ÑÏÎ
+    Afrm.ShowModal;
+  finally
+    FreeAndNil(Afrm);
+  end;
+end;
 
 procedure TViewSPO.EditStudyPlan;
 var

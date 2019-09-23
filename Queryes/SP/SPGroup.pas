@@ -365,6 +365,8 @@ begin
   qSpecEdSimple.W.Save(ASpecEdSimple, AMode,
     qSpecByChair.W.QUALIFICATION_ID.F.AsInteger);
 
+  if AMode = EditMode then
+  begin
   qSpecEd.FDQuery.RefreshRecord();
   // Если после обновления, запись исчезла (план деактивировался)
   if qSpecEd.W.PK.AsInteger <> FSpecEdDumb.W.ID.F.AsInteger then
@@ -372,7 +374,14 @@ begin
     // Выбираем другой активный план
     FSpecEdDumb.W.UpdateID(qSpecEd.W.PK.AsInteger);
   end;
-
+  end
+  else
+  begin
+    // Чтобы созданный план появился в выпадающем списке
+    qSpecEd.W.RefreshQuery;
+    // Выбираем созданный план
+    FSpecEdDumb.W.UpdateID(qSpecEdSimple.W.PK.AsInteger);
+  end;
 end;
 
 procedure TSPGroup.SetActivePlansOnly(const Value: Boolean);

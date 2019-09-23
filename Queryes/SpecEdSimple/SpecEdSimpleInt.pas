@@ -17,6 +17,7 @@ type
     function GetMonths: Integer;
     function GetPortal: Boolean;
     function GetYears: Integer;
+    function GetYear: Integer;
     property Annotation: string read GetAnnotation;
     property IDChair: Integer read GetIDChair;
     property IDEducation2: Integer read GetIDEducation2;
@@ -29,6 +30,7 @@ type
     property Months: Integer read GetMonths;
     property Portal: Boolean read GetPortal;
     property Years: Integer read GetYears;
+    property Year: Integer read GetYear;
   end;
 
   ISpecEdSimpleEx = interface(ISpecEdSimple)

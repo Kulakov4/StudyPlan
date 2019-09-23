@@ -1,6 +1,9 @@
 inherited ViewVO: TViewVO
   inherited tbd1: TTBDock
     Height = 51
+    inherited tbActions: TTBToolbar
+      DockPos = 600
+	end
     inherited tbShortSpeciality: TTBToolbar
       Top = 26
     end

@@ -17,9 +17,6 @@ inherited frmEditRetrainingPlan: TfrmEditRetrainingPlan
     Height = 16
     Caption = #1057#1092#1077#1088#1072
   end
-  inherited btnClose: TcxButton
-    ExplicitTop = 432
-  end
   inherited cxcbLocked: TcxCheckBox
     TabOrder = 13
   end
