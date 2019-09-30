@@ -686,6 +686,11 @@
             <Form>frmEditRetrainingSpec</Form>
             <FormType>dfm</FormType>
         </DCCReference>
+        <DCCReference Include="Queryes\Spec\SpecQry.pas">
+            <Form>QrySpec</Form>
+            <FormType>dfm</FormType>
+            <DesignClass>TFrame</DesignClass>
+        </DCCReference>
         <None Include="StudyPlan.todo"/>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>

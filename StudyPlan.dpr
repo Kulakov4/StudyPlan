@@ -210,7 +210,8 @@ uses
   MaxSpecSessQry in 'Queryes\SpecSess\MaxSpecSessQry.pas' {QryMaxSpecSess: TFrame},
   EditSpecFrm in 'Views\SpecView\EditSpecFrm.pas' {frmEditSpec},
   SpecByChairInt in 'Queryes\SpecByChair\SpecByChairInt.pas',
-  EditRetrainingSpecFrm in 'Views\SpecView\EditRetrainingSpecFrm.pas' {frmEditRetrainingSpec};
+  EditRetrainingSpecFrm in 'Views\SpecView\EditRetrainingSpecFrm.pas' {frmEditRetrainingSpec},
+  SpecQry in 'Queryes\Spec\SpecQry.pas' {QrySpec: TFrame};
 
 {$R *.res}
 
