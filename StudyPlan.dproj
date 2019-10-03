@@ -681,7 +681,7 @@
             <Form>frmEditSpec</Form>
             <FormType>dfm</FormType>
         </DCCReference>
-        <DCCReference Include="Queryes\SpecByChair\SpecByChairInt.pas"/>
+        <DCCReference Include="Interfaces\SpecInt.pas"/>
         <DCCReference Include="Views\SpecView\EditRetrainingSpecFrm.pas">
             <Form>frmEditRetrainingSpec</Form>
             <FormType>dfm</FormType>

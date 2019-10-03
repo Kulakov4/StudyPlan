@@ -70,7 +70,19 @@ object frmEditSpec: TfrmEditSpec
     LookAndFeel.NativeStyle = True
     ModalResult = 1
     TabOrder = 3
-    ExplicitLeft = 483
-    ExplicitTop = 212
+  end
+  object cxlcbChiper: TcxLookupComboBox
+    Left = 208
+    Top = 18
+    Properties.ListColumns = <>
+    TabOrder = 4
+    Width = 385
+  end
+  object cxlcbSpeciality: TcxLookupComboBox
+    Left = 208
+    Top = 74
+    Properties.ListColumns = <>
+    TabOrder = 5
+    Width = 385
   end
 end

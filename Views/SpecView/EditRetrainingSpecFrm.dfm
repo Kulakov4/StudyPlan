@@ -1,7 +1,7 @@
 inherited frmEditRetrainingSpec: TfrmEditRetrainingSpec
   Caption = #1053#1086#1074#1086#1077' '#1085#1072#1087#1088#1072#1074#1083#1077#1085#1080#1077' '#1087#1077#1088#1077#1087#1086#1076#1075#1086#1090#1086#1074#1082#1080
   ClientHeight = 186
-  ExplicitHeight = 225
+  ExplicitHeight = 215
   PixelsPerInch = 96
   TextHeight = 16
   inherited Label1: TLabel
@@ -34,5 +34,6 @@ inherited frmEditRetrainingSpec: TfrmEditRetrainingSpec
   end
   inherited btnClose: TcxButton
     Top = 129
+    ExplicitTop = 129
   end
 end

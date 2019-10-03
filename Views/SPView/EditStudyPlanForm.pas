@@ -362,7 +362,7 @@ end;
 
 function TfrmEditStudyPlan.CreateEditSpecForm: TfrmEditSpec;
 begin
-  Result := TfrmEditSpec.Create(FSPGroup.qSpecByChair);
+  Result := TfrmEditSpec.Create(FSPGroup.qSpec);
 end;
 
 procedure TfrmEditStudyPlan.EndUpdate;

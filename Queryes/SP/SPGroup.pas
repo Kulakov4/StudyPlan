@@ -7,7 +7,7 @@ uses
   SPQry, SpecialitySessionsQuery, SPUnit, YearsQry, SpecEdBaseFormQry,
   NotifyEvents, FDDumbQuery, System.Contnrs, EdQuery, SpecByChairQry,
   QualificationQuery, AreasQry, SPStandartQuery, SpecEdSimpleInt,
-  InsertEditMode;
+  InsertEditMode, SpecQry;
 
 type
   TSPType = (sptVO, sptSPO, sptRetraining);
@@ -26,6 +26,7 @@ type
     FqEd: TQueryEd;
     FqQualifications: TQryQualifications;
     FqSP: TQrySP;
+    FqSpec: TQrySpec;
     FqSpecByChair: TQrySpecByChair;
     FqSpecEd: TQuerySpecEd;
     FqSpecEdBaseForm: TQrySpecEdBaseForm;
@@ -45,6 +46,7 @@ type
     function GetIDSpecialityEducation: Integer;
     function GetqAreas: TQryAreas;
     function GetqQualifications: TQryQualifications;
+    function GetqSpec: TQrySpec;
     function GetqSpecByChair: TQrySpecByChair;
     function GetqSpecEdBaseForm: TQrySpecEdBaseForm;
     function GetqSPStandart: TQuerySPStandart;
@@ -72,6 +74,7 @@ type
     property qCourceName: TQueryCourceName read FqCourceName;
     property qQualifications: TQryQualifications read GetqQualifications;
     property qSP: TQrySP read FqSP;
+    property qSpec: TQrySpec read GetqSpec;
     property qSpecByChair: TQrySpecByChair read GetqSpecByChair;
     property qSpecEd: TQuerySpecEd read FqSpecEd;
     property qSpecEdBaseForm: TQrySpecEdBaseForm read GetqSpecEdBaseForm;
@@ -307,6 +310,20 @@ begin
     FqQualifications.W.TryOpen;
   end;
   Result := FqQualifications;
+end;
+
+function TSPGroup.GetqSpec: TQrySpec;
+begin
+  if FqSpec = nil then
+  begin
+    FqSpec := TQrySpec.Create(Self);
+    // Фильтруем список специальностей по наличию или отсутствию кода
+    FqSpec.FilterByChiper(FSPType = sptRetraining);
+
+    FqSpec.FDQuery.Open;
+  end;
+
+  Result := FqSpec;
 end;
 
 function TSPGroup.GetqSpecByChair: TQrySpecByChair;

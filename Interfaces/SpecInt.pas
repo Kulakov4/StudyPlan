@@ -1,9 +1,9 @@
-unit SpecByChairInt;
+unit SpecInt;
 
 interface
 
 type
-  ISpecByChair = interface(IInterface)
+  ISpec = interface(IInterface)
     function GetChiperSpeciality: string; stdcall;
     function GetShortSpeciality: string; stdcall;
     function GetSpeciality: string; stdcall;

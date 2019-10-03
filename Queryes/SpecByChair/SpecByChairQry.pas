@@ -8,7 +8,7 @@ uses
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, BaseQuery, FireDAC.Stan.Intf,
   FireDAC.Stan.Option, FireDAC.Stan.Param, FireDAC.Stan.Error, FireDAC.DatS,
   FireDAC.Phys.Intf, FireDAC.DApt.Intf, FireDAC.Stan.Async, FireDAC.DApt,
-  Data.DB, FireDAC.Comp.DataSet, FireDAC.Comp.Client, DSWrap, SpecByChairInt,
+  Data.DB, FireDAC.Comp.DataSet, FireDAC.Comp.Client, DSWrap, SpecInt,
   InsertEditMode, FireDACDataModule;
 
 type
@@ -24,7 +24,7 @@ type
     { Private declarations }
   public
     constructor Create(AOwner: TComponent); override;
-    procedure Save(ASpecByChairInt: ISpecByChair; AMode: TMode);
+    procedure Save(ASpecInt: ISpec; AMode: TMode);
     function Search(AIDEducationLevel, AIDChair: Integer): Integer;
     property W: TSpecByChairW read FW;
     { Public declarations }
@@ -44,7 +44,7 @@ type
     FSPECIALITY_ACCESS: TFieldWrap;
   public
     constructor Create(AOwner: TComponent); override;
-    procedure Save(ASpecByChairInt: ISpecByChair; AMode: TMode);
+    procedure Save(ASpecInt: ISpec; AMode: TMode);
     property CalcSpeciality: TFieldWrap read FCalcSpeciality;
     property Chiper_Speciality: TFieldWrap read FChiper_Speciality;
     property Enable_Speciality: TFieldWrap read FEnable_Speciality;
@@ -82,18 +82,18 @@ begin
   FIDChair := TFieldWrap.Create(Self, 'IDChair');
 end;
 
-procedure TSpecByChairW.Save(ASpecByChairInt: ISpecByChair; AMode: TMode);
+procedure TSpecByChairW.Save(ASpecInt: ISpec; AMode: TMode);
 begin
-  Assert(ASpecByChairInt <> nil);
+  Assert(ASpecInt <> nil);
 
   if AMode = EditMode then
     TryEdit
   else
     TryAppend;
   try
-    Chiper_Speciality.F.AsString := ASpecByChairInt.ChiperSpeciality;
-    Speciality.F.AsString := ASpecByChairInt.Speciality;
-    SHORT_SPECIALITY.F.AsString := ASpecByChairInt.ShortSpeciality;
+    Chiper_Speciality.F.AsString := ASpecInt.ChiperSpeciality;
+    Speciality.F.AsString := ASpecInt.Speciality;
+    SHORT_SPECIALITY.F.AsString := ASpecInt.ShortSpeciality;
 
     TryPost;
   except
@@ -125,9 +125,9 @@ begin
   W.SPECIALITY_ACCESS.F.Value := W.IDChair.DefaultValue;
 end;
 
-procedure TQrySpecByChair.Save(ASpecByChairInt: ISpecByChair; AMode: TMode);
+procedure TQrySpecByChair.Save(ASpecInt: ISpec; AMode: TMode);
 begin
-  W.Save(ASpecByChairInt, AMode);
+  W.Save(ASpecInt, AMode);
 end;
 
 function TQrySpecByChair.Search(AIDEducationLevel, AIDChair: Integer): Integer;

@@ -4,14 +4,14 @@ interface
 
 uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants,
-  System.Classes, Vcl.Graphics,
-  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, cxGraphics, cxControls, cxLookAndFeels,
-  cxLookAndFeelPainters, cxContainer, cxEdit, cxTextEdit, Vcl.StdCtrls,
-  Vcl.Menus, cxButtons, SpecByChairQry, InsertEditMode, SpecByChairInt,
-  System.Generics.Collections;
+  System.Classes, Vcl.Graphics, Vcl.Controls, Vcl.Forms, Vcl.Dialogs,
+  cxGraphics, cxControls, cxLookAndFeels, cxLookAndFeelPainters, cxContainer,
+  cxEdit, cxTextEdit, Vcl.StdCtrls, Vcl.Menus, cxButtons, InsertEditMode,
+  System.Generics.Collections, cxMaskEdit, cxDropDownEdit, cxLookupEdit,
+  cxDBLookupEdit, cxDBLookupComboBox, SpecQry, SpecInt, cxDBExtLookupComboBox;
 
 type
-  TfrmEditSpec = class(TForm, ISpecByChair)
+  TfrmEditSpec = class(TForm, ISpec)
     cxteChiperSpeciality: TcxTextEdit;
     Label1: TLabel;
     Label2: TLabel;
@@ -19,13 +19,16 @@ type
     cxteSpeciality: TcxTextEdit;
     cxteShortSpeciality: TcxTextEdit;
     btnClose: TcxButton;
+    cxlcbChiper: TcxLookupComboBox;
+    cxlcbSpeciality: TcxLookupComboBox;
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
   strict private
   private
     FEditModeCaption: TDictionary<Integer, String>;
+    FIDEdLvl: Integer;
     FInsertModeCaption: TDictionary<Integer, String>;
     FMode: TMode;
-    FQrySpecByChair: TQrySpecByChair;
+    FQrySpec: TQrySpec;
     function GetChiperSpeciality: string; stdcall;
     function GetSpeciality: string; stdcall;
     function GetShortSpeciality: string; stdcall;
@@ -41,6 +44,7 @@ type
     destructor Destroy; override;
     property ChiperSpeciality: string read GetChiperSpeciality
       write SetChiperSpeciality;
+    property IDEdLvl: Integer read FIDEdLvl write FIDEdLvl;
     property Speciality: string read GetSpeciality write SetSpeciality;
     property Mode: TMode read FMode write SetMode;
     property ShortSpeciality: string read GetShortSpeciality
@@ -51,23 +55,31 @@ type
 implementation
 
 uses
-  System.StrUtils;
+  System.StrUtils, DBLookupComboBoxHelper;
 
 {$R *.dfm}
 
 constructor TfrmEditSpec.Create(AOwner: TComponent);
 begin
   inherited;
-  Assert(AOwner is TQrySpecByChair);
-  FQrySpecByChair := AOwner as TQrySpecByChair;
+  Assert(AOwner is TQrySpec);
+  FQrySpec := AOwner as TQrySpec;
 
-  FEditModeCaption := TDictionary<Integer,String>.Create;
+  TLCB.Init(cxlcbChiper, FQrySpec.W.DataSource, FQrySpec.W.Chiper_Speciality,
+    lsEditList);
+
+  TLCB.Init(cxlcbSpeciality, FQrySpec.W.DataSource, FQrySpec.W.Speciality,
+    lsEditList);
+
+  FIDEdLvl := 2;
+
+  FEditModeCaption := TDictionary<Integer, String>.Create;
   FEditModeCaption.Add(1, 'Изменение специальности');
   FEditModeCaption.Add(2, 'Изменение направления подготовки');
   FEditModeCaption.Add(3, 'Изменение специальности');
   FEditModeCaption.Add(5, 'Изменение направления переподготовки');
 
-  FInsertModeCaption := TDictionary<Integer,String>.Create;
+  FInsertModeCaption := TDictionary<Integer, String>.Create;
   FInsertModeCaption.Add(1, 'Новая специальность');
   FInsertModeCaption.Add(2, 'Новое направление подготовки');
   FInsertModeCaption.Add(3, 'Новая специальность');
@@ -75,6 +87,7 @@ begin
 
   FMode := EditMode;
   Mode := InsertMode;
+
 end;
 
 destructor TfrmEditSpec.Destroy;
@@ -108,7 +121,7 @@ begin
     Check;
 
     // Просим сохранить данные
-    FQrySpecByChair.Save(Self, FMode);
+    FQrySpec.Save(Self, FMode);
   except
     Action := caNone;
     raise;
@@ -141,37 +154,32 @@ begin
 end;
 
 procedure TfrmEditSpec.SetMode(const Value: TMode);
-var
-  AIDEdLvl: Integer;
 begin
   if FMode = Value then
     Exit;
 
   FMode := Value;
 
-  AIDEdLvl := StrToIntDef
-    (VarToStrDef(FQrySpecByChair.W.IDEducationLevel.DefaultValue, '2'), 2);
-
   case FMode of
     EditMode:
       begin
-        Assert(FQrySpecByChair.FDQuery.RecordCount >= 0);
+        Assert(FQrySpec.FDQuery.RecordCount >= 0);
 
-        with FQrySpecByChair do
+        with FQrySpec do
         begin
           ChiperSpeciality := W.Chiper_Speciality.F.AsString;
           Speciality := W.Speciality.F.AsString;
           ShortSpeciality := W.SHORT_SPECIALITY.F.AsString;
         end;
 
-        Caption := FEditModeCaption[AIDEdLvl];
+        Caption := FEditModeCaption[FIDEdLvl];
       end;
     InsertMode:
       begin
         ChiperSpeciality := '';
         Speciality := '';
         ShortSpeciality := '';
-        Caption := FInsertModeCaption[AIDEdLvl]
+        Caption := FInsertModeCaption[FIDEdLvl]
       end;
   end;
 end;
