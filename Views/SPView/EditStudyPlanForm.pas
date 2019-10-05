@@ -362,7 +362,7 @@ end;
 
 function TfrmEditStudyPlan.CreateEditSpecForm: TfrmEditSpec;
 begin
-  Result := TfrmEditSpec.Create(FSPGroup.qSpec);
+  Result := TfrmEditSpec.Create(FSPGroup);
 end;
 
 procedure TfrmEditStudyPlan.EndUpdate;

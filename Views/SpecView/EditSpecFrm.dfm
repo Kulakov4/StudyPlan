@@ -71,16 +71,16 @@ object frmEditSpec: TfrmEditSpec
     ModalResult = 1
     TabOrder = 3
   end
-  object cxlcbChiper: TcxLookupComboBox
+  object cxdblcbChiper: TcxDBLookupComboBox
     Left = 208
     Top = 18
     Properties.ListColumns = <>
     TabOrder = 4
     Width = 385
   end
-  object cxlcbSpeciality: TcxLookupComboBox
+  object cxdblcbSpeciality: TcxDBLookupComboBox
     Left = 208
-    Top = 74
+    Top = 78
     Properties.ListColumns = <>
     TabOrder = 5
     Width = 385

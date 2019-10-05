@@ -85,13 +85,16 @@ end;
 function TQrySpec.FilterByChiper(AChiperIsNull: Boolean; const AFieldName:
     String): Integer;
 var
+  ASQL: string;
   AStipulation: string;
 begin
   Assert(not AFieldName.IsEmpty);
 
+  ASQL := ReplaceInSQL(SQL, AFieldName, 0);
+
   AStipulation := Format('%s is %s null', [W.Chiper_Speciality.FieldName,
     IfThen(AChiperIsNull, '', 'not')]);
-  FDQuery.SQL.Text := ReplaceInSQL(SQL, AStipulation, 0);
+  FDQuery.SQL.Text := ReplaceInSQL(ASQL, AStipulation, 1);
 
   FDQuery.Open;
 

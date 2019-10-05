@@ -8,7 +8,8 @@ uses
   cxGraphics, cxControls, cxLookAndFeels, cxLookAndFeelPainters, cxContainer,
   cxEdit, cxTextEdit, Vcl.StdCtrls, Vcl.Menus, cxButtons, InsertEditMode,
   System.Generics.Collections, cxMaskEdit, cxDropDownEdit, cxLookupEdit,
-  cxDBLookupEdit, cxDBLookupComboBox, SpecQry, SpecInt, cxDBExtLookupComboBox;
+  cxDBLookupEdit, cxDBLookupComboBox, SpecQry, SpecInt, cxDBExtLookupComboBox,
+  SPGroup, FDDumbQuery;
 
 type
   TfrmEditSpec = class(TForm, ISpec)
@@ -19,8 +20,8 @@ type
     cxteSpeciality: TcxTextEdit;
     cxteShortSpeciality: TcxTextEdit;
     btnClose: TcxButton;
-    cxlcbChiper: TcxLookupComboBox;
-    cxlcbSpeciality: TcxLookupComboBox;
+    cxdblcbChiper: TcxDBLookupComboBox;
+    cxdblcbSpeciality: TcxDBLookupComboBox;
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
   strict private
   private
@@ -28,7 +29,8 @@ type
     FIDEdLvl: Integer;
     FInsertModeCaption: TDictionary<Integer, String>;
     FMode: TMode;
-    FQrySpec: TQrySpec;
+    FqIDSpecDumb: TQueryFDDumb;
+    FSPGroup: TSPGroup;
     function GetChiperSpeciality: string; stdcall;
     function GetSpeciality: string; stdcall;
     function GetShortSpeciality: string; stdcall;
@@ -62,14 +64,22 @@ uses
 constructor TfrmEditSpec.Create(AOwner: TComponent);
 begin
   inherited;
-  Assert(AOwner is TQrySpec);
-  FQrySpec := AOwner as TQrySpec;
+  Assert(AOwner is TSPGroup);
+  FSPGroup := AOwner as TSPGroup;
 
-  TLCB.Init(cxlcbChiper, FQrySpec.W.DataSource, FQrySpec.W.Chiper_Speciality,
-    lsEditList);
+  // **********************************************
+  // Код специальности
+  // **********************************************
+  FqIDSpecDumb := TQueryFDDumb.Create(Self);
+  FqIDSpecDumb.Name := 'qIDSpecDumb';
 
-  TLCB.Init(cxlcbSpeciality, FQrySpec.W.DataSource, FQrySpec.W.Speciality,
-    lsEditList);
+  TDBLCB.Init(cxdblcbChiper, FqIDSpecDumb.W.DataSource,
+    FqIDSpecDumb.W.ID.FieldName, FSPGroup.qUniqueChiper.W.DataSource,
+    FSPGroup.qUniqueChiper.W.Chiper_Speciality, lsEditList);
+
+  TDBLCB.Init(cxdblcbSpeciality, FqIDSpecDumb.W.DataSource,
+    FqIDSpecDumb.W.ID.FieldName, FSPGroup.qUniqueSpeciality.W.DataSource,
+    FSPGroup.qUniqueSpeciality.W.Speciality, lsEditList);
 
   FIDEdLvl := 2;
 
@@ -121,7 +131,7 @@ begin
     Check;
 
     // Просим сохранить данные
-    FQrySpec.Save(Self, FMode);
+    FSPGroup.qSpecByChair.Save(Self, FMode);
   except
     Action := caNone;
     raise;
@@ -163,9 +173,9 @@ begin
   case FMode of
     EditMode:
       begin
-        Assert(FQrySpec.FDQuery.RecordCount >= 0);
+        Assert(FSPGroup.qSpecByChair.FDQuery.RecordCount >= 0);
 
-        with FQrySpec do
+        with FSPGroup.qSpecByChair do
         begin
           ChiperSpeciality := W.Chiper_Speciality.F.AsString;
           Speciality := W.Speciality.F.AsString;

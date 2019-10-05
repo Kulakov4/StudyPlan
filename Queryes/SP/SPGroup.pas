@@ -26,7 +26,8 @@ type
     FqEd: TQueryEd;
     FqQualifications: TQryQualifications;
     FqSP: TQrySP;
-    FqSpec: TQrySpec;
+    FqUniqueChiper: TQrySpec;
+    FqUniqueSpeciality: TQrySpec;
     FqSpecByChair: TQrySpecByChair;
     FqSpecEd: TQuerySpecEd;
     FqSpecEdBaseForm: TQrySpecEdBaseForm;
@@ -46,7 +47,8 @@ type
     function GetIDSpecialityEducation: Integer;
     function GetqAreas: TQryAreas;
     function GetqQualifications: TQryQualifications;
-    function GetqSpec: TQrySpec;
+    function GetqUniqueChiper: TQrySpec;
+    function GetqUniqueSpeciality: TQrySpec;
     function GetqSpecByChair: TQrySpecByChair;
     function GetqSpecEdBaseForm: TQrySpecEdBaseForm;
     function GetqSPStandart: TQuerySPStandart;
@@ -64,8 +66,8 @@ type
     procedure Save(ASpecEdSimple: ISpecEdSimple; AMode: TMode);
     property OnYearChange: TNotifyEventsEx read FOnYearChange;
     property OnSpecEdChange: TNotifyEventsEx read FOnSpecEdChange;
-    property ActivePlansOnly: Boolean read FActivePlansOnly write
-        SetActivePlansOnly;
+    property ActivePlansOnly: Boolean read FActivePlansOnly
+      write SetActivePlansOnly;
     property qEd: TQueryEd read GetqEd;
     property IDSpecialityEducation: Integer read GetIDSpecialityEducation;
     property qAreas: TQryAreas read GetqAreas;
@@ -74,7 +76,8 @@ type
     property qCourceName: TQueryCourceName read FqCourceName;
     property qQualifications: TQryQualifications read GetqQualifications;
     property qSP: TQrySP read FqSP;
-    property qSpec: TQrySpec read GetqSpec;
+    property qUniqueChiper: TQrySpec read GetqUniqueChiper;
+    property qUniqueSpeciality: TQrySpec read GetqUniqueSpeciality;
     property qSpecByChair: TQrySpecByChair read GetqSpecByChair;
     property qSpecEd: TQuerySpecEd read FqSpecEd;
     property qSpecEdBaseForm: TQrySpecEdBaseForm read GetqSpecEdBaseForm;
@@ -312,18 +315,36 @@ begin
   Result := FqQualifications;
 end;
 
-function TSPGroup.GetqSpec: TQrySpec;
+function TSPGroup.GetqUniqueChiper: TQrySpec;
 begin
-  if FqSpec = nil then
+  if FqUniqueChiper = nil then
   begin
-    FqSpec := TQrySpec.Create(Self);
+    FqUniqueChiper := TQrySpec.Create(Self);
+    FqUniqueChiper.Name := 'QueryUniqueChiper';
     // Фильтруем список специальностей по наличию или отсутствию кода
-    FqSpec.FilterByChiper(FSPType = sptRetraining);
+    FqUniqueChiper.FilterByChiper(FSPType = sptRetraining,
+      FqUniqueChiper.W.Chiper_Speciality.FieldName);
 
-    FqSpec.FDQuery.Open;
+    FqUniqueChiper.FDQuery.Open;
   end;
 
-  Result := FqSpec;
+  Result := FqUniqueChiper;
+end;
+
+function TSPGroup.GetqUniqueSpeciality: TQrySpec;
+begin
+  if FqUniqueSpeciality = nil then
+  begin
+    FqUniqueSpeciality := TQrySpec.Create(Self);
+    FqUniqueSpeciality.Name := 'QueryUniqueSpeciality';
+    // Фильтруем список специальностей по наличию или отсутствию кода
+    FqUniqueSpeciality.FilterByChiper(FSPType = sptRetraining,
+      FqUniqueSpeciality.W.Speciality.FieldName);
+
+    FqUniqueSpeciality.FDQuery.Open;
+  end;
+
+  Result := FqUniqueSpeciality;
 end;
 
 function TSPGroup.GetqSpecByChair: TQrySpecByChair;
@@ -384,13 +405,13 @@ begin
 
   if AMode = EditMode then
   begin
-  qSpecEd.FDQuery.RefreshRecord();
-  // Если после обновления, запись исчезла (план деактивировался)
-  if qSpecEd.W.PK.AsInteger <> FSpecEdDumb.W.ID.F.AsInteger then
-  begin
-    // Выбираем другой активный план
-    FSpecEdDumb.W.UpdateID(qSpecEd.W.PK.AsInteger);
-  end;
+    qSpecEd.FDQuery.RefreshRecord();
+    // Если после обновления, запись исчезла (план деактивировался)
+    if qSpecEd.W.PK.AsInteger <> FSpecEdDumb.W.ID.F.AsInteger then
+    begin
+      // Выбираем другой активный план
+      FSpecEdDumb.W.UpdateID(qSpecEd.W.PK.AsInteger);
+    end;
   end
   else
   begin
