@@ -123,10 +123,12 @@ begin
 end;
 
 procedure TfrmEditDiscipline.Check;
+{
 var
   Lab: Integer;
   Lec: Integer;
   Sem: Integer;
+}
 begin
   if cxdblcbDisciplineName.Text = '' then
     raise Exception.Create('Не задано наименование дисциплины');
@@ -134,15 +136,18 @@ begin
 //  if cxteShort.Text = '' then
 //    raise Exception.Create('Не задано сокращение');
 
+{
   Lec := cxseLec.Value;
   Lab := cxseLab.Value;
   Sem := cxseSem.Value;
+
 
   // Если ввели кол-во часов
   if (Lec + Lab + Sem) <= 0 then
   begin
     raise Exception.Create('Количество часов должно быть больше 0');
   end;
+  }
 end;
 
 procedure TfrmEditDiscipline.cxdblcbDisciplineNamePropertiesEditValueChanged

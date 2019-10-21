@@ -83,8 +83,8 @@ end;
 
 procedure TfrmEditDisciplineName.FormClose(Sender: TObject;
   var Action: TCloseAction);
-var
-  S: string;
+//var
+//  S: string;
 begin
   if ModalResult <> mrOK then
   begin
