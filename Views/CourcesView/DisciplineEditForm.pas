@@ -138,11 +138,13 @@ begin
   Lab := cxseLab.Value;
   Sem := cxseSem.Value;
 
+  {
   // Если ввели кол-во часов
   if (Lec + Lab + Sem) <= 0 then
   begin
     raise Exception.Create('Количество часов должно быть больше 0');
   end;
+  }
 end;
 
 procedure TfrmEditDiscipline.cxdblcbDisciplineNamePropertiesEditValueChanged
