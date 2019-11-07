@@ -13,7 +13,6 @@ uses
   EssenceGridView in 'C:\Users\Public\Documents\Embarcadero\Studio\Components\Kulakov\DataSet\Essence\View\EssenceGridView.pas' {dsgvEssence: TDataSetView2},
   DBTreeListView in 'C:\Users\Public\Documents\Embarcadero\Studio\Components\Kulakov\DataSet\View\DBTreeListView.pas' {viewDBTreeList: TFrame},
   GridComboBox in 'C:\Users\Public\Documents\Embarcadero\Studio\Components\Kulakov\ComboBox\GridComboBox.pas' {cxGridComboBoxView: TView_Ex},
-  CreateNewPlanForm in 'CreateNewPlanForm.pas' {frmCreateNewStudyPlan},
   CSE in 'CSE.pas',
   CSEDBTreeListView in 'CSEDBTreeListView.pas',
   CSEView in 'CSEView.pas',
@@ -61,7 +60,6 @@ uses
   StudyProcessTools in 'C:\Users\Public\Documents\Embarcadero\Studio\Components\Study_process\StudyProcessTools.pas',
   Years in 'C:\Users\Public\Documents\Embarcadero\Studio\Components\Study_process\Years.pas',
   Chairs in 'C:\Users\Public\Documents\Embarcadero\Studio\Components\Study_process\Chairs.pas',
-  Education in 'C:\Users\Public\Documents\Embarcadero\Studio\Components\Study_process\Education.pas',
   Level in 'C:\Users\Public\Documents\Embarcadero\Studio\Components\Study_process\Level.pas',
   Specialitys in 'C:\Users\Public\Documents\Embarcadero\Studio\Components\Study_process\Specialitys.pas',
   EducationLevel in 'C:\Users\Public\Documents\Embarcadero\Studio\Components\Study_process\EducationLevel.pas',
@@ -211,7 +209,11 @@ uses
   EditSpecFrm in 'Views\SpecView\EditSpecFrm.pas' {frmEditSpec},
   SpecByChairInt in 'Queryes\SpecByChair\SpecByChairInt.pas',
   EditRetrainingSpecFrm in 'Views\SpecView\EditRetrainingSpecFrm.pas' {frmEditRetrainingSpec},
-  SpecQry in 'Queryes\Spec\SpecQry.pas' {QrySpec: TFrame};
+  SpecQry in 'Queryes\Spec\SpecQry.pas' {QrySpec: TFrame},
+  FilesUpdater in 'FilesUpdater\FilesUpdater.pas',
+  FRDataModule in 'helpers\FRDataModule.pas' {FRDM: TDataModule},
+  FR3 in 'helpers\FR3.pas',
+  ReportFilesUpdater in 'FilesUpdater\ReportFilesUpdater.pas';
 
 {$R *.res}
 

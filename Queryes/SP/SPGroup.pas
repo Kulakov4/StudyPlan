@@ -62,8 +62,8 @@ type
     procedure Save(ASpecEdSimple: ISpecEdSimple; AMode: TMode);
     property OnYearChange: TNotifyEventsEx read FOnYearChange;
     property OnSpecEdChange: TNotifyEventsEx read FOnSpecEdChange;
-    property ActivePlansOnly: Boolean read FActivePlansOnly write
-        SetActivePlansOnly;
+    property ActivePlansOnly: Boolean read FActivePlansOnly
+      write SetActivePlansOnly;
     property qEd: TQueryEd read GetqEd;
     property IDSpecialityEducation: Integer read GetIDSpecialityEducation;
     property qAreas: TQryAreas read GetqAreas;
@@ -88,7 +88,7 @@ type
 implementation
 
 uses
-  MyFR, System.SysUtils, CopyStudyPlanQuery;
+  MyFR, System.SysUtils, CopyStudyPlanQuery, FR3, ReportFilesUpdater;
 
 constructor TSPGroup.Create(AOwner: TComponent;
   AYear, AIDSpecialityEducation: Integer; ASPType: TSPType);
@@ -216,8 +216,13 @@ end;
 
 procedure TSPGroup.DoOnReportPlanGraphBySpecExec;
 begin
-  TMyFR.Create(Self).Show('study_plan\plan_graph_by_spec2.fr3',
-    ['year_', 'id_specialityeducation'], [qSpecEdSimple.W.Year.F.AsInteger,
+//  TMyFR.Create(Self).Show('study_plan\plan_graph_by_spec2.fr3',
+//    ['year_', 'id_specialityeducation'], [qSpecEdSimple.W.Year.F.AsInteger,
+//    qSpecEdSimple.W.ID_SPECIALITYEDUCATION.F.AsInteger]);
+
+  TFR3.Create.Show(TReportFilesUpdater.TryUpdate
+    ('study_plan\plan_graph_by_spec2.fr3'), ['year_', 'id_specialityeducation'],
+    [qSpecEdSimple.W.Year.F.AsInteger,
     qSpecEdSimple.W.ID_SPECIALITYEDUCATION.F.AsInteger]);
 end;
 
@@ -367,13 +372,13 @@ begin
 
   if AMode = EditMode then
   begin
-  qSpecEd.FDQuery.RefreshRecord();
-  // Если после обновления, запись исчезла (план деактивировался)
-  if qSpecEd.W.PK.AsInteger <> FSpecEdDumb.W.ID.F.AsInteger then
-  begin
-    // Выбираем другой активный план
-    FSpecEdDumb.W.UpdateID(qSpecEd.W.PK.AsInteger);
-  end;
+    qSpecEd.FDQuery.RefreshRecord();
+    // Если после обновления, запись исчезла (план деактивировался)
+    if qSpecEd.W.PK.AsInteger <> FSpecEdDumb.W.ID.F.AsInteger then
+    begin
+      // Выбираем другой активный план
+      FSpecEdDumb.W.UpdateID(qSpecEd.W.PK.AsInteger);
+    end;
   end
   else
   begin

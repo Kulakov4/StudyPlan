@@ -136,9 +136,6 @@
             <Form>cxGridComboBoxView</Form>
             <DesignClass>TView_Ex</DesignClass>
         </DCCReference>
-        <DCCReference Include="CreateNewPlanForm.pas">
-            <Form>frmCreateNewStudyPlan</Form>
-        </DCCReference>
         <DCCReference Include="CSE.pas"/>
         <DCCReference Include="CSEDBTreeListView.pas"/>
         <DCCReference Include="CSEView.pas"/>
@@ -243,7 +240,6 @@
         <DCCReference Include="C:\Users\Public\Documents\Embarcadero\Studio\Components\Study_process\StudyProcessTools.pas"/>
         <DCCReference Include="C:\Users\Public\Documents\Embarcadero\Studio\Components\Study_process\Years.pas"/>
         <DCCReference Include="C:\Users\Public\Documents\Embarcadero\Studio\Components\Study_process\Chairs.pas"/>
-        <DCCReference Include="C:\Users\Public\Documents\Embarcadero\Studio\Components\Study_process\Education.pas"/>
         <DCCReference Include="C:\Users\Public\Documents\Embarcadero\Studio\Components\Study_process\Level.pas"/>
         <DCCReference Include="C:\Users\Public\Documents\Embarcadero\Studio\Components\Study_process\Specialitys.pas"/>
         <DCCReference Include="C:\Users\Public\Documents\Embarcadero\Studio\Components\Study_process\EducationLevel.pas"/>
@@ -691,6 +687,14 @@
             <FormType>dfm</FormType>
             <DesignClass>TFrame</DesignClass>
         </DCCReference>
+        <DCCReference Include="FilesUpdater\FilesUpdater.pas"/>
+        <DCCReference Include="helpers\FRDataModule.pas">
+            <Form>FRDM</Form>
+            <FormType>dfm</FormType>
+            <DesignClass>TDataModule</DesignClass>
+        </DCCReference>
+        <DCCReference Include="helpers\FR3.pas"/>
+        <DCCReference Include="FilesUpdater\ReportFilesUpdater.pas"/>
         <None Include="StudyPlan.todo"/>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>

@@ -17,7 +17,7 @@ type
     FSHORT_SPECIALITY: TFieldWrap;
     FSpeciality: TFieldWrap;
   public
-    constructor Create(AOwner: TComponent);
+    constructor Create(AOwner: TComponent); override;
     property Chiper_Speciality: TFieldWrap read FChiper_Speciality;
     property ID_Speciality: TFieldWrap read FID_Speciality;
     property SHORT_SPECIALITY: TFieldWrap read FSHORT_SPECIALITY;

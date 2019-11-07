@@ -63,7 +63,7 @@ type
 
 implementation
 
-uses MessageForm, CreateNewPlanForm, System.UITypes;
+uses MessageForm, {CreateNewPlanForm, }System.UITypes;
 
 {$R *.dfm}
 
@@ -115,9 +115,12 @@ begin
 end;
 
 procedure TgvSpecEducation.actCreateStudyPlanExecute(Sender: TObject);
+{
 var
   frmCreateNewStudyPlan: TfrmCreateNewStudyPlan;
+}
 begin
+{
   frmCreateNewStudyPlan := TfrmCreateNewStudyPlan.Create(Document);
   try
     with frmCreateNewStudyPlan do
@@ -130,6 +133,7 @@ begin
   finally
     frmCreateNewStudyPlan.Free;
   end;
+}
 end;
 
 procedure TgvSpecEducation.actDropPlanExecute(Sender: TObject);
@@ -172,9 +176,12 @@ begin
 end;
 
 procedure TgvSpecEducation.actEditStudyPlanExecute(Sender: TObject);
+{
 var
   frmCreateNewStudyPlan: TfrmCreateNewStudyPlan;
+}
 begin
+{
   frmCreateNewStudyPlan := TfrmCreateNewStudyPlan.Create(Document);
   try
     with frmCreateNewStudyPlan do
@@ -191,6 +198,7 @@ begin
   finally
     frmCreateNewStudyPlan.Free;
   end;
+}
 end;
 
 procedure TgvSpecEducation.cxcbCourcesClick(Sender: TObject);

@@ -215,7 +215,7 @@ uses SPEditForm, DB, SPEditView, SPViewDM, cxDBTL, cxStyles, cxCustomData,
   DisciplineCompetence, DisciplineCompetenceView, ProgressBarForm,
   StudyPlanInfo, System.IOUtils, UMKDataModule, System.UITypes, DisciplineLit,
   DisciplineLitView, CSEView, OptionsHelper, SpecSessGroup, GridViewForm,
-  SpecSessView;
+  SpecSessView, FR3, ReportFilesUpdater;
 
 {$R *.dfm}
 
@@ -641,8 +641,11 @@ end;
 
 procedure TviewSP.actPlanGraphByAdmissionReportExecute(Sender: TObject);
 begin
-  TMyFR.Create(Self).Show('study_plan\plan_graph_by_admission2.fr3',
-    ['idspecialityeducation'], [Document.IDSpecEducation]);
+//  TMyFR.Create(Self).Show('study_plan\plan_graph_by_admission2.fr3',
+//    ['idspecialityeducation'], [Document.IDSpecEducation]);
+  TFR3.Create.Show(TReportFilesUpdater.TryUpdate
+    ('study_plan\plan_graph_by_admission2.fr3'), ['idspecialityeducation'],
+    [Document.IDSpecEducation]);
 end;
 
 procedure TviewSP.actPlanGraphBySpecReportExecute(Sender: TObject);
@@ -752,7 +755,10 @@ end;
 
 procedure TviewSP.actStudyPlanReportExecute(Sender: TObject);
 begin
-  TMyFR.Create(Self).Show('study_plan\Study_plan2.fr3',
+  // TMyFR.Create(Self).Show('study_plan\Study_plan2.fr3',
+  // ['idspecialityeducation'],
+  // [Document.SpecialitySessions.SpecialityEducationParam.ParamValue]);
+  TFR3.Create.Show(TReportFilesUpdater.TryUpdate('study_plan\Study_plan2.fr3'),
     ['idspecialityeducation'],
     [Document.SpecialitySessions.SpecialityEducationParam.ParamValue]);
 end;
