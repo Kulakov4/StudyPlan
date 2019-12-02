@@ -9,28 +9,27 @@ uses
   cxEdit, cxTextEdit, Vcl.StdCtrls, Vcl.Menus, cxButtons, InsertEditMode,
   System.Generics.Collections, cxMaskEdit, cxDropDownEdit, cxLookupEdit,
   cxDBLookupEdit, cxDBLookupComboBox, SpecQry, SpecInt, cxDBExtLookupComboBox,
-  SPGroup, FDDumbQuery;
+  SPGroup, FDDumbQuery, cxDBEdit;
 
 type
   TfrmEditSpec = class(TForm, ISpec)
-    cxteChiperSpeciality: TcxTextEdit;
     Label1: TLabel;
     Label2: TLabel;
     Label3: TLabel;
-    cxteSpeciality: TcxTextEdit;
     cxteShortSpeciality: TcxTextEdit;
     btnClose: TcxButton;
-    cxdblcbChiper: TcxDBLookupComboBox;
-    cxdblcbSpeciality: TcxDBLookupComboBox;
+    cxlcbChiper: TcxLookupComboBox;
+    cxlcbSpeciality: TcxLookupComboBox;
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
+    procedure cxlcbChiperPropertiesChange(Sender: TObject);
   strict private
+    function GetIDChair: Integer; stdcall;
+    procedure SetIDChair(const Value: Integer); stdcall;
   private
     FEditModeCaption: TDictionary<Integer, String>;
-    FIDEdLvl: Integer;
+    FIDChair: Integer;
     FInsertModeCaption: TDictionary<Integer, String>;
     FMode: TMode;
-    FqIDSpecDumb: TQueryFDDumb;
-    FSPGroup: TSPGroup;
     function GetChiperSpeciality: string; stdcall;
     function GetSpeciality: string; stdcall;
     function GetShortSpeciality: string; stdcall;
@@ -39,6 +38,7 @@ type
     procedure SetShortSpeciality(const Value: string);
     { Private declarations }
   protected
+    FSPGroup: TSPGroup;
     procedure Check; virtual;
     procedure SetMode(const Value: TMode); virtual;
   public
@@ -46,7 +46,6 @@ type
     destructor Destroy; override;
     property ChiperSpeciality: string read GetChiperSpeciality
       write SetChiperSpeciality;
-    property IDEdLvl: Integer read FIDEdLvl write FIDEdLvl;
     property Speciality: string read GetSpeciality write SetSpeciality;
     property Mode: TMode read FMode write SetMode;
     property ShortSpeciality: string read GetShortSpeciality
@@ -67,37 +66,36 @@ begin
   Assert(AOwner is TSPGroup);
   FSPGroup := AOwner as TSPGroup;
 
-  // **********************************************
-  // Код специальности
-  // **********************************************
-  FqIDSpecDumb := TQueryFDDumb.Create(Self);
-  FqIDSpecDumb.Name := 'qIDSpecDumb';
+  // Выпадающий список уникальных кодов специальностей
+  TLCB.Init(cxlcbChiper, FSPGroup.qSpecChiper.W.DataSource,
+    FSPGroup.qSpecChiper.W.Chiper_Speciality, lsEditList);
 
-  TDBLCB.Init(cxdblcbChiper, FqIDSpecDumb.W.DataSource,
-    FqIDSpecDumb.W.ID.FieldName, FSPGroup.qUniqueChiper.W.DataSource,
-    FSPGroup.qUniqueChiper.W.Chiper_Speciality, lsEditList);
-
-  TDBLCB.Init(cxdblcbSpeciality, FqIDSpecDumb.W.DataSource,
-    FqIDSpecDumb.W.ID.FieldName, FSPGroup.qUniqueSpeciality.W.DataSource,
-    FSPGroup.qUniqueSpeciality.W.Speciality, lsEditList);
-
-  FIDEdLvl := 2;
-
-  FEditModeCaption := TDictionary<Integer, String>.Create;
-  FEditModeCaption.Add(1, 'Изменение специальности');
-  FEditModeCaption.Add(2, 'Изменение направления подготовки');
-  FEditModeCaption.Add(3, 'Изменение специальности');
-  FEditModeCaption.Add(5, 'Изменение направления переподготовки');
-
-  FInsertModeCaption := TDictionary<Integer, String>.Create;
-  FInsertModeCaption.Add(1, 'Новая специальность');
-  FInsertModeCaption.Add(2, 'Новое направление подготовки');
-  FInsertModeCaption.Add(3, 'Новая специальность');
-  FInsertModeCaption.Add(5, 'Новое направление переподготовки');
+  // Выпадающий список уникальных наименований специальностей
+  TLCB.Init(cxlcbSpeciality, FSPGroup.qSpecName.W.DataSource,
+    FSPGroup.qSpecName.W.Speciality, lsEditList);
 
   FMode := EditMode;
   Mode := InsertMode;
+end;
 
+procedure TfrmEditSpec.cxlcbChiperPropertiesChange(Sender: TObject);
+begin
+  cxlcbChiper.PostEditValue;
+
+  if cxlcbChiper.Text = '' then
+    Exit;
+
+    // Если есть специальность, соответствующая выбранному коду
+  if FSPGroup.qSpec.SearchByChiper(cxlcbChiper.Text) > 0 then
+  begin
+    cxlcbSpeciality.Text := FSPGroup.qSpec.W.Speciality.F.AsString;
+    cxteShortSpeciality.Text := FSPGroup.qSpec.W.SHORT_SPECIALITY.F.AsString;
+  end
+  else
+  begin
+    cxlcbSpeciality.Text := '';
+    cxteShortSpeciality.Text := '';
+  end;
 end;
 
 destructor TfrmEditSpec.Destroy;
@@ -131,7 +129,7 @@ begin
     Check;
 
     // Просим сохранить данные
-    FSPGroup.qSpecByChair.Save(Self, FMode);
+    FSPGroup.qSpecByChair.W.Save(Self, Mode);
   except
     Action := caNone;
     raise;
@@ -140,12 +138,17 @@ end;
 
 function TfrmEditSpec.GetChiperSpeciality: string;
 begin
-  Result := cxteChiperSpeciality.Text;
+  Result := cxlcbChiper.Text;
+end;
+
+function TfrmEditSpec.GetIDChair: Integer;
+begin
+  Result := FIDChair;
 end;
 
 function TfrmEditSpec.GetSpeciality: string;
 begin
-  Result := cxteSpeciality.Text;
+  Result := cxlcbSpeciality.Text;
 end;
 
 function TfrmEditSpec.GetShortSpeciality: string;
@@ -155,12 +158,17 @@ end;
 
 procedure TfrmEditSpec.SetChiperSpeciality(const Value: string);
 begin
-  cxteChiperSpeciality.Text := Value;
+  cxlcbChiper.Text := Value;
+end;
+
+procedure TfrmEditSpec.SetIDChair(const Value: Integer);
+begin
+  FIDChair := Value;
 end;
 
 procedure TfrmEditSpec.SetSpeciality(const Value: string);
 begin
-  cxteSpeciality.Text := Value;
+  cxlcbSpeciality.Text := Value;
 end;
 
 procedure TfrmEditSpec.SetMode(const Value: TMode);
@@ -182,14 +190,14 @@ begin
           ShortSpeciality := W.SHORT_SPECIALITY.F.AsString;
         end;
 
-        Caption := FEditModeCaption[FIDEdLvl];
+        Caption := 'Изменение специальности (направления подготовки)';
       end;
     InsertMode:
       begin
         ChiperSpeciality := '';
         Speciality := '';
         ShortSpeciality := '';
-        Caption := FInsertModeCaption[FIDEdLvl]
+        Caption := 'Новая специальность (направления подготовки)';
       end;
   end;
 end;

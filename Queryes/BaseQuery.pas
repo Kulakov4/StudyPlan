@@ -43,16 +43,18 @@ type
       const ADetailKeyFieldName: String;
       const AFromClientOnly: Boolean = False);
     procedure DeleteFromClient;
-    procedure Load(const AParamNames: TArray<String>; const AParamValues:
-        TArray<Variant>); overload;
-    function Search(const AParamNames: TArray<String>; const AParamValues:
-        TArray<Variant>; TestResult: Integer = -1): Integer; overload;
-    function SearchEx(AParams: TArray<TParamRec>; TestResult: Integer = -1; ASQL:
-        String = ''): Integer;
-    procedure SetParameters(const AParamNames: TArray<String>; const AParamValues:
-        TArray<Variant>);
-    function SetParamType(const AParamName: String; AParamType: TParamType =
-        ptInput; ADataType: TFieldType = ftInteger): TFDParam;
+    procedure Load(const AParamNames: TArray<String>;
+      const AParamValues: TArray<Variant>); overload;
+    function Search(const AParamNames: TArray<String>;
+      const AParamValues: TArray<Variant>; TestResult: Integer = -1)
+      : Integer; overload;
+    function SearchEx(AParams: TArray<TParamRec>; TestResult: Integer = -1;
+      ASQL: String = ''): Integer;
+    procedure SetParameters(const AParamNames: TArray<String>;
+      const AParamValues: TArray<Variant>);
+    function SetParamType(const AParamName: String;
+      AParamType: TParamType = ptInput; ADataType: TFieldType = ftInteger)
+      : TFDParam;
     property DataSource: TDataSource read GetDataSource;
     { Public declarations }
   end;
@@ -138,8 +140,8 @@ begin
   Result := FDataSource;
 end;
 
-procedure TQueryBase.Load(const AParamNames: TArray<String>; const
-    AParamValues: TArray<Variant>);
+procedure TQueryBase.Load(const AParamNames: TArray<String>;
+  const AParamValues: TArray<Variant>);
 begin
   FDQuery.DisableControls;
   try
@@ -151,8 +153,8 @@ begin
   end;
 end;
 
-function TQueryBase.Search(const AParamNames: TArray<String>; const
-    AParamValues: TArray<Variant>; TestResult: Integer = -1): Integer;
+function TQueryBase.Search(const AParamNames: TArray<String>;
+  const AParamValues: TArray<Variant>; TestResult: Integer = -1): Integer;
 begin
   Load(AParamNames, AParamValues);
 
@@ -161,8 +163,8 @@ begin
     Assert(Result = TestResult);
 end;
 
-function TQueryBase.SearchEx(AParams: TArray<TParamRec>; TestResult: Integer =
-    -1; ASQL: String = ''): Integer;
+function TQueryBase.SearchEx(AParams: TArray<TParamRec>;
+  TestResult: Integer = -1; ASQL: String = ''): Integer;
 var
   AParamNames: TList<String>;
   AFormatStr: string;
@@ -178,15 +180,22 @@ begin
 
   for i := Low(AParams) to High(AParams) do
   begin
-    // Если поиск нечувствительный к регистру
-    if AParams[i].CaseInsensitive then
-      AFormatStr := 'upper(%s) %s upper(:%s)'
+    // Если значение параметра = NULL
+    if VarIsNull(AParams[i].Value) then
+    begin
+      ANewValue := Format('%s is null', [AParams[i].FullName]);
+    end
     else
-      AFormatStr := '%s %s :%s';
+    begin
+      // Если поиск нечувствительный к регистру
+      if AParams[i].CaseInsensitive then
+        AFormatStr := 'upper(%s) %s upper(:%s)'
+      else
+        AFormatStr := '%s %s :%s';
 
-    ANewValue := Format(AFormatStr, [AParams[i].FullName, AParams[i].Operation,
-      AParams[i].FieldName]);
-
+      ANewValue := Format(AFormatStr, [AParams[i].FullName,
+        AParams[i].Operation, AParams[i].FieldName]);
+    end;
     // Делаем замену в SQL запросе
     ANewSQL := ReplaceInSQL(ANewSQL, ANewValue, i);
   end;
@@ -200,6 +209,9 @@ begin
     // Создаём параметры SQL запроса
     for i := Low(AParams) to High(AParams) do
     begin
+      if VarIsNull(AParams[i].Value) then
+        Continue;
+
       SetParamType(AParams[i].FieldName, ptInput, AParams[i].DataType);
 
       AParamNames.Add(AParams[i].FieldName);
@@ -214,8 +226,8 @@ begin
   end;
 end;
 
-procedure TQueryBase.SetParameters(const AParamNames: TArray<String>; const
-    AParamValues: TArray<Variant>);
+procedure TQueryBase.SetParameters(const AParamNames: TArray<String>;
+  const AParamValues: TArray<Variant>);
 var
   i: Integer;
 begin
@@ -228,8 +240,9 @@ begin
   end;
 end;
 
-function TQueryBase.SetParamType(const AParamName: String; AParamType:
-    TParamType = ptInput; ADataType: TFieldType = ftInteger): TFDParam;
+function TQueryBase.SetParamType(const AParamName: String;
+  AParamType: TParamType = ptInput; ADataType: TFieldType = ftInteger)
+  : TFDParam;
 begin
   Result := FDQuery.FindParam(AParamName);
   Assert(Result <> nil);
@@ -245,7 +258,8 @@ var
 begin
   inherited;
   Assert(not AFullName.IsEmpty);
-  Assert(not VarIsNull(AValue));
+// Пустое значение теперь обрабатывается!!
+//  Assert(not VarIsNull(AValue));
 
   FullName := AFullName;
   p := FullName.IndexOf('.');

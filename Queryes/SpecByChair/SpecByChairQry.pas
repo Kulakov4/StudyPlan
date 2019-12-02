@@ -15,7 +15,6 @@ type
   TSpecByChairW = class;
 
   TQrySpecByChair = class(TQueryBase)
-    FDUpdateSQL: TFDUpdateSQL;
     procedure FDQueryPostError(DataSet: TDataSet; E: EDatabaseError;
       var Action: TDataAction);
   private
@@ -60,7 +59,7 @@ type
 implementation
 
 uses
-  NotifyEvents, FireDAC.Phys.OracleWrapper;
+  NotifyEvents, FireDAC.Phys.OracleWrapper, System.StrUtils;
 
 constructor TSpecByChairW.Create(AOwner: TComponent);
 begin
@@ -94,7 +93,11 @@ begin
     Chiper_Speciality.F.AsString := ASpecInt.ChiperSpeciality;
     Speciality.F.AsString := ASpecInt.Speciality;
     SHORT_SPECIALITY.F.AsString := ASpecInt.ShortSpeciality;
-
+    // Формируем вычисляемое в запросе поле
+    // nvl2(s.chiper_speciality, s.chiper_speciality || ' ', '' ) || S.SPECIALITY CalcSpeciality,
+    CalcSpeciality.F.AsString := ASpecInt.ChiperSpeciality.Trim +
+      ifthen(ASpecInt.ChiperSpeciality.Trim.IsEmpty, '', ' ') +
+      ASpecInt.Speciality;
     TryPost;
   except
     TryCancel;
@@ -108,14 +111,9 @@ begin
   FW := TSpecByChairW.Create(FDQuery);
 
   FDQuery.UpdateOptions.CheckRequired := False;
-  FDQuery.UpdateOptions.RefreshMode := rmAll;
-
-  // Костыль !!!
-  with FDUpdateSQL.Commands[arInsert].ParamByName('NEW_' + W.PKFieldName) do
-  begin
-    ParamType := ptOutput;
-    DataType := ftInteger;
-  end;
+  FDQuery.UpdateOptions.AutoIncFields := W.PKFieldName;
+  FDQuery.CachedUpdates := True;
+//  FDQuery.UpdateOptions.RefreshMode := rmAll;
 
   TNotifyEventWrap.Create(W.BeforePost, DoBeforePost, W.EventList);
 end;
@@ -157,7 +155,8 @@ begin
   begin
     // В штатном режиме у нас не должны появляться в базе не используемые специальности.
     // Либо эта специальность используется на другой кафедре, что странно!
-    E.Message := 'Направление подготовки с таким наименованием уже есть в базе данных';
+    E.Message :=
+      'Направление подготовки с таким наименованием уже есть в базе данных';
   end;
 end;
 

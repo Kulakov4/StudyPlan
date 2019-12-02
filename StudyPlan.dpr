@@ -209,7 +209,10 @@ uses
   EditSpecFrm in 'Views\SpecView\EditSpecFrm.pas' {frmEditSpec},
   SpecInt in 'Interfaces\SpecInt.pas',
   EditRetrainingSpecFrm in 'Views\SpecView\EditRetrainingSpecFrm.pas' {frmEditRetrainingSpec},
-  SpecQry in 'Queryes\Spec\SpecQry.pas' {QrySpec: TFrame};
+  SpecQry in 'Queryes\Spec\SpecQry.pas' {QrySpec: TFrame},
+  SpecUniqueQuery in 'Queryes\Spec\SpecUniqueQuery.pas' {QueryUniqueSpec: TFrame},
+  SpecChiperUniqueQry in 'Queryes\Spec\SpecChiperUniqueQry.pas' {QrySpecChiper: TFrame},
+  SpecNameUniqueQry in 'Queryes\Spec\SpecNameUniqueQry.pas' {QrySpecName: TFrame};
 
 {$R *.res}
 

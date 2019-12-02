@@ -52,8 +52,8 @@ type
     procedure cxbtnAddSpecialityClick(Sender: TObject);
   private
     FAddSpecialityHint: TDictionary<Integer, String>;
+    FfrmEditSpec: TfrmEditSpec;
     FMode: TMode;
-    FNewIDSpecList: TList<Integer>;
     FqEdDumb: TQueryFDDumb;
     FqChairDumb: TQueryFDDumb;
     FqEdLvlDumb: TQueryFDDumb;
@@ -114,8 +114,8 @@ type
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
     procedure AfterConstruction; override;
-    property IDEducationLevel: Integer read GetIDEducationLevel write
-        SetIDEducationLevel;
+    property IDEducationLevel: Integer read GetIDEducationLevel
+      write SetIDEducationLevel;
     property Year: Integer read GetYear;
     property Mode: TMode read FMode write SetMode;
     { Public declarations }
@@ -146,9 +146,6 @@ begin
   FAddSpecialityHint.Add(2, 'Новое направление подготовки');
   FAddSpecialityHint.Add(3, 'Новая специальность');
   FAddSpecialityHint.Add(5, 'Новое направление переподготовки');
-
-  // Список добавленных специальностей
-  FNewIDSpecList := TList<Integer>.Create;
 
   // **********************************************
   // Уровень образования
@@ -222,21 +219,18 @@ begin
 end;
 
 procedure TfrmEditStudyPlan.cxbtnAddSpecialityClick(Sender: TObject);
-var
-  AfrmEditSpec: TfrmEditSpec;
 begin
-  AfrmEditSpec := CreateEditSpecForm;
-  try
-    AfrmEditSpec.Mode := InsertMode;
-    if AfrmEditSpec.ShowModal = mrOK then
-    begin
-      IDSpeciality := FSPGroup.qSpecByChair.W.ID_Speciality.F.AsInteger;
-      // Запоминаем, что мы добавили новую специальность в базу!
-      FNewIDSpecList.Add(IDSpeciality);
-    end;
-  finally
-    AfrmEditSpec.Free;
-  end;
+  if FfrmEditSpec <> nil then
+    FreeAndNil(FfrmEditSpec);
+
+  FfrmEditSpec := CreateEditSpecForm;
+
+  FfrmEditSpec.Mode := InsertMode;
+  if FfrmEditSpec.ShowModal = mrOK then
+    // Выбираем добавленную в выпадающий список специальность
+    IDSpeciality := FSPGroup.qSpecByChair.W.ID_Speciality.F.AsInteger
+  else
+    FreeAndNil(FfrmEditSpec)
 end;
 
 procedure TfrmEditStudyPlan.cxdbextlcbSpecialitysPropertiesChange
@@ -288,6 +282,7 @@ begin
 
   lblSpeciality.Caption := FSpecLabel[AIDEdLvl];
   cxbtnAddSpeciality.Hint := FAddSpecialityHint[AIDEdLvl];
+  cxbtnAddSpeciality.Enabled := IDChair > 0;
 end;
 
 procedure TfrmEditStudyPlan.cxdblcbEducationsPropertiesChange(Sender: TObject);
@@ -319,7 +314,8 @@ end;
 
 destructor TfrmEditStudyPlan.Destroy;
 begin
-  FreeAndNil(FNewIDSpecList);
+  if FfrmEditSpec <> nil then
+    FreeAndNil(FfrmEditSpec);
   inherited;
 end;
 
@@ -377,7 +373,7 @@ begin
   if ModalResult <> mrOK then
   begin
     // НЕ сохраняем сделанные изменения в БД
-    FSPGroup.Cancel(FNewIDSpecList.ToArray);
+    FSPGroup.Cancel();
     Exit;
   end;
 
@@ -388,7 +384,7 @@ begin
     Check;
 
     // Просим учебный план сохранить информацию
-    FSPGroup.Save(Self, FMode);
+    FSPGroup.Save(Self, FMode, FfrmEditSpec);
   except
     Action := caNone;
     raise;
@@ -494,8 +490,8 @@ end;
 
 procedure TfrmEditStudyPlan.SetMode(const Value: TMode);
 begin
-//  if FMode = Value then
-//    Exit;
+  // if FMode = Value then
+  // Exit;
 
   FMode := Value;
 

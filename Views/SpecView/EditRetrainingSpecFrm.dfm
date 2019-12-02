@@ -17,23 +17,22 @@ inherited frmEditRetrainingSpec: TfrmEditRetrainingSpec
     Top = 83
     ExplicitTop = 83
   end
-  inherited cxteChiperSpeciality: TcxTextEdit
+  inherited cxlcbChiper: TcxLookupComboBox [3]
     Top = 133
     Visible = False
     ExplicitTop = 133
-    ExplicitWidth = 57
-    Width = 57
   end
-  inherited cxteSpeciality: TcxTextEdit
-    Top = 24
-    ExplicitTop = 24
-  end
-  inherited cxteShortSpeciality: TcxTextEdit
+  inherited cxteShortSpeciality: TcxTextEdit [4]
     Top = 80
     ExplicitTop = 80
   end
-  inherited btnClose: TcxButton
+  inherited btnClose: TcxButton [5]
     Top = 129
     ExplicitTop = 129
+  end
+  inherited cxlcbSpeciality: TcxLookupComboBox
+    Top = 24
+    Properties.OnChange = cxlcbSpecialityPropertiesChange
+    ExplicitTop = 24
   end
 end

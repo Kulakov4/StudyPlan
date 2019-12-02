@@ -7,7 +7,7 @@ uses
   SPQry, SpecialitySessionsQuery, SPUnit, YearsQry, SpecEdBaseFormQry,
   NotifyEvents, FDDumbQuery, System.Contnrs, EdQuery, SpecByChairQry,
   QualificationQuery, AreasQry, SPStandartQuery, SpecEdSimpleInt,
-  InsertEditMode, SpecQry;
+  InsertEditMode, SpecQry, SpecChiperUniqueQry, SpecNameUniqueQry, SpecInt;
 
 type
   TSPType = (sptVO, sptSPO, sptRetraining);
@@ -26,8 +26,9 @@ type
     FqEd: TQueryEd;
     FqQualifications: TQryQualifications;
     FqSP: TQrySP;
-    FqUniqueChiper: TQrySpec;
-    FqUniqueSpeciality: TQrySpec;
+    FqSpec: TQrySpec;
+    FqSpecChiper: TQrySpecChiper;
+    FqSpecName: TQrySpecName;
     FqSpecByChair: TQrySpecByChair;
     FqSpecEd: TQuerySpecEd;
     FqSpecEdBaseForm: TQrySpecEdBaseForm;
@@ -47,8 +48,9 @@ type
     function GetIDSpecialityEducation: Integer;
     function GetqAreas: TQryAreas;
     function GetqQualifications: TQryQualifications;
-    function GetqUniqueChiper: TQrySpec;
-    function GetqUniqueSpeciality: TQrySpec;
+    function GetqSpec: TQrySpec;
+    function GetqSpecChiper: TQrySpecChiper;
+    function GetqSpecName: TQrySpecName;
     function GetqSpecByChair: TQrySpecByChair;
     function GetqSpecEdBaseForm: TQrySpecEdBaseForm;
     function GetqSPStandart: TQuerySPStandart;
@@ -59,11 +61,11 @@ type
     constructor Create(AOwner: TComponent;
       AYear, AIDSpecialityEducation: Integer; ASPType: TSPType); reintroduce;
     destructor Destroy; override;
-    procedure Cancel(AIDSpecArr: TArray<Integer>);
+    procedure Cancel;
     procedure CopyStudyPlan(AYear: Integer);
     procedure DeleteStudyPlan;
     procedure DoOnReportPlanGraphBySpecExec;
-    procedure Save(ASpecEdSimple: ISpecEdSimple; AMode: TMode);
+    procedure Save(ASpecEdSimple: ISpecEdSimple; AMode: TMode; ASpec: ISpec);
     property OnYearChange: TNotifyEventsEx read FOnYearChange;
     property OnSpecEdChange: TNotifyEventsEx read FOnSpecEdChange;
     property ActivePlansOnly: Boolean read FActivePlansOnly
@@ -76,8 +78,9 @@ type
     property qCourceName: TQueryCourceName read FqCourceName;
     property qQualifications: TQryQualifications read GetqQualifications;
     property qSP: TQrySP read FqSP;
-    property qUniqueChiper: TQrySpec read GetqUniqueChiper;
-    property qUniqueSpeciality: TQrySpec read GetqUniqueSpeciality;
+    property qSpec: TQrySpec read GetqSpec;
+    property qSpecChiper: TQrySpecChiper read GetqSpecChiper;
+    property qSpecName: TQrySpecName read GetqSpecName;
     property qSpecByChair: TQrySpecByChair read GetqSpecByChair;
     property qSpecEd: TQuerySpecEd read FqSpecEd;
     property qSpecEdBaseForm: TQrySpecEdBaseForm read GetqSpecEdBaseForm;
@@ -87,6 +90,7 @@ type
     property qYears: TQryYears read FqYears;
     property SP: TStudyPlan read FSP;
     property SpecEdDumb: TQueryFDDumb read FSpecEdDumb;
+    property SPType: TSPType read FSPType;
     property Year: Integer read GetYear write SetYear;
     property YearDumb: TQueryFDDumb read FYearDumb;
   end;
@@ -178,19 +182,11 @@ begin
   inherited;
 end;
 
-procedure TSPGroup.Cancel(AIDSpecArr: TArray<Integer>);
-var
-  ASpecID: Integer;
+procedure TSPGroup.Cancel;
 begin
-  // Если были добавлены новые специальности в справочник то удаляем их
-  if Length(AIDSpecArr) > 0 then
-  begin
-    for ASpecID in AIDSpecArr do
-    begin
-      qSpecByChair.W.LocateByPK(ASpecID, True);
-      qSpecByChair.FDQuery.Delete;
-    end;
-  end;
+  // Отменяем сделанные изменения в специальностях кафедры
+  Assert(qSpecByChair.FDQuery.CachedUpdates);
+  qSpecByChair.FDQuery.CancelUpdates;
 
   // Отменяем сделанные изменения в стандартах учебного плана
   Assert(qSPStandart.FDQuery.CachedUpdates);
@@ -315,42 +311,47 @@ begin
   Result := FqQualifications;
 end;
 
-function TSPGroup.GetqUniqueChiper: TQrySpec;
+function TSPGroup.GetqSpec: TQrySpec;
 begin
-  if FqUniqueChiper = nil then
+  if FqSpec = nil then
   begin
-    FqUniqueChiper := TQrySpec.Create(Self);
-    FqUniqueChiper.Name := 'QueryUniqueChiper';
-    // Фильтруем список специальностей по наличию или отсутствию кода
-    FqUniqueChiper.FilterByChiper(FSPType = sptRetraining,
-      FqUniqueChiper.W.Chiper_Speciality.FieldName);
-
-    FqUniqueChiper.FDQuery.Open;
+    FqSpec := TQrySpec.Create(Self);
   end;
 
-  Result := FqUniqueChiper;
+  Result := FqSpec;
 end;
 
-function TSPGroup.GetqUniqueSpeciality: TQrySpec;
+function TSPGroup.GetqSpecChiper: TQrySpecChiper;
 begin
-  if FqUniqueSpeciality = nil then
+  if FqSpecChiper = nil then
   begin
-    FqUniqueSpeciality := TQrySpec.Create(Self);
-    FqUniqueSpeciality.Name := 'QueryUniqueSpeciality';
-    // Фильтруем список специальностей по наличию или отсутствию кода
-    FqUniqueSpeciality.FilterByChiper(FSPType = sptRetraining,
-      FqUniqueSpeciality.W.Speciality.FieldName);
-
-    FqUniqueSpeciality.FDQuery.Open;
+    // Уникальный список кодов специальностей
+    FqSpecChiper := TQrySpecChiper.Create(Self, FSPType = sptRetraining);
+    FqSpecChiper.FDQuery.Open;
   end;
 
-  Result := FqUniqueSpeciality;
+  Result := FqSpecChiper;
+end;
+
+function TSPGroup.GetqSpecName: TQrySpecName;
+begin
+  if FqSpecName = nil then
+  begin
+    // Уникальный список наименований специальностей с кодом или без
+    FqSpecName := TQrySpecName.Create(Self, FSPType = sptRetraining);
+    FqSpecName.FDQuery.Open;
+  end;
+
+  Result := FqSpecName;
 end;
 
 function TSPGroup.GetqSpecByChair: TQrySpecByChair;
 begin
   if FqSpecByChair = nil then
+  begin
     FqSpecByChair := TQrySpecByChair.Create(Self);
+    FqSpecByChair.FDQuery.CachedUpdates := True;
+  end;
 
   Result := FqSpecByChair;
 end;
@@ -378,10 +379,41 @@ begin
   Result := FYearDumb.W.ID.F.AsInteger;
 end;
 
-procedure TSPGroup.Save(ASpecEdSimple: ISpecEdSimple; AMode: TMode);
+procedure TSPGroup.Save(ASpecEdSimple: ISpecEdSimple; AMode: TMode;
+  ASpec: ISpec);
 var
   ASpecEdSimpleEx: ISpecEdSimpleEx;
 begin
+  // Если в ДБ нужно поробовать добавить новую специальность
+  if ASpec <> nil then
+  begin
+    ASpec.IDChair := ASpecEdSimple.IDChair;
+    // Если такой специальности точно нет
+    if qSpec.SearchByChiperAndName(ASpec.ChiperSpeciality, ASpec.Speciality) = 0
+    then
+    begin
+      qSpec.W.Save(ASpec, InsertMode); // Добавляем специальность в базу
+    end
+    else
+    begin
+      Assert(qSpec.FDQuery.RecordCount = 1);
+      // Обновляем сокращённое наименование
+      qSpec.W.UpdateShortSpeciality(ASpec.ShortSpeciality);
+      // qSpec.W.Save(ASpec, EditMode);
+    end;
+    // Сохраняем код найденной или добавленной специальности
+    Assert(qSpec.W.ID_Speciality.F.AsInteger > 0);
+    ASpecEdSimple.IDSpeciality := qSpec.W.ID_Speciality.F.AsInteger;
+  end
+  else
+  begin
+    // Мы выбрали специальность из списка, а не добавляли её
+    Assert(ASpecEdSimple.IDSpeciality > 0);
+    // Ищем выбранную специальность. Нужно узнать её квалификацию
+    qSpec.SearchByID(ASpecEdSimple.IDSpeciality);
+    Assert(qSpec.FDQuery.RecordCount = 1);
+  end;
+
   ASpecEdSimpleEx := nil;
 
   ASpecEdSimple.QueryInterface(ISpecEdSimpleEx, ASpecEdSimpleEx);
@@ -397,11 +429,9 @@ begin
     end;
   end;
 
-  // Ищем выбранную специальность
-  qSpecByChair.W.LocateByPK(ASpecEdSimple.IDSpeciality, True);
-
+  // Сохраняем учебный план
   qSpecEdSimple.W.Save(ASpecEdSimple, AMode,
-    qSpecByChair.W.QUALIFICATION_ID.F.AsInteger);
+    qSpec.W.QUALIFICATION_ID.F.AsInteger);
 
   if AMode = EditMode then
   begin

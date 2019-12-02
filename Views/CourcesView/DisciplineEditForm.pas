@@ -123,10 +123,10 @@ begin
 end;
 
 procedure TfrmEditDiscipline.Check;
-var
-  Lab: Integer;
-  Lec: Integer;
-  Sem: Integer;
+//var
+//  Lab: Integer;
+//  Lec: Integer;
+//  Sem: Integer;
 begin
   if cxdblcbDisciplineName.Text = '' then
     raise Exception.Create('Не задано наименование дисциплины');
@@ -134,9 +134,9 @@ begin
 //  if cxteShort.Text = '' then
 //    raise Exception.Create('Не задано сокращение');
 
-  Lec := cxseLec.Value;
-  Lab := cxseLab.Value;
-  Sem := cxseSem.Value;
+//  Lec := cxseLec.Value;
+//  Lab := cxseLab.Value;
+//  Sem := cxseSem.Value;
 
   {
   // Если ввели кол-во часов
