@@ -62,7 +62,7 @@ end;
 
 function TfrmEditRetrainingPlan.CreateEditSpecForm: TfrmEditSpec;
 begin
-  Result := TfrmEditRetrainingSpec.Create(SPGroup.qSpecByChair);
+  Result := TfrmEditRetrainingSpec.Create(SPGroup);
 end;
 
 procedure TfrmEditRetrainingPlan.cxdblcbAreaPropertiesNewLookupDisplayText

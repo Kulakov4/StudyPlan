@@ -18,12 +18,13 @@ type
     function GetPortal: Boolean;
     function GetYears: Integer;
     function GetYear: Integer;
+    procedure SetIDSpeciality(const Value: Integer);
     property Annotation: string read GetAnnotation;
     property IDChair: Integer read GetIDChair;
     property IDEducation2: Integer read GetIDEducation2;
     property IDEducationLevel: Integer read GetIDEducationLevel;
     property IDQualification: Integer read GetIDQualification;
-    property IDSpeciality: Integer read GetIDSpeciality;
+    property IDSpeciality: Integer read GetIDSpeciality write SetIDSpeciality;
     property IDStandart: Integer read GetIDStandart;
     property Locked: Boolean read GetLocked;
     property IsEnabled: Boolean read GetIsEnabled;

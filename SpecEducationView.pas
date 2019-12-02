@@ -63,7 +63,7 @@ type
 
 implementation
 
-uses MessageForm, {CreateNewPlanForm, }System.UITypes;
+uses MessageForm, System.UITypes;
 
 {$R *.dfm}
 
@@ -115,25 +115,21 @@ begin
 end;
 
 procedure TgvSpecEducation.actCreateStudyPlanExecute(Sender: TObject);
-{
-var
-  frmCreateNewStudyPlan: TfrmCreateNewStudyPlan;
-}
+//var
+//  frmCreateNewStudyPlan: TfrmCreateNewStudyPlan;
 begin
-{
-  frmCreateNewStudyPlan := TfrmCreateNewStudyPlan.Create(Document);
-  try
-    with frmCreateNewStudyPlan do
-    begin
-      if ShowModal = mrOk then
-        Document.CreateNew(IDSpeciality, IDEducation, Year, Years, Months,
-          IDStudyPlanStandart, IDChair, Annotation, IDQualification);
-    end;
-
-  finally
-    frmCreateNewStudyPlan.Free;
-  end;
-}
+//  frmCreateNewStudyPlan := TfrmCreateNewStudyPlan.Create(Document);
+//  try
+//    with frmCreateNewStudyPlan do
+//    begin
+//      if ShowModal = mrOk then
+//        Document.CreateNew(IDSpeciality, IDEducation, Year, Years, Months,
+//          IDStudyPlanStandart, IDChair, Annotation, IDQualification);
+//    end;
+//
+//  finally
+//    frmCreateNewStudyPlan.Free;
+//  end;
 end;
 
 procedure TgvSpecEducation.actDropPlanExecute(Sender: TObject);
@@ -176,29 +172,25 @@ begin
 end;
 
 procedure TgvSpecEducation.actEditStudyPlanExecute(Sender: TObject);
-{
-var
-  frmCreateNewStudyPlan: TfrmCreateNewStudyPlan;
-}
+//var
+//  frmCreateNewStudyPlan: TfrmCreateNewStudyPlan;
 begin
-{
-  frmCreateNewStudyPlan := TfrmCreateNewStudyPlan.Create(Document);
-  try
-    with frmCreateNewStudyPlan do
-    begin
-      Caption := 'Изменение учебного плана';
-      btnClose.Caption := 'ОК';
-      cxmeYear.Properties.ReadOnly := True;
+//  frmCreateNewStudyPlan := TfrmCreateNewStudyPlan.Create(Document);
+//  try
+//    with frmCreateNewStudyPlan do
+//    begin
+//      Caption := 'Изменение учебного плана';
+//      btnClose.Caption := 'ОК';
+//      cxmeYear.Properties.ReadOnly := True;
 
-      if ShowModal = mrOk then
-        Document.Edit(IDSpeciality, IDEducation, Years, Months,
-          IDStudyPlanStandart, IDChair, Annotation, IDQualification);
-    end;
+//      if ShowModal = mrOk then
+//        Document.Edit(IDSpeciality, IDEducation, Years, Months,
+//          IDStudyPlanStandart, IDChair, Annotation, IDQualification);
+//    end;
 
-  finally
-    frmCreateNewStudyPlan.Free;
-  end;
-}
+//  finally
+//    frmCreateNewStudyPlan.Free;
+//  end;
 end;
 
 procedure TgvSpecEducation.cxcbCourcesClick(Sender: TObject);

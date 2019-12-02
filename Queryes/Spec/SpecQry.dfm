@@ -3,6 +3,6 @@ inherited QrySpec: TQrySpec
     SQL.Strings = (
       'select *'
       'from Specialitys'
-      'order by Speciality')
+      'where (0=0) and (1=1)')
   end
 end

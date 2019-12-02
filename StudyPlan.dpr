@@ -207,13 +207,16 @@ uses
   SpecSessView in 'Views\SpecSessView\SpecSessView.pas' {ViewSpecSess: TFrame},
   MaxSpecSessQry in 'Queryes\SpecSess\MaxSpecSessQry.pas' {QryMaxSpecSess: TFrame},
   EditSpecFrm in 'Views\SpecView\EditSpecFrm.pas' {frmEditSpec},
-  SpecByChairInt in 'Queryes\SpecByChair\SpecByChairInt.pas',
+  SpecInt in 'Interfaces\SpecInt.pas',
   EditRetrainingSpecFrm in 'Views\SpecView\EditRetrainingSpecFrm.pas' {frmEditRetrainingSpec},
   SpecQry in 'Queryes\Spec\SpecQry.pas' {QrySpec: TFrame},
   FilesUpdater in 'FilesUpdater\FilesUpdater.pas',
   FRDataModule in 'helpers\FRDataModule.pas' {FRDM: TDataModule},
   FR3 in 'helpers\FR3.pas',
-  ReportFilesUpdater in 'FilesUpdater\ReportFilesUpdater.pas';
+  ReportFilesUpdater in 'FilesUpdater\ReportFilesUpdater.pas',
+  SpecUniqueQuery in 'Queryes\Spec\SpecUniqueQuery.pas' {QueryUniqueSpec: TFrame},
+  SpecChiperUniqueQry in 'Queryes\Spec\SpecChiperUniqueQry.pas' {QrySpecChiper: TFrame},
+  SpecNameUniqueQry in 'Queryes\Spec\SpecNameUniqueQry.pas' {QrySpecName: TFrame};
 
 {$R *.res}
 

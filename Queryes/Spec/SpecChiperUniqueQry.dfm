@@ -1,0 +1,2 @@
+inherited QrySpecChiper: TQrySpecChiper
+end
