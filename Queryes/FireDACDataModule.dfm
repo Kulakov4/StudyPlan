@@ -4,7 +4,6 @@ object FireDACDM: TFireDACDM
   Width = 215
   object FDConnection: TFDConnection
     Params.Strings = (
-      'Database=ORACLE'
       'User_Name=cdb_win_studyplan'
       'Password=studyplan'
       'DriverID=Ora')

@@ -710,6 +710,7 @@
             <FormType>dfm</FormType>
             <DesignClass>TFrame</DesignClass>
         </DCCReference>
+        <DCCReference Include="ConnectionSettings.pas"/>
         <None Include="StudyPlan.todo"/>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>

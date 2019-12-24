@@ -15,7 +15,7 @@ type
 
 implementation
 
-uses SysUtils, Windows, classes, PersistentSequence;
+uses SysUtils, Windows, classes, PersistentSequence, ConnectionSettings;
 
 function TMyDBServerConnection.CreateConnection: TSQLConnection;
 var
@@ -33,7 +33,18 @@ begin
     LibraryName := 'dbexpora.dll';
     VendorLib := 'oci.dll';
     GetDriverFunc := 'getSQLDriverORACLE';
-    Params.LoadFromFile(ExtractFilePath(ParamStr(0)) + 'SQLConnection.ini');
+    Params.Add('DriverName=Oracle');
+    Params.Add(sDBConnection);
+    Params.Add('User_Name=cdb_win_studyplan');
+    Params.Add('Password=studyplan');
+    Params.Add('RowsetSize=50');
+    Params.Add('BlobSize=-1');
+    Params.Add('LocaleCode=0000');
+    Params.Add('Oracle TransIsolation=ReadCommited');
+    Params.Add('OS Authentication=False');
+    Params.Add('Multiple Transaction=False');
+    Params.Add('Trim Char=False');
+//    Params.LoadFromFile(ExtractFilePath(ParamStr(0)) + 'SQLConnection.ini');
 
 {
     APassword := TPassword.Create(nil, 'Однажды в студёную зимнюю пору я из лесу вышел');

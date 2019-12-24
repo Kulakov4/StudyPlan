@@ -216,7 +216,8 @@ uses
   ReportFilesUpdater in 'FilesUpdater\ReportFilesUpdater.pas',
   SpecUniqueQuery in 'Queryes\Spec\SpecUniqueQuery.pas' {QueryUniqueSpec: TFrame},
   SpecChiperUniqueQry in 'Queryes\Spec\SpecChiperUniqueQry.pas' {QrySpecChiper: TFrame},
-  SpecNameUniqueQry in 'Queryes\Spec\SpecNameUniqueQry.pas' {QrySpecName: TFrame};
+  SpecNameUniqueQry in 'Queryes\Spec\SpecNameUniqueQry.pas' {QrySpecName: TFrame},
+  ConnectionSettings in 'ConnectionSettings.pas';
 
 {$R *.res}
 

@@ -18,6 +18,7 @@ type
   private
     { Private declarations }
   public
+    constructor Create(AOwner: TComponent); override;
     { Public declarations }
   end;
 
@@ -36,7 +37,7 @@ type
 implementation
 
 uses
-  System.Contnrs, CommissionOptions;
+  System.Contnrs, CommissionOptions, ConnectionSettings;
 
 var
   SingletonList: TObjectList;
@@ -63,6 +64,12 @@ begin
   Instance.FDM.FDConnection.Open;
   SingletonList.Add(Instance);
   Result := Instance;
+end;
+
+constructor TFireDACDM.Create(AOwner: TComponent);
+begin
+  inherited;
+  FDConnection.Params.Database := '(DESCRIPTION = (ADDRESS_LIST = (ADDRESS = (PROTOCOL = TCP)(HOST = 192.168.0.71)(PORT = 1521)))(CONNECT_DATA = (SERVICE_NAME = ORCL)))';
 end;
 
 procedure TFireDACDM.FDConnectionAfterConnect(Sender: TObject);
