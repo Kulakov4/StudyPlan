@@ -16,6 +16,7 @@ type
   TAdmissionsW = class;
 
   TQueryAdmissions = class(TQueryBase)
+    procedure FDQueryBeforeScroll(DataSet: TDataSet);
     procedure FDQueryUpdateRecord(ASender: TDataSet; ARequest: TFDUpdateRequest;
       var AAction: TFDErrorAction; AOptions: TFDUpdateRowOptions);
   private
@@ -25,6 +26,7 @@ type
     FqSS: TQuerySpecialitySessions;
     FW: TAdmissionsW;
     procedure ApplyDelete;
+    procedure DoBeforeScroll(Sender: TObject);
     function GetqCSE: TQueryCycleSpecialityEducations;
     function GetqLT: TQueryLessonType;
     function GetqSP: TQueryStudyPlans;
@@ -87,6 +89,7 @@ constructor TQueryAdmissions.Create(AOwner: TComponent);
 begin
   inherited;
   FW := TAdmissionsW.Create(FDQuery);
+//  TNotifyEventWrap.Create(FW.BeforeScrollM, DoBeforeScroll, FW.EventList);
 end;
 
 procedure TQueryAdmissions.FDQueryUpdateRecord(ASender: TDataSet;
@@ -235,6 +238,17 @@ begin
   // Удаляем цикл
   // *********************************************
   qCSE.FDQuery.Delete;
+end;
+
+procedure TQueryAdmissions.DoBeforeScroll(Sender: TObject);
+begin
+  ;
+end;
+
+procedure TQueryAdmissions.FDQueryBeforeScroll(DataSet: TDataSet);
+begin
+  inherited;
+  ;
 end;
 
 function TQueryAdmissions.GetqCSE: TQueryCycleSpecialityEducations;
