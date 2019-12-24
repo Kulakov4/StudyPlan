@@ -388,6 +388,15 @@ begin
   end;
 
   // *********************************************
+  // »щем запись о дисциплине учебного плана
+  // *********************************************
+  qSP.SearchByIDStudyPlan(W.ID_StudyPlan.F.AsInteger, 1);
+  // *********************************************
+  // ”дал€ем из учебного плана
+  // *********************************************
+  qSP.FDQuery.Delete;
+{
+  // *********************************************
   // »щем цикл
   // *********************************************
   qCSE.SearchBySpecialityEducation(W.IDSPECIALITYEDUCATION.F.AsInteger, 1);
@@ -403,6 +412,7 @@ begin
   // ”дал€ем цикл
   // *********************************************
   qCSE.FDQuery.Delete;
+}
 end;
 
 function TQueryDPOSP.GetqCSE: TQueryCycleSpecialityEducations;

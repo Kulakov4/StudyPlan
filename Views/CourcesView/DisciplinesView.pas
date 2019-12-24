@@ -190,7 +190,7 @@ begin
   FDisciplineNameW := TDisciplineNameW.Create
     (FCourceGroup.qDisciplineName.W.AddClone(''));
   // Фильтруем названия дисциплин по кафедре
-  FDisciplineNameW.FilterByChair(AIDChair);
+//  FDisciplineNameW.FilterByChair(AIDChair);
 
   dsDisciplineName.DataSet := FDisciplineNameW.DataSet;
   DataSource.DataSet := FDPOSPW.DataSet;

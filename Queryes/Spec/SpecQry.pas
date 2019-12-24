@@ -137,7 +137,7 @@ end;
 
 function TQrySpec.SearchByID(AIDSpeciality: Integer): Integer;
 begin
-  Assert(not AIDSpeciality > 0);
+  Assert(AIDSpeciality > 0);
 
   Result := SearchEx([TParamrec.Create(W.ID_Speciality.FullName,
     AIDSpeciality)]);

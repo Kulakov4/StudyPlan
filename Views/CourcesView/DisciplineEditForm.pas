@@ -96,7 +96,7 @@ begin
   // Ñîçäà¸ì îá¸ğòêó
   FDisciplineNameW := TDisciplineNameW.Create(FDisciplineName);
   // Ôèëüòğóåì íàçâàíèÿ äèñöèïëèí ïî êàôåäğå
-  FDisciplineNameW.FilterByChair(FIDChair);
+//  FDisciplineNameW.FilterByChair(FIDChair);
   dsDisciplineName.DataSet := FDisciplineName;
 
   // **********************************************
@@ -222,8 +222,7 @@ begin
 
     W.TryPost;
     // Âîçìîæíî qDPOSP â ğåæèìå êıøèğîâàíèÿ äàííûõ!!!
-
-//    Assert(W.ID_StudyPlan.F.AsInteger > 0);
+    // Assert(W.ID_StudyPlan.F.AsInteger > 0);
   end;
 
 end;
