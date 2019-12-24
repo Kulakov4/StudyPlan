@@ -41,6 +41,7 @@ type
     FCourceGroup: TCourceGroup;
     FCourceName: TFDMemTable;
     FCourceNameW: TCourceNameW;
+    FID: Integer;
     FMode: TMode;
     FqChairDumb: TQueryFDDumb;
     FqSpecialityDumb: TQueryFDDumb;
@@ -82,6 +83,8 @@ begin
   Assert(AOwner is TCourceGroup);
 
   FCourceGroup := AOwner as TCourceGroup;
+
+  FID := FCourceGroup.qAdmissions.W.PK.AsInteger;
 
   FCourceGroup.qDPOSP.FDQuery.CachedUpdates := True;
 
@@ -249,8 +252,6 @@ end;
 
 procedure TfrmCreateCourcePlan.FormClose(Sender: TObject;
   var Action: TCloseAction);
-var
-  AID: Integer;
 begin
   if ModalResult <> mrOK then
   begin
@@ -266,16 +267,23 @@ begin
   end;
 
   try
-    AID := FCourceGroup.qAdmissions.W.PK.AsInteger;
+    if FMode = EditMode then
+    begin
+      Assert(FID > 0);
+      // Возвращаемся к той записи, которую начали редактировать
+      FCourceGroup.qAdmissions.W.LocateByPK(FID, True);
+    end;
+
+
     SavePlan;
-    if AID = 0 then
-      AID := FCourceGroup.qAdmissions.W.PK.AsInteger;
+    if FID = 0 then
+      FID := FCourceGroup.qAdmissions.W.PK.AsInteger;
 
     SaveSP;
     SaveGroups;
     FCourceGroup.qDPOSP.FDQuery.CachedUpdates := False;
 
-    FCourceGroup.qAdmissions.W.LocateByPK(AID, True);
+    FCourceGroup.qAdmissions.W.LocateByPK(FID, True);
 
     // Обновляем кол-во групп учебного плана
     if FCourceGroup.qStudentGroups.FDQuery.Active then
@@ -284,7 +292,7 @@ begin
         (FCourceGroup.qStudentGroups.FDQuery.RecordCount);
     end;
 
-    FCourceGroup.qAdmissions.W.LocateByPK(AID, True);
+    FCourceGroup.qAdmissions.W.LocateByPK(FID, True);
   except
     Action := caNone;
     raise;

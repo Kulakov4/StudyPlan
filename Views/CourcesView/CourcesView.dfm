@@ -6,6 +6,9 @@ inherited ViewCources: TViewCources
     ExplicitHeight = 438
     inherited cxGridDBBandedTableView: TcxGridDBBandedTableView
       OnDblClick = cxGridDBBandedTableViewDblClick
+      OnCanFocusRecord = cxGridDBBandedTableViewCanFocusRecord
+      OnCanSelectRecord = cxGridDBBandedTableViewCanSelectRecord
+      DataController.OnDetailExpanding = cxGridDBBandedTableViewDataControllerDetailExpanding
       OptionsCustomize.ColumnMoving = False
       OptionsView.ColumnAutoWidth = False
       OnColumnHeaderClick = cxGridDBBandedTableViewColumnHeaderClick
@@ -15,6 +18,8 @@ inherited ViewCources: TViewCources
       OnKeyDown = cxGridDBBandedTableView2KeyDown
       OnMouseDown = cxGridDBBandedTableView2MouseDown
       Navigator.Buttons.CustomButtons = <>
+      OnCanFocusRecord = cxGridDBBandedTableView2CanFocusRecord
+      OnCanSelectRecord = cxGridDBBandedTableView2CanSelectRecord
       OnEditKeyDown = cxGridDBBandedTableView2EditKeyDown
       DataController.DataSource = dsStudyPlan
       DataController.Summary.DefaultGroupSummaryItems = <>

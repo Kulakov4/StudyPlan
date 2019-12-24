@@ -79,8 +79,24 @@ type
       AColumn: TcxGridColumn);
     procedure cxGridDBBandedTableViewDblClick(Sender: TObject);
     procedure cxdblcbYearsPropertiesChange(Sender: TObject);
+    procedure cxGridDBBandedTableView2CanFocusRecord
+      (Sender: TcxCustomGridTableView; ARecord: TcxCustomGridRecord;
+      var AAllow: Boolean);
+    procedure cxGridDBBandedTableView2CanSelectRecord
+      (Sender: TcxCustomGridTableView; ARecord: TcxCustomGridRecord;
+      var AAllow: Boolean);
+    procedure cxGridDBBandedTableViewCanFocusRecord
+      (Sender: TcxCustomGridTableView; ARecord: TcxCustomGridRecord;
+      var AAllow: Boolean);
+    procedure cxGridDBBandedTableViewCanSelectRecord
+      (Sender: TcxCustomGridTableView; ARecord: TcxCustomGridRecord;
+      var AAllow: Boolean);
+    procedure cxGridDBBandedTableViewDataControllerDetailExpanding
+      (ADataController: TcxCustomDataController; ARecordIndex: Integer;
+      var AAllow: Boolean);
   private
     FAccessLevel: TAccessLevel;
+    FCanFocusRecord: Boolean;
     FCourceGroup: TCourceGroup;
     function GetclIDChair: TcxGridDBBandedColumn;
     function GetclIDSpeciality: TcxGridDBBandedColumn;
@@ -102,6 +118,8 @@ type
     function GetFocusedTableView: TcxGridDBBandedTableView; override;
   public
     constructor Create(AOwner: TComponent); override;
+    procedure BeginUpdate; override;
+    procedure EndUpdate; override;
     procedure UpdateView; override;
     property AccessLevel: TAccessLevel read FAccessLevel write SetAccessLevel;
     property clIDChair: TcxGridDBBandedColumn read GetclIDChair;
@@ -135,6 +153,7 @@ constructor TViewCources.Create(AOwner: TComponent);
 begin
   inherited;
   seYears.Value := CurrentYear + 1;
+  FCanFocusRecord := True;
 end;
 
 procedure TViewCources.actAddPlanExecute(Sender: TObject);
@@ -173,13 +192,18 @@ var
 begin
   inherited;
 
-  AView := FocusedTableView;
-  Assert(AView <> nil);
+  BeginUpdate;
+  try
+    AView := FocusedTableView;
+    Assert(AView <> nil);
 
-  if AView = MainView then
-    actEditPlan.Execute
-  else
-    actEditDiscipline.Execute;
+    if AView = MainView then
+      actEditPlan.Execute
+    else
+      actEditDiscipline.Execute;
+  finally
+    EndUpdate;
+  end;
 end;
 
 procedure TViewCources.actAddDisciplineExecute(Sender: TObject);
@@ -187,11 +211,16 @@ var
   frm: TfrmEditDiscipline;
 begin
   inherited;
-  frm := TfrmEditDiscipline.Create(FCourceGroup);
+  BeginUpdate;
   try
-    frm.ShowModal;
+    frm := TfrmEditDiscipline.Create(FCourceGroup);
+    try
+      frm.ShowModal;
+    finally
+      FreeAndNil(frm);
+    end;
   finally
-    FreeAndNil(frm);
+    EndUpdate;
   end;
 
   UpdateView;
@@ -222,13 +251,7 @@ begin
   frm := TfrmEditDiscipline.Create(FCourceGroup);
   try
     frm.Mode := EditMode;
-
-    cxGrid.BeginUpdate();
-    try
-      frm.ShowModal;
-    finally
-      cxGrid.EndUpdate;
-    end;
+    frm.ShowModal;
   finally
     FreeAndNil(frm);
   end;
@@ -246,15 +269,7 @@ begin
   frm := TfrmCreateCourcePlan.Create(FCourceGroup);
   try
     frm.Mode := EditMode;
-
-    // cxGrid.BeginUpdate();
-    // DisableCollapsingAndExpanding;
-    try
-      frm.ShowModal;
-    finally
-      // cxGrid.EndUpdate;
-      // EnableCollapsingAndExpanding;
-    end;
+    frm.ShowModal;
   finally
     FreeAndNil(frm);
   end;
@@ -290,11 +305,39 @@ begin
   end;
 end;
 
+procedure TViewCources.BeginUpdate;
+begin
+  // Inc(UpdateCount);
+  // if UpdateCount = 1 then
+  // DisableCollapsingAndExpanding;
+
+  // cxGrid.BeginUpdate();
+  FCanFocusRecord := False;
+  MainView.DataController.DataModeController.SyncMode := False;
+  cxGridDBBandedTableView2.DataController.DataModeController.SyncMode := False;
+end;
+
 procedure TViewCources.cxdblcbYearsPropertiesChange(Sender: TObject);
 begin
   inherited;
   (Sender as TcxDBLookupComboBox).PostEditValue;
   FCourceGroup.YearDumb.W.TryPost;
+end;
+
+procedure TViewCources.cxGridDBBandedTableView2CanFocusRecord
+  (Sender: TcxCustomGridTableView; ARecord: TcxCustomGridRecord;
+  var AAllow: Boolean);
+begin
+  inherited;
+  AAllow := FCanFocusRecord;
+end;
+
+procedure TViewCources.cxGridDBBandedTableView2CanSelectRecord
+  (Sender: TcxCustomGridTableView; ARecord: TcxCustomGridRecord;
+  var AAllow: Boolean);
+begin
+  inherited;
+  AAllow := FCanFocusRecord;
 end;
 
 procedure TViewCources.cxGridDBBandedTableView2DblClick(Sender: TObject);
@@ -325,11 +368,35 @@ begin
   DoOnKeyOrMouseDown;
 end;
 
+procedure TViewCources.cxGridDBBandedTableViewCanFocusRecord
+  (Sender: TcxCustomGridTableView; ARecord: TcxCustomGridRecord;
+  var AAllow: Boolean);
+begin
+  inherited;
+  AAllow := FCanFocusRecord;
+end;
+
+procedure TViewCources.cxGridDBBandedTableViewCanSelectRecord
+  (Sender: TcxCustomGridTableView; ARecord: TcxCustomGridRecord;
+  var AAllow: Boolean);
+begin
+  inherited;
+  AAllow := FCanFocusRecord;
+end;
+
 procedure TViewCources.cxGridDBBandedTableViewColumnHeaderClick
   (Sender: TcxGridTableView; AColumn: TcxGridColumn);
 begin
   inherited;
   ApplySort(Sender, AColumn);
+end;
+
+procedure TViewCources.cxGridDBBandedTableViewDataControllerDetailExpanding
+  (ADataController: TcxCustomDataController; ARecordIndex: Integer;
+  var AAllow: Boolean);
+begin
+  inherited;
+  AAllow := FCanFocusRecord;
 end;
 
 procedure TViewCources.cxGridDBBandedTableViewDblClick(Sender: TObject);
@@ -343,6 +410,13 @@ begin
   MyApplyBestFitForView(MainView);
   MainView.ViewData.Collapse(True);
   UpdateView;
+end;
+
+procedure TViewCources.EndUpdate;
+begin
+  FCanFocusRecord := True;
+  MainView.DataController.DataModeController.SyncMode := True;
+  cxGridDBBandedTableView2.DataController.DataModeController.SyncMode := True;
 end;
 
 function TViewCources.GetclIDChair: TcxGridDBBandedColumn;
