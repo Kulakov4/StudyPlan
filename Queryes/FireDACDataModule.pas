@@ -69,7 +69,7 @@ end;
 constructor TFireDACDM.Create(AOwner: TComponent);
 begin
   inherited;
-  FDConnection.Params.Database := '(DESCRIPTION = (ADDRESS_LIST = (ADDRESS = (PROTOCOL = TCP)(HOST = 192.168.0.71)(PORT = 1521)))(CONNECT_DATA = (SERVICE_NAME = ORCL)))';
+  FDConnection.Params.Database := '(DESCRIPTION = (ADDRESS_LIST = (ADDRESS = (PROTOCOL = TCP)(HOST = 192.168.0.4)(PORT = 1521)))(CONNECT_DATA = (SERVICE_NAME = ORCL)))';
 end;
 
 procedure TFireDACDM.FDConnectionAfterConnect(Sender: TObject);

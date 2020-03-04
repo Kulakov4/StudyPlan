@@ -16,7 +16,7 @@ uses
   System.ImageList, Vcl.ImgList, cxImageList, cxDBLookupComboBox, cxCheckBox,
   TB2Item, TB2Dock, TB2Toolbar, Vcl.StdCtrls, NotifyEvents, Vcl.Samples.Spin,
   cxContainer, cxTextEdit, cxMaskEdit, cxDropDownEdit, cxLookupEdit,
-  cxDBLookupEdit, OptionsHelper;
+  cxDBLookupEdit, OptionsHelper, dxDateRanges;
 
 type
   TViewCources = class(TfrmGrid)
@@ -194,6 +194,11 @@ begin
 
   BeginUpdate;
   try
+//    CourceGroup.qAdmissions.W.PK.AsInteger
+//    CourceGroup.qDPOSP.W.PK.AsInteger
+///    CourceGroup.qAdmissions.W.SaveBookmark;
+//    CourceGroup.qDPOSP.W.SaveBookmark;
+
     AView := FocusedTableView;
     Assert(AView <> nil);
 
@@ -201,6 +206,9 @@ begin
       actEditPlan.Execute
     else
       actEditDiscipline.Execute;
+
+//    CourceGroup.qDPOSP.W.RestoreBookmark;
+//    CourceGroup.qAdmissions.W.RestoreBookmark;
   finally
     EndUpdate;
   end;
@@ -414,9 +422,9 @@ end;
 
 procedure TViewCources.EndUpdate;
 begin
-  FCanFocusRecord := True;
   MainView.DataController.DataModeController.SyncMode := True;
   cxGridDBBandedTableView2.DataController.DataModeController.SyncMode := True;
+  FCanFocusRecord := True;
 end;
 
 function TViewCources.GetclIDChair: TcxGridDBBandedColumn;

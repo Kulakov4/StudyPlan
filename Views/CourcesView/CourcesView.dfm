@@ -9,6 +9,7 @@ inherited ViewCources: TViewCources
       OnCanFocusRecord = cxGridDBBandedTableViewCanFocusRecord
       OnCanSelectRecord = cxGridDBBandedTableViewCanSelectRecord
       DataController.OnDetailExpanding = cxGridDBBandedTableViewDataControllerDetailExpanding
+      OptionsBehavior.ExpandMasterRowOnDblClick = False
       OptionsCustomize.ColumnMoving = False
       OptionsView.ColumnAutoWidth = False
       OnColumnHeaderClick = cxGridDBBandedTableViewColumnHeaderClick
@@ -89,21 +90,21 @@ inherited ViewCources: TViewCources
       end
       object Label1: TLabel
         Left = 77
-        Top = 4
+        Top = 8
         Width = 15
         Height = 13
         Caption = #1085#1072' '
       end
       object Label2: TLabel
         Left = 142
-        Top = 4
+        Top = 8
         Width = 24
         Height = 13
         Caption = ' '#1075#1086#1076' '
       end
       object seYears: TSpinEdit
         Left = 92
-        Top = 0
+        Top = 4
         Width = 50
         Height = 22
         MaxValue = 2099
@@ -126,14 +127,14 @@ inherited ViewCources: TViewCources
       end
       object lbl1: TLabel
         Left = 0
-        Top = 4
+        Top = 8
         Width = 29
         Height = 13
         Caption = #1043#1086#1076':  '
       end
       object cxdblcbYears: TcxDBLookupComboBox
         Left = 29
-        Top = 0
+        Top = 4
         Properties.ListColumns = <>
         Properties.OnChange = cxdblcbYearsPropertiesChange
         TabOrder = 0
