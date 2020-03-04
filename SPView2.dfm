@@ -192,21 +192,21 @@ inherited viewSP: TviewSP
       Checked = True
       OnExecute = actLecturesExecute
     end
-    object actSeminars: TAction
+    object actPracticalLessons: TAction
       Tag = 3
-      Caption = #1057#1077#1084#1080#1085#1072#1088#1099
+      Caption = #1055#1088#1072#1082#1090#1080#1095#1077#1089#1082#1080#1077' '#1079#1072#1085#1103#1090#1080#1103
       Checked = True
-      OnExecute = actSeminarsExecute
+      OnExecute = actPracticalLessonsExecute
     end
-    object actLabWorks: TAction
+    object actLaboratoryLessons: TAction
       Tag = 2
-      Caption = #1051#1072#1073#1086#1088#1072#1090#1086#1088#1085#1099#1077
+      Caption = #1051#1072#1073#1086#1088#1072#1090#1086#1088#1085#1099#1077' '#1079#1072#1085#1103#1090#1080#1103
       Checked = True
-      OnExecute = actLabWorksExecute
+      OnExecute = actLaboratoryLessonsExecute
     end
     object actSam: TAction
       Tag = 22
-      Caption = #1057#1072#1084'. '#1088#1072#1073'. '
+      Caption = #1063#1072#1089#1099' '#1076#1083#1103' '#1089#1072#1084#1086#1089#1090#1086#1103#1090#1077#1083#1100#1085#1086#1081' '#1088#1072#1073#1086#1090#1099
       OnExecute = actSamExecute
     end
     object actExam: TAction
@@ -339,7 +339,7 @@ inherited viewSP: TviewSP
     Left = 344
     Top = 145
     Bitmap = {
-      494C01010B00B801740118001800FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C01010B00B801780118001800FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       000000000000360000002800000060000000480000000100200000000000006C
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000008C5A5A008C5A5A008C5A5A008C5A
@@ -1267,11 +1267,11 @@ inherited viewSP: TviewSP
     end
     object N10: TMenuItem
       Tag = 3
-      Action = actSeminars
+      Action = actPracticalLessons
     end
     object N11: TMenuItem
       Tag = 2
-      Action = actLabWorks
+      Action = actLaboratoryLessons
     end
     object N12: TMenuItem
       Tag = 5
@@ -1292,9 +1292,6 @@ inherited viewSP: TviewSP
     object N17: TMenuItem
       Tag = 9
       Action = actConsultation
-    end
-    object N2: TMenuItem
-      Action = actRepeatExam
     end
     object N16: TMenuItem
       Tag = 12

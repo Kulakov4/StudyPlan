@@ -1,6 +1,5 @@
 inherited QueryAdmissions: TQueryAdmissions
   inherited FDQuery: TFDQuery
-    BeforeScroll = FDQueryBeforeScroll
     OnUpdateRecord = FDQueryUpdateRecord
     UpdateOptions.AssignedValues = [uvRefreshMode, uvCheckRequired]
     UpdateOptions.CheckRequired = False

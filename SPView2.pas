@@ -26,8 +26,8 @@ type
     actChair: TAction;
     actMark: TAction;
     actLectures: TAction;
-    actSeminars: TAction;
-    actLabWorks: TAction;
+    actPracticalLessons: TAction;
+    actLaboratoryLessons: TAction;
     actExam: TAction;
     actZach: TAction;
     actCurs: TAction;
@@ -76,7 +76,6 @@ type
     actShowSummary: TAction;
     actTotal2: TAction;
     actRepeatExam: TAction;
-    N2: TMenuItem;
     actSam: TAction;
     N3: TMenuItem;
     actUMK: TAction;
@@ -128,7 +127,7 @@ type
     procedure actExamExecute(Sender: TObject);
     procedure actGAExecute(Sender: TObject);
     procedure actIDStudyPlanExecute(Sender: TObject);
-    procedure actLabWorksExecute(Sender: TObject);
+    procedure actLaboratoryLessonsExecute(Sender: TObject);
     procedure actLecturesExecute(Sender: TObject);
     procedure actMarkExecute(Sender: TObject);
     procedure actNewExecute(Sender: TObject);
@@ -140,7 +139,7 @@ type
     procedure actRepeatExamExecute(Sender: TObject);
     procedure actSamExecute(Sender: TObject);
     procedure actSelfExecute(Sender: TObject);
-    procedure actSeminarsExecute(Sender: TObject);
+    procedure actPracticalLessonsExecute(Sender: TObject);
     procedure actShowSummaryExecute(Sender: TObject);
     procedure actSpecialitySessionsExecute(Sender: TObject);
     procedure actStructureExecute(Sender: TObject);
@@ -254,10 +253,10 @@ begin
       actAuditor.Execute;
     if actLectures.Checked then
       actLectures.Execute;
-    if actSeminars.Checked then
-      actSeminars.Execute;
-    if actLabWorks.Checked then
-      actLabWorks.Execute;
+    if actPracticalLessons.Checked then
+      actPracticalLessons.Execute;
+    if actLaboratoryLessons.Checked then
+      actLaboratoryLessons.Execute;
     if actExam.Checked then
       actExam.Execute;
     if actZach.Checked then
@@ -299,10 +298,10 @@ begin
       actAuditor.Execute;
     if not actLectures.Checked then
       actLectures.Execute;
-    if not actSeminars.Checked then
-      actSeminars.Execute;
-    if not actLabWorks.Checked then
-      actLabWorks.Execute;
+    if not actPracticalLessons.Checked then
+      actPracticalLessons.Execute;
+    if not actLaboratoryLessons.Checked then
+      actLaboratoryLessons.Execute;
     if not actExam.Checked then
       actExam.Execute;
     if not actZach.Checked then
@@ -572,9 +571,9 @@ begin
   OnColumnVisibleChange(actIDStudyPlan, 'id_studyplan');
 end;
 
-procedure TviewSP.actLabWorksExecute(Sender: TObject);
+procedure TviewSP.actLaboratoryLessonsExecute(Sender: TObject);
 begin
-  OnColumnVisibleChange(actLabWorks, actLabWorks.Tag);
+  OnColumnVisibleChange(actLaboratoryLessons, actLaboratoryLessons.Tag);
 end;
 
 procedure TviewSP.actLecturesExecute(Sender: TObject);
@@ -678,9 +677,9 @@ begin
   OnColumnVisibleChange(actSelf, 'Self');
 end;
 
-procedure TviewSP.actSeminarsExecute(Sender: TObject);
+procedure TviewSP.actPracticalLessonsExecute(Sender: TObject);
 begin
-  OnColumnVisibleChange(actSeminars, actSeminars.Tag);
+  OnColumnVisibleChange(actPracticalLessons, actPracticalLessons.Tag);
 end;
 
 procedure TviewSP.actShowSummaryExecute(Sender: TObject);
@@ -1289,7 +1288,7 @@ begin
 
     with CreateColumn as TcxDBTreeListColumn do
     begin
-      Caption.Text := 'Сем.';
+      Caption.Text := 'Пр.';
       DataBinding.FieldName := Document.StudyPlanCDS.Seminars.FieldName;
       Width := 35;
       Caption.AlignHorz := taCenter;

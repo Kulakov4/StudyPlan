@@ -14,7 +14,7 @@ uses
   cxGridCustomView, cxGridCustomTableView, cxGridTableView,
   cxGridBandedTableView, cxGridDBBandedTableView, cxGrid, SpecSessGroup,
   SpecSessQry, Vcl.StdCtrls, cxTextEdit, cxContainer, System.ImageList,
-  Vcl.ImgList, cxImageList;
+  Vcl.ImgList, cxImageList, dxDateRanges;
 
 type
   TViewSpecSess = class(TfrmGrid)
@@ -86,7 +86,7 @@ type
 implementation
 
 uses
-  cxDropDownEdit, System.Generics.Collections;
+  cxDropDownEdit, System.Generics.Collections, System.Types;
 
 {$R *.dfm}
 

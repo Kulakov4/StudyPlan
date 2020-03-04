@@ -18,33 +18,41 @@ inherited PlanEditView: TPlanEditView
     Caption = #1044#1080#1089#1094#1080#1087#1083#1080#1085#1072':'
   end
   object lbl4: TLabel
-    Left = 154
+    Left = 144
     Top = 295
-    Width = 64
-    Height = 13
+    Width = 102
+    Height = 17
+    Alignment = taRightJustify
+    AutoSize = False
     Caption = #1042#1089#1077#1075#1086' '#1095#1072#1089#1086#1074':'
     OnClick = lbl4Click
   end
   object lbl5: TLabel
-    Left = 327
+    Left = 323
     Top = 295
-    Width = 41
-    Height = 13
+    Width = 63
+    Height = 17
+    Alignment = taRightJustify
+    AutoSize = False
     Caption = #1051#1077#1082#1094#1080#1081':'
   end
   object lbl6: TLabel
     Left = 463
     Top = 295
-    Width = 79
-    Height = 13
+    Width = 106
+    Height = 17
+    Alignment = taRightJustify
+    AutoSize = False
     Caption = #1051#1072#1073#1086#1088#1072#1090#1086#1088#1085#1099#1093':'
   end
   object lbl7: TLabel
     Left = 637
     Top = 295
-    Width = 59
-    Height = 13
-    Caption = #1057#1077#1084#1080#1085#1072#1088#1086#1074':'
+    Width = 110
+    Height = 17
+    Alignment = taRightJustify
+    AutoSize = False
+    Caption = #1055#1088#1072#1082#1090#1080#1095#1077#1089#1082#1080#1093':'
   end
   object Label1: TLabel
     Left = 14
@@ -111,7 +119,7 @@ inherited PlanEditView: TPlanEditView
     Width = 65
   end
   object cxdbspndtSeminars: TcxDBSpinEdit
-    Left = 725
+    Left = 747
     Top = 291
     TabOrder = 9
     Width = 65
