@@ -13,7 +13,7 @@ uses
   System.Actions, Vcl.ActnList, cxClasses, dxBar, Vcl.ComCtrls, cxGridLevel,
   cxGridCustomView, cxGridCustomTableView, cxGridTableView,
   cxGridBandedTableView, cxGridDBBandedTableView, cxGrid, SpecEdQuery, SPGroup,
-  cxCheckBox;
+  cxCheckBox, dxDateRanges;
 
 type
   TViewSpecEdPopup = class(TfrmGrid)

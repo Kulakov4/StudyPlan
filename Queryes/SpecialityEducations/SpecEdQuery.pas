@@ -19,6 +19,7 @@ type
     { Private declarations }
   public
     constructor Create(AOwner: TComponent); override;
+    procedure LockAllOnClient;
     function Search(AYear, AIDEducationType: Integer; AEnableOnly: Boolean):
         Integer;
     function SearchRetraining(AYear: Integer; AEnableOnly: Boolean): Integer;
@@ -135,6 +136,34 @@ constructor TQuerySpecEd.Create(AOwner: TComponent);
 begin
   inherited;
   FW := TSpecEdW.Create(FDQuery);
+end;
+
+procedure TQuerySpecEd.LockAllOnClient;
+var
+  E: TFDUpdateRecordEvent;
+  Wr: TSpecEdW;
+begin
+  E := FDQuery.OnUpdateRecord;
+  try
+    FDQuery.OnUpdateRecord := FDQueryUpdateRecordOnClient;
+
+    Wr := TSpecEdW.Create(W.AddClone(Format('%s = 0', [W.Locked.FieldName])));
+    try
+      while not wr.DataSet.Eof do
+      begin
+        wr.TryEdit;
+        wr.Locked.F.AsInteger := 1;
+        wr.TryPost;
+        // Т.к. клог отфильтрован, то количество записей будет уменьшаться
+//        wr.DataSet.Next;
+      end;
+    finally
+      W.DropClone(Wr.DataSet as TFDMemTable);
+    end;
+
+  finally
+    FDQuery.OnUpdateRecord := E;
+  end;
 end;
 
 function TQuerySpecEd.Search(AYear, AIDEducationType: Integer; AEnableOnly:

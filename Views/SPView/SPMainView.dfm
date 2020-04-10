@@ -14,7 +14,7 @@ object ViewSPMain: TViewSPMain
     Left = 0
     Top = 0
     Width = 1387
-    Height = 51
+    Height = 56
     object tbYear: TTBToolbar
       Left = 0
       Top = 0
@@ -29,7 +29,7 @@ object ViewSPMain: TViewSPMain
       end
       object lbl1: TLabel
         Left = 0
-        Top = 2
+        Top = 4
         Width = 34
         Height = 16
         Caption = #1043#1086#1076':  '
@@ -57,7 +57,7 @@ object ViewSPMain: TViewSPMain
       end
       object lbl2: TLabel
         Left = 0
-        Top = 2
+        Top = 4
         Width = 161
         Height = 16
         Caption = #1053#1072#1087#1088#1072#1074#1083#1077#1085#1080#1077' '#1087#1086#1076#1075#1086#1090#1086#1074#1082#1080':  '
@@ -74,7 +74,7 @@ object ViewSPMain: TViewSPMain
     end
     object tbShortSpeciality: TTBToolbar
       Left = 0
-      Top = 26
+      Top = 28
       Caption = 'tbShortSpeciality'
       DockPos = 0
       DockRow = 1
@@ -87,7 +87,7 @@ object ViewSPMain: TViewSPMain
       end
       object Label3: TLabel
         Left = 0
-        Top = 2
+        Top = 4
         Width = 87
         Height = 16
         Caption = #1057#1086#1082#1088#1072#1097#1077#1085#1080#1077':  '
@@ -102,7 +102,7 @@ object ViewSPMain: TViewSPMain
     end
     object tbChairs: TTBToolbar
       Left = 281
-      Top = 26
+      Top = 28
       DockPos = 10
       DockRow = 1
       SystemFont = False
@@ -115,7 +115,7 @@ object ViewSPMain: TViewSPMain
       end
       object Label4: TLabel
         Left = 0
-        Top = 2
+        Top = 4
         Width = 65
         Height = 16
         Caption = #1050#1072#1092#1077#1076#1088#1072':  '
@@ -151,11 +151,14 @@ object ViewSPMain: TViewSPMain
         object TBItem2: TTBItem
           Action = actDeleteStudyPlan
         end
+        object TBItem4: TTBItem
+          Action = actLockAllStudyPlans
+        end
       end
     end
     object tbIDSpecEd: TTBToolbar
-      Left = 1037
-      Top = 26
+      Left = 972
+      Top = 28
       Caption = 'tbIDSpecEd'
       DockPos = 956
       DockRow = 1
@@ -165,14 +168,14 @@ object ViewSPMain: TViewSPMain
       end
       object cxdblID: TcxDBLabel
         Left = 0
-        Top = 0
+        Top = 1
         Height = 21
         Width = 41
       end
     end
     object tbLocked: TTBToolbar
       Left = 906
-      Top = 26
+      Top = 28
       Caption = 'tbLocked'
       DockPos = 900
       DockRow = 1
@@ -224,6 +227,11 @@ object ViewSPMain: TViewSPMain
       Checked = True
       GroupIndex = 1
       OnExecute = actActivePlansExecute
+    end
+    object actLockAllStudyPlans: TAction
+      Caption = #1047#1072#1073#1083#1086#1082#1080#1088#1086#1074#1072#1090#1100' '#1074#1089#1077' '#1087#1083#1072#1085#1099
+      ImageIndex = 4
+      OnExecute = actLockAllStudyPlansExecute
     end
   end
   object cxImageList: TcxImageList
@@ -378,6 +386,27 @@ object ViewSPMain: TViewSPMain
           B9FFE3C5A3FFC59973F24C392A67000000060000000100000000000000000000
           000000000001000000022019122C6C543E89A47E5FCCC59770F1C19570EEA47E
           60CD6C543F8B16110D2200000003000000010000000000000000}
+      end
+      item
+        ImageClass = 'TdxSmartImage'
+        Image.Data = {
+          3C3F786D6C2076657273696F6E3D22312E302220656E636F64696E673D225554
+          462D38223F3E0D0A3C7376672076657273696F6E3D22312E31222069643D224C
+          617965725F312220786D6C6E733D22687474703A2F2F7777772E77332E6F7267
+          2F323030302F7376672220786D6C6E733A786C696E6B3D22687474703A2F2F77
+          77772E77332E6F72672F313939392F786C696E6B2220783D223070782220793D
+          22307078222076696577426F783D2230203020313820313822207374796C653D
+          22656E61626C652D6261636B67726F756E643A6E657720302030203138203138
+          3B2220786D6C3A73706163653D227072657365727665223E262331333B262331
+          303B3C7374796C6520747970653D22746578742F637373223E2E59656C6C6F77
+          7B66696C6C3A234646423131353B7D3C2F7374796C653E0D0A3C706174682063
+          6C6173733D2259656C6C6F772220643D224D31352C31384833632D312E312C30
+          2D322D302E392D322D32762D3663302D312E312C302E392D322C322D32683132
+          63312E312C302C322C302E392C322C3276364331372C31372E312C31362E312C
+          31382C31352C31387A222F3E0D0A3C7061746820636C6173733D2259656C6C6F
+          772220643D224D392C3043352E372C302C332C322E372C332C36763868325636
+          63302D322E322C312E382D342C342D3473342C312E382C342C34763868325636
+          4331352C322E372C31322E332C302C392C307A222F3E0D0A3C2F7376673E0D0A}
       end>
   end
   object PopupMenu: TPopupMenu

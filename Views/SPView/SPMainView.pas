@@ -61,11 +61,14 @@ type
     actActivePlans: TAction;
     N1: TMenuItem;
     N2: TMenuItem;
+    actLockAllStudyPlans: TAction;
+    TBItem4: TTBItem;
     procedure actCopyStudyPlanExecute(Sender: TObject);
     procedure actDeleteStudyPlanExecute(Sender: TObject);
     procedure actEditStudyPlanExecute(Sender: TObject);
     procedure actCreateStudyPlanExecute(Sender: TObject);
     procedure actActivePlansExecute(Sender: TObject);
+    procedure actLockAllStudyPlansExecute(Sender: TObject);
     procedure actShowAllExecute(Sender: TObject);
     procedure cxdbelcbSpecialityMouseDown(Sender: TObject; Button: TMouseButton;
       Shift: TShiftState; X, Y: Integer);
@@ -203,6 +206,11 @@ end;
 procedure TViewSPMain.actCreateStudyPlanExecute(Sender: TObject);
 begin
   CreateStudyPlan;
+end;
+
+procedure TViewSPMain.actLockAllStudyPlansExecute(Sender: TObject);
+begin
+  SPGroup.LockAllStudyPlans;
 end;
 
 procedure TViewSPMain.CreateStudyPlan;

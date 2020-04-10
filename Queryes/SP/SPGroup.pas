@@ -65,6 +65,7 @@ type
     procedure CopyStudyPlan(AYear: Integer);
     procedure DeleteStudyPlan;
     procedure DoOnReportPlanGraphBySpecExec;
+    procedure LockAllStudyPlans;
     procedure Save(ASpecEdSimple: ISpecEdSimple; AMode: TMode; ASpec: ISpec);
     property OnYearChange: TNotifyEventsEx read FOnYearChange;
     property OnSpecEdChange: TNotifyEventsEx read FOnSpecEdChange;
@@ -98,7 +99,7 @@ type
 implementation
 
 uses
-  MyFR, System.SysUtils, CopyStudyPlanQuery, FR3, ReportFilesUpdater;
+  MyFR, System.SysUtils, CopyStudyPlanQuery, FR3, ReportFilesUpdater, LockSPQry;
 
 constructor TSPGroup.Create(AOwner: TComponent;
   AYear, AIDSpecialityEducation: Integer; ASPType: TSPType);
@@ -218,9 +219,9 @@ end;
 
 procedure TSPGroup.DoOnReportPlanGraphBySpecExec;
 begin
-//  TMyFR.Create(Self).Show('study_plan\plan_graph_by_spec2.fr3',
-//    ['year_', 'id_specialityeducation'], [qSpecEdSimple.W.Year.F.AsInteger,
-//    qSpecEdSimple.W.ID_SPECIALITYEDUCATION.F.AsInteger]);
+  // TMyFR.Create(Self).Show('study_plan\plan_graph_by_spec2.fr3',
+  // ['year_', 'id_specialityeducation'], [qSpecEdSimple.W.Year.F.AsInteger,
+  // qSpecEdSimple.W.ID_SPECIALITYEDUCATION.F.AsInteger]);
 
   TFR3.Create.Show(TReportFilesUpdater.TryUpdate
     ('study_plan\plan_graph_by_spec2.fr3'), ['year_', 'id_specialityeducation'],
@@ -382,6 +383,20 @@ end;
 function TSPGroup.GetYear: Integer;
 begin
   Result := FYearDumb.W.ID.F.AsInteger;
+end;
+
+procedure TSPGroup.LockAllStudyPlans;
+begin
+  case FSPType of
+    sptVO:
+      TQryLockSP.Lock_All([1, 2]); // ВО;
+    sptSPO:
+      TQryLockSP.Lock_All([3]); // СПО;
+    sptRetraining:
+      TQryLockSP.Lock_All([5]); // Переподготовка;
+  end;
+
+  qSpecEd.LockAllOnClient;
 end;
 
 procedure TSPGroup.Save(ASpecEdSimple: ISpecEdSimple; AMode: TMode;
