@@ -22,7 +22,6 @@ inherited ViewCources: TViewCources
       OnCanFocusRecord = cxGridDBBandedTableView2CanFocusRecord
       OnCanSelectRecord = cxGridDBBandedTableView2CanSelectRecord
       OnEditKeyDown = cxGridDBBandedTableView2EditKeyDown
-      DataController.DataSource = dsStudyPlan
       DataController.Summary.DefaultGroupSummaryItems = <>
       DataController.Summary.FooterSummaryItems = <>
       DataController.Summary.SummaryGroups = <>
@@ -727,9 +726,5 @@ inherited ViewCources: TViewCources
           0000000000000000000000000000000000000000000000000000000000000000
           0000000000000000000000000000000000000000000000000000}
       end>
-  end
-  object dsStudyPlan: TDataSource
-    Left = 592
-    Top = 184
   end
 end

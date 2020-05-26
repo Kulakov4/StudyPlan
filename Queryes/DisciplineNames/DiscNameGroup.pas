@@ -26,7 +26,7 @@ begin
   FqChairs.W.RefreshQuery;
 
   FqDiscName := TQryDiscName.Create(Self);
-  FqDiscName.W.RefreshQuery;
+  FqDiscName.SearchByType([1, 2]);
 end;
 
 procedure TDiscNameGroup.Save(ADiscNameInt: IDiscName; AMode: TMode);

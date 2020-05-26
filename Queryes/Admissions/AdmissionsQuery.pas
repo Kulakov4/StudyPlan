@@ -10,7 +10,7 @@ uses
   FireDAC.Phys.Intf, FireDAC.DApt.Intf, FireDAC.Stan.Async, FireDAC.DApt,
   Data.DB, FireDAC.Comp.DataSet, FireDAC.Comp.Client, DSWrap,
   SpecialitySessionsQuery, LessonTypeQuery, CycleSpecialityEducationQuery,
-  StudyPlansQuery;
+  StudyPlansQuery, InsertEditMode, AdmissionsInterface;
 
 type
   TAdmissionsW = class;
@@ -64,6 +64,7 @@ type
     procedure DoAfterOpen(Sender: TObject);
   public
     constructor Create(AOwner: TComponent); override;
+    procedure Save(AdmissionInt: IAdmission; AMode: TMode);
     property Data: TFieldWrap read FData;
     property GroupCount: TFieldWrap read FGroupCount;
     property IDChair: TFieldWrap read FIDChair;
@@ -181,6 +182,25 @@ procedure TAdmissionsW.DoBeforePost(Sender: TObject);
 begin
   // Это одно и то-же поле!
   IDShortSpeciality.F.AsInteger := IDSpeciality.F.AsInteger;
+end;
+
+procedure TAdmissionsW.Save(AdmissionInt: IAdmission; AMode: TMode);
+begin
+  Assert(AdmissionInt <> nil);
+
+  if AMode = EditMode then
+    TryEdit
+  else
+    TryAppend;
+  try
+    IDSpeciality.F.AsInteger := AdmissionInt.IDSpeciality;
+    IDChair.F.AsInteger := AdmissionInt.IDChair;
+    Data.F.AsInteger := AdmissionInt.Data;
+    TryPost;
+  except
+    TryCancel;
+    raise;
+  end;
 end;
 
 procedure TQueryAdmissions.ApplyDelete;

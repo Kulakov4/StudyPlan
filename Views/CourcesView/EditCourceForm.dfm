@@ -1,4 +1,4 @@
-object frmCreateCourcePlan: TfrmCreateCourcePlan
+object frmEditCource: TfrmEditCource
   Left = 0
   Top = 0
   BorderStyle = bsDialog
@@ -117,10 +117,18 @@ object frmCreateCourcePlan: TfrmCreateCourcePlan
     object cxtshDisciplines: TcxTabSheet
       Caption = #1044#1080#1089#1094#1080#1087#1083#1080#1085#1099
       ImageIndex = 1
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
     end
     object cxtshGroups: TcxTabSheet
       Caption = #1043#1088#1091#1087#1087#1099
       ImageIndex = 2
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
     end
   end
   object dsSpeciality: TDataSource

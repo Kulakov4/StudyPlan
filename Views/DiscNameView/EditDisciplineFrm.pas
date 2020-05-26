@@ -151,7 +151,7 @@ begin
         begin
           DisciplineName := W.DisciplineName.F.AsString;
           ShortDisciplineName := W.ShortDisciplineName.F.AsString;
-          SetIDChair(W.IDCHAR.F.AsInteger);
+          SetIDChair(W.IDChair.F.AsInteger);
         end;
         Caption := 'Изменение наименования дисциплины';
       end;

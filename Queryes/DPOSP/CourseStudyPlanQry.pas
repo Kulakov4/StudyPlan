@@ -1,4 +1,4 @@
-unit DPOSPQuery;
+unit CourseStudyPlanQry;
 
 interface
 
@@ -10,7 +10,8 @@ uses
   FireDAC.Phys.Intf, FireDAC.DApt.Intf, FireDAC.Stan.Async, FireDAC.DApt,
   Data.DB, FireDAC.Comp.DataSet, FireDAC.Comp.Client, DSWrap,
   CycleSpecialityEducationQuery, SpecialitySessionsQuery, StudyPlansQuery,
-  LessonTypeQuery, System.Generics.Collections;
+  LessonTypeQuery, System.Generics.Collections, InsertEditMode,
+  CourseStudyPlanInterface;
 
 type
   TLTInfo = record
@@ -29,9 +30,9 @@ type
     constructor Create(APK: TField; AIDType: Integer; ADataField: TField);
   end;
 
-  TDPOSPW = class;
+  TCourseStudyPlanW = class;
 
-  TQueryDPOSP = class(TQueryBase)
+  TQryCourseStudyPlan = class(TQueryBase)
     procedure FDQueryUpdateRecord(ASender: TDataSet; ARequest: TFDUpdateRequest;
       var AAction: TFDErrorAction; AOptions: TFDUpdateRowOptions);
   private
@@ -39,7 +40,7 @@ type
     FqLT: TQueryLessonType;
     FqSP: TQueryStudyPlans;
     FqSS: TQuerySpecialitySessions;
-    FW: TDPOSPW;
+    FW: TCourseStudyPlanW;
     function GetqCSE: TQueryCycleSpecialityEducations;
     function GetqLT: TQueryLessonType;
     function GetqSP: TQueryStudyPlans;
@@ -55,12 +56,13 @@ type
     property qSS: TQuerySpecialitySessions read GetqSS;
   public
     constructor Create(AOwner: TComponent); override;
-    function Search(AIDEducationLevel, AYear: Integer): Integer;
-    property W: TDPOSPW read FW;
+    function Search(AIDEducationLevel, AYear: Integer): Integer; overload;
+    function Search(AIDSpecEd: Integer): Integer; overload;
+    property W: TCourseStudyPlanW read FW;
     { Public declarations }
   end;
 
-  TDPOSPW = class(TDSWrap)
+  TCourseStudyPlanW = class(TDSWrap)
   private
     FIDSPECIALITYEDUCATION: TFieldWrap;
     FIDDisciplineName: TFieldWrap;
@@ -80,6 +82,7 @@ type
     FSemID: TFieldWrap;
   public
     constructor Create(AOwner: TComponent); override;
+    procedure Save(ACourseStudyPlanInt: ICourseStudyPlan; AMode: TMode);
     property IDSPECIALITYEDUCATION: TFieldWrap read FIDSPECIALITYEDUCATION;
     property IDDisciplineName: TFieldWrap read FIDDisciplineName;
     property ID_StudyPlan: TFieldWrap read FID_StudyPlan;
@@ -100,13 +103,16 @@ type
 
 implementation
 
-constructor TQueryDPOSP.Create(AOwner: TComponent);
+uses
+  System.Math;
+
+constructor TQryCourseStudyPlan.Create(AOwner: TComponent);
 begin
   inherited;
-  FW := TDPOSPW.Create(FDQuery);
+  FW := TCourseStudyPlanW.Create(FDQuery);
 end;
 
-procedure TQueryDPOSP.FDQueryUpdateRecord(ASender: TDataSet;
+procedure TQryCourseStudyPlan.FDQueryUpdateRecord(ASender: TDataSet;
   ARequest: TFDUpdateRequest; var AAction: TFDErrorAction;
   AOptions: TFDUpdateRowOptions);
 begin
@@ -116,23 +122,29 @@ begin
 
   case ARequest of
     arInsert:
-      ApplyInsert;
+      begin
+        ApplyInsert;
+        AAction := eaApplied;
+      end;
     arUpdate:
-      ApplyUpdate;
+      begin
+        ApplyUpdate;
+        AAction := eaApplied;
+      end;
     arDelete:
-      ApplyDelete;
+      begin
+        ApplyDelete;
+        AAction := eaApplied;
+      end;
     arFetchRow:
       ;
   end;
-
-  AAction := eaApplied;
 end;
 
-constructor TDPOSPW.Create(AOwner: TComponent);
+constructor TCourseStudyPlanW.Create(AOwner: TComponent);
 begin
   inherited;
-  FID_StudyPlan := TFieldWrap.Create(Self, 'ID_StudyPlan');
-  PKFieldName := FID_StudyPlan.FieldName;
+  FID_StudyPlan := TFieldWrap.Create(Self, 'ID_StudyPlan', '', True);
 
   FIDSPECIALITYEDUCATION := TFieldWrap.Create(Self, 'IDSPECIALITYEDUCATION');
   FIDDisciplineName := TFieldWrap.Create(Self, 'IDDisciplineName',
@@ -156,7 +168,30 @@ end;
 
 {$R *.dfm}
 
-procedure TQueryDPOSP.ApplyInsert;
+procedure TCourseStudyPlanW.Save(ACourseStudyPlanInt: ICourseStudyPlan; AMode:
+    TMode);
+begin
+  if AMode = EditMode then
+    TryEdit
+  else
+    TryAppend;
+  try
+    IDSPECIALITYEDUCATION.F.AsInteger := ACourseStudyPlanInt.IDSPECIALITYEDUCATION;
+    IDChair.F.AsInteger := ACourseStudyPlanInt.IDChair;
+    IDDisciplineName.F.AsInteger := ACourseStudyPlanInt.IDDisciplineName;
+    LecData.F.AsInteger := ACourseStudyPlanInt.Lec;
+    LabData.F.AsInteger := ACourseStudyPlanInt.Lab;
+    SemData.F.AsInteger := ACourseStudyPlanInt.Sem;
+    ZachData.F.AsInteger := IfThen(ACourseStudyPlanInt.Zach, 2, 0);
+    ExamData.F.AsInteger := IfThen(ACourseStudyPlanInt.Exam, 2, 0);
+    TryPost;
+  except
+    TryCancel;
+    raise;
+  end;
+end;
+
+procedure TQryCourseStudyPlan.ApplyInsert;
 Var
   AL: TList<TLTInfo>;
   ALTI: TLTInfo;
@@ -258,10 +293,11 @@ begin
   end;
 end;
 
-procedure TQueryDPOSP.ApplyUpdate;
+procedure TQryCourseStudyPlan.ApplyUpdate;
 var
   AL: TList<TLTInfo2>;
   ALTI: TLTInfo2;
+  OK: Boolean;
 begin
   Assert(W.IDSPECIALITYEDUCATION.F.AsInteger > 0);
   Assert(W.ID_StudyPlan.F.AsInteger > 0);
@@ -336,8 +372,12 @@ begin
           // Если часы удалили
           qLT.FDQuery.Delete;
           Assert(qLT.FDQuery.RecordCount = 0);
+
+          OK := W.TryEdit;
           ALTI.PK.Value := NULL;
           ALTI.DataField.Value := NULL;
+          if OK then
+            W.TryPost;
         end;
       end
       else
@@ -356,7 +396,11 @@ begin
             TryPost;
           end;
           Assert(qLT.W.PK.AsInteger > 0);
-          ALTI.PK.AsInteger := qLT.W.PK.AsInteger;
+
+          OK := W.TryEdit;
+          ALTI.PK.Value := qLT.W.PK.AsInteger;
+          if OK then
+            W.TryPost;
         end
       end;
     end;
@@ -365,7 +409,7 @@ begin
   end;
 end;
 
-procedure TQueryDPOSP.ApplyDelete;
+procedure TQryCourseStudyPlan.ApplyDelete;
 begin
   Assert(W.IDSPECIALITYEDUCATION.F.AsInteger > 0);
   Assert(W.ID_StudyPlan.F.AsInteger > 0);
@@ -395,27 +439,27 @@ begin
   // Удаляем из учебного плана
   // *********************************************
   qSP.FDQuery.Delete;
-{
-  // *********************************************
-  // Ищем цикл
-  // *********************************************
-  qCSE.SearchBySpecialityEducation(W.IDSPECIALITYEDUCATION.F.AsInteger, 1);
+  {
+    // *********************************************
+    // Ищем цикл
+    // *********************************************
+    qCSE.SearchBySpecialityEducation(W.IDSPECIALITYEDUCATION.F.AsInteger, 1);
 
-  // *********************************************
-  // Удаляем из учебного плана всё, что относится к этому циклу
-  // *********************************************
-  qSP.SearchByCycleSpecialityEducation(qCSE.W.PK.AsInteger);
-  while not qSP.FDQuery.Eof do
+    // *********************************************
+    // Удаляем из учебного плана всё, что относится к этому циклу
+    // *********************************************
+    qSP.SearchByCycleSpecialityEducation(qCSE.W.PK.AsInteger);
+    while not qSP.FDQuery.Eof do
     qSP.FDQuery.Delete;
 
-  // *********************************************
-  // Удаляем цикл
-  // *********************************************
-  qCSE.FDQuery.Delete;
-}
+    // *********************************************
+    // Удаляем цикл
+    // *********************************************
+    qCSE.FDQuery.Delete;
+  }
 end;
 
-function TQueryDPOSP.GetqCSE: TQueryCycleSpecialityEducations;
+function TQryCourseStudyPlan.GetqCSE: TQueryCycleSpecialityEducations;
 begin
   if FqCSE = nil then
     FqCSE := TQueryCycleSpecialityEducations.Create(Self);
@@ -423,7 +467,7 @@ begin
   Result := FqCSE;
 end;
 
-function TQueryDPOSP.GetqLT: TQueryLessonType;
+function TQryCourseStudyPlan.GetqLT: TQueryLessonType;
 begin
   if FqLT = nil then
     FqLT := TQueryLessonType.Create(Self);
@@ -431,7 +475,7 @@ begin
   Result := FqLT;
 end;
 
-function TQueryDPOSP.GetqSP: TQueryStudyPlans;
+function TQryCourseStudyPlan.GetqSP: TQueryStudyPlans;
 begin
   if FqSP = nil then
     FqSP := TQueryStudyPlans.Create(Self);
@@ -439,7 +483,7 @@ begin
   Result := FqSP;
 end;
 
-function TQueryDPOSP.GetqSS: TQuerySpecialitySessions;
+function TQryCourseStudyPlan.GetqSS: TQuerySpecialitySessions;
 begin
   if FqSS = nil then
     FqSS := TQuerySpecialitySessions.Create(Self);
@@ -447,7 +491,7 @@ begin
   Result := FqSS;
 end;
 
-function TQueryDPOSP.Search(AIDEducationLevel, AYear: Integer): Integer;
+function TQryCourseStudyPlan.Search(AIDEducationLevel, AYear: Integer): Integer;
 begin
   Assert(AIDEducationLevel > 0);
   Assert(AYear > 0);
@@ -466,6 +510,14 @@ begin
 
   Result := W.Load([W.IDEducationLevel.FieldName, W.Year.FieldName],
     [AIDEducationLevel, AYear]);
+end;
+
+function TQryCourseStudyPlan.Search(AIDSpecEd: Integer): Integer;
+begin
+  // Assert(AIDSpecEd > 0);
+
+  Result := SearchEx([TParamRec.Create(W.IDSPECIALITYEDUCATION.FullName,
+    AIDSpecEd)])
 end;
 
 constructor TLTInfo.Create(AIDType, AData: Integer;

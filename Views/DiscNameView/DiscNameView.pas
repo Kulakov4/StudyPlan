@@ -13,7 +13,8 @@ uses
   System.Actions, Vcl.ActnList, cxClasses, dxBar, Vcl.ComCtrls, cxGridLevel,
   cxGridCustomView, cxGridCustomTableView, cxGridTableView,
   cxGridBandedTableView, cxGridDBBandedTableView, cxGrid, DiscNameGroup,
-  System.ImageList, Vcl.ImgList, cxImageList, FireDAC.Phys.OracleWrapper;
+  System.ImageList, Vcl.ImgList, cxImageList, FireDAC.Phys.OracleWrapper,
+  dxDateRanges;
 
 type
   TViewDiscName = class(TfrmGrid)
@@ -79,7 +80,7 @@ end;
 function TViewDiscName.GetclIDChair: TcxGridDBBandedColumn;
 begin
   Result := MainView.GetColumnByFieldName
-    (FDiscNameGroup.qDiscName.W.IDCHAR.FieldName);
+    (FDiscNameGroup.qDiscName.W.IDChair.FieldName);
 end;
 
 function TViewDiscName.GetclDisciplineName: TcxGridDBBandedColumn;

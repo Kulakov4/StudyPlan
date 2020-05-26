@@ -4,21 +4,20 @@ interface
 
 uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants,
-  System.Classes, Vcl.Graphics,
-  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, GridFrame, cxGraphics, cxControls,
-  cxLookAndFeels, cxLookAndFeelPainters, cxStyles, cxCustomData, cxFilter,
-  cxData, cxDataStorage, cxEdit, cxNavigator,
+  System.Classes, Vcl.Graphics, Vcl.Controls, Vcl.Forms, Vcl.Dialogs, GridFrame,
+  cxGraphics, cxControls, cxLookAndFeels, cxLookAndFeelPainters, cxStyles,
+  cxCustomData, cxFilter, cxData, cxDataStorage, cxEdit, cxNavigator,
   cxDataControllerConditionalFormattingRulesManagerDialog, Data.DB, cxDBData,
   dxBarBuiltInMenu, cxGridCustomPopupMenu, cxGridPopupMenu, Vcl.Menus,
   System.Actions, Vcl.ActnList, cxClasses, dxBar, Vcl.ComCtrls, cxGridLevel,
   cxGridCustomView, cxGridCustomTableView, cxGridTableView,
-  cxGridBandedTableView, cxGridDBBandedTableView, cxGrid, DPOSPQuery,
-  DisciplineNameQuery, System.ImageList, Vcl.ImgList, cxImageList, TB2Dock,
-  TB2Toolbar, CourceGroup, TB2Item;
+  cxGridBandedTableView, cxGridDBBandedTableView, cxGrid,
+  System.ImageList, Vcl.ImgList, cxImageList, TB2Dock, TB2Toolbar, TB2Item,
+  dxDateRanges, DiscNameQry, CourseDiscViewModel,
+  InsertEditMode;
 
 type
   TViewDisciplines = class(TfrmGrid)
-    dsDisciplineName: TDataSource;
     TBDock1: TTBDock;
     TBToolbar1: TTBToolbar;
     actAdd: TAction;
@@ -27,14 +26,10 @@ type
     TBItem1: TTBItem;
     TBItem2: TTBItem;
     TBItem3: TTBItem;
-    actSave: TAction;
     procedure actAddExecute(Sender: TObject);
     procedure actEditExecute(Sender: TObject);
-    procedure actSaveExecute(Sender: TObject);
   private
-    FDPOSPW: TDPOSPW;
-    FCourceGroup: TCourceGroup;
-    FDisciplineNameW: TDisciplineNameW;
+    FModel: TCourseDiscViewModel;
     procedure DoOnExamChange(Sender: TObject);
     procedure DoOnIDDisciplineNameChanged(Sender: TObject);
     function GetclExam: TcxGridDBBandedColumn;
@@ -43,7 +38,8 @@ type
     function GetclLec: TcxGridDBBandedColumn;
     function GetclSem: TcxGridDBBandedColumn;
     function GetclZach: TcxGridDBBandedColumn;
-    procedure SetCourceGroup(const Value: TCourceGroup);
+    procedure SetModel(const Value: TCourseDiscViewModel);
+    procedure ShowDisciplineEditForm(AMode: TMode);
     { Private declarations }
   public
     destructor Destroy; override;
@@ -55,64 +51,36 @@ type
     property clLec: TcxGridDBBandedColumn read GetclLec;
     property clSem: TcxGridDBBandedColumn read GetclSem;
     property clZach: TcxGridDBBandedColumn read GetclZach;
-    property CourceGroup: TCourceGroup read FCourceGroup write SetCourceGroup;
+    property Model: TCourseDiscViewModel read FModel write SetModel;
     { Public declarations }
   end;
 
 implementation
 
 uses
-  cxDropDownEdit, cxCheckBox, DisciplineEditForm, FireDAC.Comp.Client,
-  InsertEditMode, cxDBLookupComboBox;
+  cxDropDownEdit, cxCheckBox, FireDAC.Comp.Client,
+  cxDBLookupComboBox, NotifyEvents, CourceDiscEditForm,
+  CourceDiscNameViewModel;
 
 {$R *.dfm}
 
 destructor TViewDisciplines.Destroy;
 begin
-  CourceGroup := nil;
+  Model := nil;
 
   inherited;
 end;
 
 procedure TViewDisciplines.actAddExecute(Sender: TObject);
-var
-  frm: TfrmEditDiscipline;
 begin
   inherited;
-  frm := TfrmEditDiscipline.Create(CourceGroup);
-  try
-    frm.ShowModal;
-  finally
-    FreeAndNil(frm);
-  end;
-
-  MyApplyBestFitForView(MainView);
-  UpdateView;
+  ShowDisciplineEditForm(InsertMode);
 end;
 
 procedure TViewDisciplines.actEditExecute(Sender: TObject);
-var
-  frm: TfrmEditDiscipline;
 begin
   inherited;
-  frm := TfrmEditDiscipline.Create(CourceGroup);
-  try
-    frm.Mode := EditMode;
-    frm.ShowModal;
-  finally
-    FreeAndNil(frm);
-  end;
-
-  MyApplyBestFitForView(MainView);
-  UpdateView;
-end;
-
-procedure TViewDisciplines.actSaveExecute(Sender: TObject);
-begin
-  inherited;
-  FDPOSPW.TryPost;
-
-  UpdateView;
+  ShowDisciplineEditForm(EditMode);
 end;
 
 procedure TViewDisciplines.DoOnExamChange(Sender: TObject);
@@ -130,82 +98,65 @@ end;
 
 function TViewDisciplines.GetclExam: TcxGridDBBandedColumn;
 begin
-  Result := MainView.GetColumnByFieldName(FDPOSPW.ExamData.FieldName);
+  Result := MainView.GetColumnByFieldName
+    (Model.CourseStudyPlanW.ExamData.FieldName);
 end;
 
 function TViewDisciplines.GetclIDDisciplineName: TcxGridDBBandedColumn;
 begin
-  Result := MainView.GetColumnByFieldName(FDPOSPW.IDDisciplineName.FieldName);
+  Result := MainView.GetColumnByFieldName
+    (Model.CourseStudyPlanW.IDDisciplineName.FieldName);
 end;
 
 function TViewDisciplines.GetclLab: TcxGridDBBandedColumn;
 begin
-  Result := MainView.GetColumnByFieldName(FDPOSPW.LabData.FieldName);
+  Result := MainView.GetColumnByFieldName
+    (Model.CourseStudyPlanW.LabData.FieldName);
 end;
 
 function TViewDisciplines.GetclLec: TcxGridDBBandedColumn;
 begin
-  Result := MainView.GetColumnByFieldName(FDPOSPW.LecData.FieldName);
+  Result := MainView.GetColumnByFieldName
+    (Model.CourseStudyPlanW.LecData.FieldName);
 end;
 
 function TViewDisciplines.GetclSem: TcxGridDBBandedColumn;
 begin
-  Result := MainView.GetColumnByFieldName(FDPOSPW.SemData.FieldName);
+  Result := MainView.GetColumnByFieldName
+    (Model.CourseStudyPlanW.SemData.FieldName);
 end;
 
 function TViewDisciplines.GetclZach: TcxGridDBBandedColumn;
 begin
-  Result := MainView.GetColumnByFieldName(FDPOSPW.ZachData.FieldName);
+  Result := MainView.GetColumnByFieldName
+    (Model.CourseStudyPlanW.ZachData.FieldName);
 end;
 
-procedure TViewDisciplines.SetCourceGroup(const Value: TCourceGroup);
-var
-  AIDChair: Integer;
+procedure TViewDisciplines.SetModel(const Value: TCourseDiscViewModel);
 begin
-  if FCourceGroup = Value then
+  if FModel = Value then
     Exit;
 
-  if FCourceGroup <> nil then
-  begin
-    FCourceGroup.qDisciplineName.W.DropClone
-      (FDisciplineNameW.DataSet as TFDMemTable);
-    FCourceGroup.qDPOSP.W.DropClone(FDPOSPW.DataSet as TFDMemTable);
-  end;
+  FModel := Value;
 
-  FCourceGroup := Value;
-
-  if FCourceGroup = nil then
+  if FModel = nil then
   begin
     Exit;
   end;
 
-  // Получаем клон содержащий дисциплины одного учебного плана
-  FDPOSPW := FCourceGroup.GetCurrSPW;
-
-  Assert(FCourceGroup.qAdmissions.FDQuery.RecordCount > 0);
-  AIDChair := FCourceGroup.qAdmissions.W.IDChair.F.AsInteger;
-  Assert(AIDChair > 0);
-
-  // Создаём обёртку и клон
-  FDisciplineNameW := TDisciplineNameW.Create
-    (FCourceGroup.qDisciplineName.W.AddClone(''));
-  // Фильтруем названия дисциплин по кафедре
-//  FDisciplineNameW.FilterByChair(AIDChair);
-
-  dsDisciplineName.DataSet := FDisciplineNameW.DataSet;
-  DataSource.DataSet := FDPOSPW.DataSet;
+  DataSource.DataSet := Model.CourseStudyPlanW.DataSet;
   MainView.DataController.CreateAllItems;
 
   InitView(MainView);
   MainView.OptionsBehavior.CellHints := True;
 
   // Настраиваем подстановочную колонку Наименование дисциплины
-  InitializeLookupColumn(clIDDisciplineName, dsDisciplineName, lsEditList,
-    FDisciplineNameW.DisciplineName.FieldName,
-    FDisciplineNameW.PKFieldName);
+  InitializeLookupColumn(clIDDisciplineName, Model.DiscNameW.DataSource,
+    lsEditList, Model.DiscNameW.DisciplineName.FieldName,
+    Model.DiscNameW.PKFieldName);
 
-  (clIDDisciplineName.Properties as TcxLookupComboBoxProperties).OnEditValueChanged :=
-    DoOnIDDisciplineNameChanged;
+  (clIDDisciplineName.Properties as TcxLookupComboBoxProperties)
+    .OnEditValueChanged := DoOnIDDisciplineNameChanged;
 
   clIDDisciplineName.Options.SortByDisplayText := isbtOn;
   clLec.Options.AutoWidthSizable := False;
@@ -249,14 +200,36 @@ begin
   UpdateView;
 end;
 
+procedure TViewDisciplines.ShowDisciplineEditForm(AMode: TMode);
+var
+  AModel: TCourceDiscNameVM;
+  frm: TfrmCourceDiscEdit;
+begin
+  inherited;
+
+  // Создаём модель для представления
+  AModel := Model.CreateCourceDiscNameVM(Self);
+
+  frm := TfrmCourceDiscEdit.Create(AModel);
+  try
+    frm.Mode := AMode;
+    frm.ShowModal;
+  finally
+    FreeAndNil(AModel);
+  end;
+
+  MyApplyBestFitForView(MainView);
+  UpdateView;
+end;
+
 procedure TViewDisciplines.UpdateView;
 var
   AView: TcxGridDBBandedTableView;
   OK: Boolean;
 begin
   inherited;
-  OK := (CourceGroup <> nil) and (FDPOSPW.DataSet.Active) and
-    (CourceGroup.qDisciplineName.W.DataSet.Active);
+  OK := (Model <> nil) and (Model.CourseStudyPlanW.DataSet.Active) and
+    (Model.DiscNameW.DataSet.Active);
 
   AView := FocusedTableView;
 
@@ -267,8 +240,6 @@ begin
 
   actDeleteEx.Enabled := OK and (AView <> nil) and
     (AView.Controller.SelectedRowCount > 0);
-
-  actSave.Enabled := OK and FDPOSPW.HaveAnyChanges;
 end;
 
 end.

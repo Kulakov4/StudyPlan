@@ -5,7 +5,8 @@ inherited QryDiscName: TQryDiscName
     SQL.Strings = (
       'select *'
       'from DisciplineNames'
-      'where type_discipline in (1, 2)'
+      'where --type_discipline in (1, 2)'
+      '0=0'
       'order by DisciplineName')
   end
 end

@@ -8,11 +8,20 @@ function GetWords(const S: String): String;
 function Uncomment(ASQL, AComment: string): string;
 
 function ReplaceInSQL(const ASQL: String; const AStipulation: String;
-  ANumber: Integer): String;
+  ANumber: Integer): String; overload;
+
+function IntArrToStr(const AIntArr: TArray<Integer>;
+  const ADelimiter: String): String;
+
+  function StrArrToStr(const AStrArr: TArray<String>;
+  const ADelimiter: String): String;
+
+function ReplaceInSQL(const ASQL, AStipulation, ATemplate: String)
+  : String; overload;
 
 implementation
 
-uses System.SysUtils;
+uses System.SysUtils, System.StrUtils;
 
 function DeleteDoubleSpace(const S: string): String;
 var
@@ -73,15 +82,43 @@ end;
 
 function ReplaceInSQL(const ASQL: String; const AStipulation: String;
   ANumber: Integer): String;
+begin
+  Result := ReplaceInSQL(ASQL, AStipulation,
+    Format('%d=%d', [ANumber, ANumber]));
+end;
+
+function StrArrToStr(const AStrArr: TArray<String>;
+  const ADelimiter: String): String;
 var
-  ATemplate: string;
+  S: String;
+begin
+  Result := '';
+  for S in AStrArr do
+  begin
+    Result := Result + IfThen(Result.IsEmpty, '', ADelimiter) + S;
+  end;
+end;
+
+function IntArrToStr(const AIntArr: TArray<Integer>;
+  const ADelimiter: String): String;
+var
+  AID: Integer;
+begin
+  Result := '';
+  for AID in AIntArr do
+  begin
+    Result := Result + IfThen(Result.IsEmpty, '', ADelimiter) + AID.ToString;
+  end;
+end;
+
+function ReplaceInSQL(const ASQL, AStipulation, ATemplate: String): String;
+var
   lp: Integer;
   p: Integer;
 begin
   Assert(not ASQL.IsEmpty);
   Assert(not AStipulation.IsEmpty);
 
-  ATemplate := Format('%d=%d', [ANumber, ANumber]);
   p := ASQL.IndexOf(ATemplate);
   Assert(p >= 0);
   lp := ASQL.LastIndexOf(ATemplate);

@@ -18,6 +18,7 @@ type
     { Private declarations }
   public
     constructor Create(AOwner: TComponent); override;
+    function ApplyUpdates(AID: Integer; AShortCaption: string): Integer;
     function Search(AEnabled: Boolean = True): Integer;
     function SearchCourceName(AEnabled: Boolean = True): Integer;
     property W: TCourceNameW read FW;
@@ -61,6 +62,25 @@ begin
   FDQuery.CachedUpdates := True;
   FDQuery.UpdateOptions.AutoIncFields := W.PKFieldName;
   FDQuery.UpdateOptions.RefreshMode := rmOnDemand;
+end;
+
+function TQueryCourceName.ApplyUpdates(AID: Integer; AShortCaption: string):
+    Integer;
+begin
+  Assert(FDQuery.CachedUpdates);
+
+  // Тут у нас пока может ID = 0 (NULL)
+  W.LocateByPK(AID);
+  W.UpdateShortCaption(AShortCaption);
+
+  // Наконец-то сохраняем сделанные изменения в БД
+  FDQuery.ApplyUpdates(0);
+  FDQuery.CommitUpdates;
+  Assert(FDQuery.ChangeCount = 0);
+
+  // Тут должен появиться положительный ID
+  Assert(W.PK.AsInteger > 0);
+  Result := W.PK.AsInteger;
 end;
 
 function TQueryCourceName.Search(AEnabled: Boolean = True): Integer;

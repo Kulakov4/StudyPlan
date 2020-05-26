@@ -1,4 +1,4 @@
-object frmEditDiscipline: TfrmEditDiscipline
+object frmCourceDiscEdit: TfrmCourceDiscEdit
   Left = 0
   Top = 0
   BorderStyle = bsDialog
@@ -142,9 +142,5 @@ object frmEditDiscipline: TfrmEditDiscipline
     Default = True
     ModalResult = 1
     TabOrder = 7
-  end
-  object dsDisciplineName: TDataSource
-    Left = 656
-    Top = 16
   end
 end

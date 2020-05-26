@@ -16,7 +16,7 @@ uses
   System.ImageList, Vcl.ImgList, cxImageList, cxDBLookupComboBox, cxCheckBox,
   TB2Item, TB2Dock, TB2Toolbar, Vcl.StdCtrls, NotifyEvents, Vcl.Samples.Spin,
   cxContainer, cxTextEdit, cxMaskEdit, cxDropDownEdit, cxLookupEdit,
-  cxDBLookupEdit, OptionsHelper, dxDateRanges;
+  cxDBLookupEdit, OptionsHelper, dxDateRanges, InsertEditMode;
 
 type
   TViewCources = class(TfrmGrid)
@@ -25,7 +25,6 @@ type
     dxBarButton1: TdxBarButton;
     cxGridLevel2: TcxGridLevel;
     cxGridDBBandedTableView2: TcxGridDBBandedTableView;
-    dsStudyPlan: TDataSource;
     actEdit: TAction;
     dxBarButton2: TdxBarButton;
     dxBarButton3: TdxBarButton;
@@ -112,6 +111,8 @@ type
     function GetclIDSpecialityEducation: TcxGridDBBandedColumn;
     procedure SetAccessLevel(const Value: TAccessLevel);
     procedure SetCourceGroup(const Value: TCourceGroup);
+    procedure ShowEditCourceForm(AMode: TMode);
+    procedure ShowEditDisciplineForm(AMode: TMode);
     { Private declarations }
   protected
     procedure DoAfterLoadData(Sender: TObject);
@@ -144,8 +145,8 @@ type
 implementation
 
 uses
-  GridSort, CreateCourcePlanForm, DisciplineEditForm,
-  InsertEditMode, GridComboBox, DialogUnit, DBLookupComboBoxHelper;
+  GridSort, EditCourseForm, GridComboBox, DialogUnit, DBLookupComboBoxHelper,
+  CourceDiscEditForm, CourceDiscNameViewModel;
 
 {$R *.dfm}
 
@@ -157,33 +158,9 @@ begin
 end;
 
 procedure TViewCources.actAddPlanExecute(Sender: TObject);
-var
-  frm: TfrmCreateCourcePlan;
 begin
   inherited;
-  cxGrid.SetFocus;
-  MainView.Focused := True;
-
-  frm := TfrmCreateCourcePlan.Create(FCourceGroup);
-  try
-    DisableCollapsingAndExpanding;
-    // cxGrid.BeginUpdate();
-    try
-      frm.ShowModal;
-    finally
-      // cxGrid.EndUpdate;
-      EnableCollapsingAndExpanding;
-    end;
-  finally
-    FreeAndNil(frm);
-  end;
-
-  cxGrid.SetFocus;
-  MainView.Focused := True;
-
-  MyApplyBestFitForView(MainView);
-
-  UpdateView;
+  ShowEditCourceForm(InsertMode);
 end;
 
 procedure TViewCources.actEditExecute(Sender: TObject);
@@ -194,10 +171,10 @@ begin
 
   BeginUpdate;
   try
-//    CourceGroup.qAdmissions.W.PK.AsInteger
-//    CourceGroup.qDPOSP.W.PK.AsInteger
-///    CourceGroup.qAdmissions.W.SaveBookmark;
-//    CourceGroup.qDPOSP.W.SaveBookmark;
+    // CourceGroup.qAdmissions.W.PK.AsInteger
+    // CourceGroup.qDPOSP.W.PK.AsInteger
+    /// CourceGroup.qAdmissions.W.SaveBookmark;
+    // CourceGroup.qDPOSP.W.SaveBookmark;
 
     AView := FocusedTableView;
     Assert(AView <> nil);
@@ -207,31 +184,17 @@ begin
     else
       actEditDiscipline.Execute;
 
-//    CourceGroup.qDPOSP.W.RestoreBookmark;
-//    CourceGroup.qAdmissions.W.RestoreBookmark;
+    // CourceGroup.qDPOSP.W.RestoreBookmark;
+    // CourceGroup.qAdmissions.W.RestoreBookmark;
   finally
     EndUpdate;
   end;
 end;
 
 procedure TViewCources.actAddDisciplineExecute(Sender: TObject);
-var
-  frm: TfrmEditDiscipline;
 begin
   inherited;
-  BeginUpdate;
-  try
-    frm := TfrmEditDiscipline.Create(FCourceGroup);
-    try
-      frm.ShowModal;
-    finally
-      FreeAndNil(frm);
-    end;
-  finally
-    EndUpdate;
-  end;
-
-  UpdateView;
+  ShowEditDisciplineForm(InsertMode);
 end;
 
 procedure TViewCources.actCopyExecute(Sender: TObject);
@@ -250,39 +213,15 @@ begin
 end;
 
 procedure TViewCources.actEditDisciplineExecute(Sender: TObject);
-var
-  frm: TfrmEditDiscipline;
 begin
   inherited;
-  Assert(FCourceGroup.qAdmissions.W.DataSet.RecordCount > 0);
-
-  frm := TfrmEditDiscipline.Create(FCourceGroup);
-  try
-    frm.Mode := EditMode;
-    frm.ShowModal;
-  finally
-    FreeAndNil(frm);
-  end;
-
-  UpdateView;
+  ShowEditDisciplineForm(EditMode);
 end;
 
 procedure TViewCources.actEditPlanExecute(Sender: TObject);
-var
-  frm: TfrmCreateCourcePlan;
 begin
   inherited;
-  Assert(FCourceGroup.qAdmissions.W.DataSet.RecordCount > 0);
-
-  frm := TfrmCreateCourcePlan.Create(FCourceGroup);
-  try
-    frm.Mode := EditMode;
-    frm.ShowModal;
-  finally
-    FreeAndNil(frm);
-  end;
-
-  UpdateView;
+  ShowEditCourceForm(EditMode);
 end;
 
 procedure TViewCources.actMoveExecute(Sender: TObject);
@@ -448,13 +387,13 @@ end;
 function TViewCources.GetclIDDisciplineName: TcxGridDBBandedColumn;
 begin
   Result := cxGridDBBandedTableView2.GetColumnByFieldName
-    (FCourceGroup.qDPOSP.W.IDDisciplineName.FieldName);
+    (FCourceGroup.qCourseStudyPlan.W.IDDisciplineName.FieldName);
 end;
 
 function TViewCources.GetclLec: TcxGridDBBandedColumn;
 begin
   Result := cxGridDBBandedTableView2.GetColumnByFieldName
-    (FCourceGroup.qDPOSP.W.LecData.FieldName);
+    (FCourceGroup.qCourseStudyPlan.W.LecData.FieldName);
 end;
 
 function TViewCources.GetclIDShortSpeciality: TcxGridDBBandedColumn;
@@ -466,25 +405,25 @@ end;
 function TViewCources.GetclLab: TcxGridDBBandedColumn;
 begin
   Result := cxGridDBBandedTableView2.GetColumnByFieldName
-    (FCourceGroup.qDPOSP.W.LabData.FieldName);
+    (FCourceGroup.qCourseStudyPlan.W.LabData.FieldName);
 end;
 
 function TViewCources.GetclSem: TcxGridDBBandedColumn;
 begin
   Result := cxGridDBBandedTableView2.GetColumnByFieldName
-    (FCourceGroup.qDPOSP.W.SemData.FieldName);
+    (FCourceGroup.qCourseStudyPlan.W.SemData.FieldName);
 end;
 
 function TViewCources.GetclZach: TcxGridDBBandedColumn;
 begin
   Result := cxGridDBBandedTableView2.GetColumnByFieldName
-    (FCourceGroup.qDPOSP.W.ZachData.FieldName);
+    (FCourceGroup.qCourseStudyPlan.W.ZachData.FieldName);
 end;
 
 function TViewCources.GetclExam: TcxGridDBBandedColumn;
 begin
   Result := cxGridDBBandedTableView2.GetColumnByFieldName
-    (FCourceGroup.qDPOSP.W.ExamData.FieldName);
+    (FCourceGroup.qCourseStudyPlan.W.ExamData.FieldName);
 end;
 
 function TViewCources.GetclGroupCount: TcxGridDBBandedColumn;
@@ -558,11 +497,11 @@ begin
     // **************************************
     with cxGridDBBandedTableView2.DataController do
     begin
-      dsStudyPlan.DataSet := FCourceGroup.qDPOSP.FDQuery;
-      KeyFieldNames := FCourceGroup.qDPOSP.W.PKFieldName;
+      DataSource := FCourceGroup.qCourseStudyPlan.W.DataSource;
+      KeyFieldNames := FCourceGroup.qCourseStudyPlan.W.PKFieldName;
 
-      DetailKeyFieldNames :=
-        FCourceGroup.qDPOSP.W.IDSPECIALITYEDUCATION.FieldName;
+      DetailKeyFieldNames := FCourceGroup.qCourseStudyPlan.W.
+        IDSPECIALITYEDUCATION.FieldName;
 
       MasterKeyFieldNames := FCourceGroup.qAdmissions.W.PKFieldName;
 
@@ -591,9 +530,9 @@ begin
 
     // Настраиваем подстановочную колонку Наименование дисциплины
     InitializeLookupColumn(clIDDisciplineName,
-      FCourceGroup.qDisciplineName.DataSource, lsEditList,
-      FCourceGroup.qDisciplineName.W.DisciplineName.FieldName,
-      FCourceGroup.qDisciplineName.W.PKFieldName);
+      FCourceGroup.qDiscName.DataSource, lsEditList,
+      FCourceGroup.qDiscName.W.DisciplineName.FieldName,
+      FCourceGroup.qDiscName.W.PKFieldName);
 
     InitView(MainView);
     InitView(cxGridDBBandedTableView2);
@@ -661,6 +600,64 @@ begin
     EndUpdate;
   end;
   DoAfterLoadData(nil);
+end;
+
+procedure TViewCources.ShowEditCourceForm(AMode: TMode);
+var
+  frm: TfrmEditCourse;
+begin
+  inherited;
+  cxGrid.SetFocus;
+  MainView.Focused := True;
+
+  frm := TfrmEditCourse.Create(FCourceGroup);
+  try
+    BeginUpdate;
+    try
+      frm.Mode := AMode;
+      frm.ShowModal;
+    finally
+      EndUpdate;
+    end;
+  finally
+    FreeAndNil(frm);
+  end;
+
+  cxGrid.SetFocus;
+  MainView.Focused := True;
+
+  MyApplyBestFitForView(MainView);
+
+  UpdateView;
+end;
+
+procedure TViewCources.ShowEditDisciplineForm(AMode: TMode);
+var
+  AModel: TCourceDiscNameVM;
+  frm: TfrmCourceDiscEdit;
+begin
+  inherited;
+  Assert(FCourceGroup.qAdmissions.W.DataSet.RecordCount > 0);
+
+  // Создаём модель для представления
+  AModel := TCourceDiscNameVM.Create(Self, CourceGroup.qCourseStudyPlan.W,
+    CourceGroup.qDiscName, CourceGroup.qAdmissions.W.IDChair.F.AsInteger,
+    CourceGroup.qAdmissions.W.ID_SpecialityEducation.F.AsInteger);
+
+  BeginUpdate;
+  try
+    frm := TfrmCourceDiscEdit.Create(AModel);
+    try
+      frm.Mode := AMode;
+      frm.ShowModal;
+    finally
+      FreeAndNil(AModel);
+    end;
+  finally
+    EndUpdate;
+  end;
+
+  UpdateView;
 end;
 
 procedure TViewCources.UpdateView;

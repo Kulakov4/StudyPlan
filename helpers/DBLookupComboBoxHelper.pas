@@ -14,11 +14,17 @@ type
   end;
 
   TDBLCB = class(TObject)
+  private
   public
     class procedure Init(AcxDBLookupComboBox: TcxDBLookupComboBox;
       ADataSource: TDataSource; const ADataField: string;
       AListSource: TDataSource; const AListFieldWrap: TFieldWrap;
-      ADropDownListStyle: TcxEditDropDownListStyle = lsEditFixedList); static;
+      ADropDownListStyle: TcxEditDropDownListStyle = lsEditFixedList);
+      overload; static;
+    class procedure Init(AcxLookupComboBoxProperties
+      : TcxLookupComboBoxProperties; AListSource: TDataSource;
+      const AListFieldWrap: TFieldWrap;
+      ADropDownListStyle: TcxEditDropDownListStyle = lsEditFixedList); overload;
   end;
 
   TDBL = class(TObject)
@@ -55,6 +61,21 @@ begin
     AListFieldWrap.DataSetWrap.PKFieldName;
   AcxDBLookupComboBox.Properties.ListFieldNames := AListFieldWrap.FieldName;
   AcxDBLookupComboBox.Properties.DropDownListStyle := ADropDownListStyle;
+end;
+
+class procedure TDBLCB.Init(AcxLookupComboBoxProperties
+  : TcxLookupComboBoxProperties; AListSource: TDataSource;
+  const AListFieldWrap: TFieldWrap;
+  ADropDownListStyle: TcxEditDropDownListStyle = lsEditFixedList);
+begin
+  Assert(AcxLookupComboBoxProperties <> nil);
+  Assert(AListSource <> nil);
+
+  AcxLookupComboBoxProperties.ListSource := AListSource;
+  AcxLookupComboBoxProperties.KeyFieldNames :=
+    AListFieldWrap.DataSetWrap.PKFieldName;
+  AcxLookupComboBoxProperties.ListFieldNames := AListFieldWrap.FieldName;
+  AcxLookupComboBoxProperties.DropDownListStyle := ADropDownListStyle;
 end;
 
 class procedure TDBL.Init(AcxDBLabel: TcxDBLabel; ADataSource: TDataSource;

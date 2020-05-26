@@ -1,4 +1,4 @@
-inherited QueryDPOSP: TQueryDPOSP
+inherited QryCourseStudyPlan: TQryCourseStudyPlan
   inherited FDQuery: TFDQuery
     OnUpdateRecord = FDQueryUpdateRecord
     UpdateOptions.AssignedValues = [uvCheckRequired]

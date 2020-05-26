@@ -408,8 +408,8 @@
             <FormType>dfm</FormType>
             <DesignClass>TFrame</DesignClass>
         </DCCReference>
-        <DCCReference Include="Queryes\DPOSP\DPOSPQuery.pas">
-            <Form>QueryDPOSP</Form>
+        <DCCReference Include="Queryes\DPOSP\CourseStudyPlanQry.pas">
+            <Form>QryCourseStudyPlan</Form>
             <FormType>dfm</FormType>
             <DesignClass>TFrame</DesignClass>
         </DCCReference>
@@ -424,8 +424,8 @@
             <FormType>dfm</FormType>
             <DesignClass>TFrame</DesignClass>
         </DCCReference>
-        <DCCReference Include="Views\CourcesView\CreateCourcePlanForm.pas">
-            <Form>frmCreateCourcePlan</Form>
+        <DCCReference Include="Views\CourcesView\EditCourseForm.pas">
+            <Form>frmEditCourse</Form>
             <FormType>dfm</FormType>
         </DCCReference>
         <DCCReference Include="Queryes\FDDumbQuery.pas">
@@ -433,14 +433,9 @@
             <FormType>dfm</FormType>
             <DesignClass>TFrame</DesignClass>
         </DCCReference>
-        <DCCReference Include="Views\CourcesView\DisciplineEditForm.pas">
-            <Form>frmEditDiscipline</Form>
+        <DCCReference Include="Views\CourcesView\CourceDiscEditForm.pas">
+            <Form>frmCourceDiscEdit</Form>
             <FormType>dfm</FormType>
-        </DCCReference>
-        <DCCReference Include="Queryes\DisciplineName\DisciplineNameQuery.pas">
-            <Form>QueryDisciplineName</Form>
-            <FormType>dfm</FormType>
-            <DesignClass>TFrame</DesignClass>
         </DCCReference>
         <DCCReference Include="helpers\InsertEditMode.pas"/>
         <DCCReference Include="Queryes\cyclespecialityeducations\CycleSpecialityEducationQuery.pas">
@@ -716,6 +711,10 @@
             <FormType>dfm</FormType>
             <DesignClass>TFrame</DesignClass>
         </DCCReference>
+        <DCCReference Include="Queryes\CourceDiscNameViewModel.pas"/>
+        <DCCReference Include="Queryes\DPOSP\CourseStudyPlanInterface.pas"/>
+        <DCCReference Include="Queryes\DPOSP\CourseDiscViewModel.pas"/>
+        <DCCReference Include="Queryes\Admissions\AdmissionsInterface.pas"/>
         <None Include="StudyPlan.todo"/>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>

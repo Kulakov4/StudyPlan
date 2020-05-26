@@ -142,14 +142,13 @@ uses
   FireDACDataModule in 'Queryes\FireDACDataModule.pas' {FireDACDM: TDataModule},
   BaseQuery in 'Queryes\BaseQuery.pas' {QueryBase: TFrame},
   AdmissionsQuery in 'Queryes\Admissions\AdmissionsQuery.pas' {QueryAdmissions: TFrame},
-  DPOSPQuery in 'Queryes\DPOSP\DPOSPQuery.pas' {QueryDPOSP: TFrame},
+  CourseStudyPlanQry in 'Queryes\DPOSP\CourseStudyPlanQry.pas' {QryCourseStudyPlan: TFrame},
   DSWrap in 'Queryes\DSWrap.pas',
   ChairsQuery in 'Queryes\Chairs\ChairsQuery.pas' {QueryChairs: TFrame},
   CourceNameQuery in 'Queryes\CourceName\CourceNameQuery.pas' {QueryCourceName: TFrame},
-  CreateCourcePlanForm in 'Views\CourcesView\CreateCourcePlanForm.pas' {frmCreateCourcePlan},
+  EditCourseForm in 'Views\CourcesView\EditCourseForm.pas' {frmEditCourse},
   FDDumbQuery in 'Queryes\FDDumbQuery.pas' {QueryFDDumb: TFrame},
-  DisciplineEditForm in 'Views\CourcesView\DisciplineEditForm.pas' {frmEditDiscipline},
-  DisciplineNameQuery in 'Queryes\DisciplineName\DisciplineNameQuery.pas' {QueryDisciplineName: TFrame},
+  CourceDiscEditForm in 'Views\CourcesView\CourceDiscEditForm.pas' {frmCourceDiscEdit},
   InsertEditMode in 'helpers\InsertEditMode.pas',
   CycleSpecialityEducationQuery in 'Queryes\cyclespecialityeducations\CycleSpecialityEducationQuery.pas' {QueryCycleSpecialityEducations: TFrame},
   SpecialitySessionsQuery in 'Queryes\SpecialitySessions\SpecialitySessionsQuery.pas' {QuerySpecialitySessions: TFrame},
@@ -218,7 +217,11 @@ uses
   SpecChiperUniqueQry in 'Queryes\Spec\SpecChiperUniqueQry.pas' {QrySpecChiper: TFrame},
   SpecNameUniqueQry in 'Queryes\Spec\SpecNameUniqueQry.pas' {QrySpecName: TFrame},
   ConnectionSettings in 'ConnectionSettings.pas',
-  LockSPQry in 'Queryes\LockSPQry\LockSPQry.pas' {QryLockSP: TFrame};
+  LockSPQry in 'Queryes\LockSPQry\LockSPQry.pas' {QryLockSP: TFrame},
+  CourceDiscNameViewModel in 'Queryes\CourceDiscNameViewModel.pas',
+  CourseStudyPlanInterface in 'Queryes\DPOSP\CourseStudyPlanInterface.pas',
+  CourseDiscViewModel in 'Queryes\DPOSP\CourseDiscViewModel.pas',
+  AdmissionsInterface in 'Queryes\Admissions\AdmissionsInterface.pas';
 
 {$R *.res}
 

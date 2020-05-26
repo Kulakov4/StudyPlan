@@ -17,15 +17,18 @@ type
     FID_DisciplineName: TFieldWrap;
     FDisciplineName: TFieldWrap;
     FShortDisciplineName: TFieldWrap;
-    FIDCHAR: TFieldWrap;
+    FIDChair: TFieldWrap;
     FType_Discipline: TFieldWrap;
   public
     constructor Create(AOwner: TComponent); override;
+    procedure Append(const ADisciplineName, AShortDisciplineName: String; AIDChair,
+        AIDType: Integer);
     procedure Save(ADiscNameInt: IDiscName; AMode: TMode);
+    procedure UpdateShortCaption(const AShortDisciplineName: String);
     property ID_DisciplineName: TFieldWrap read FID_DisciplineName;
     property DisciplineName: TFieldWrap read FDisciplineName;
     property ShortDisciplineName: TFieldWrap read FShortDisciplineName;
-    property IDCHAR: TFieldWrap read FIDCHAR;
+    property IDChair: TFieldWrap read FIDChair;
     property Type_Discipline: TFieldWrap read FType_Discipline;
   end;
 
@@ -39,6 +42,7 @@ type
     { Private declarations }
   public
     constructor Create(AOwner: TComponent); override;
+    procedure SearchByType(AIDTypeArr: TArray<Integer>);
     property W: TDiscNameW read FW;
     { Public declarations }
   end;
@@ -46,7 +50,7 @@ type
 implementation
 
 uses
-  FireDAC.Phys.OracleWrapper;
+  FireDAC.Phys.OracleWrapper, StrHelper;
 
 constructor TDiscNameW.Create(AOwner: TComponent);
 begin
@@ -55,9 +59,29 @@ begin
   FDisciplineName := TFieldWrap.Create(Self, 'DisciplineName', 'Наименование');
   FShortDisciplineName := TFieldWrap.Create(Self, 'ShortDisciplineName',
     'Сокращение');
-  FIDCHAR := TFieldWrap.Create(Self, 'IDCHAR', 'Кафедра');
+  FIDChair := TFieldWrap.Create(Self, 'IDChar', 'Кафедра');
   FType_Discipline := TFieldWrap.Create(Self, 'Type_Discipline');
   // FType_Discipline.DefaultValue := 1;
+end;
+
+procedure TDiscNameW.Append(const ADisciplineName, AShortDisciplineName:
+    String; AIDChair, AIDType: Integer);
+begin
+  Assert(not ADisciplineName.IsEmpty);
+
+  TryAppend;
+  DisciplineName.F.Value := ADisciplineName;
+  ShortDisciplineName.F.Value := AShortDisciplineName;
+  IDChair.F.Value := AIDChair;
+  Type_Discipline.F.Value := AIDType;
+  TryPost;
+end;
+
+procedure TDiscNameW.UpdateShortCaption(const AShortDisciplineName: String);
+begin
+  TryEdit;
+  ShortDisciplineName.F.AsString := AShortDisciplineName;
+  TryPost;
 end;
 
 procedure TDiscNameW.Save(ADiscNameInt: IDiscName; AMode: TMode);
@@ -71,7 +95,7 @@ begin
   try
     DisciplineName.F.AsString := ADiscNameInt.DisciplineName;
     ShortDisciplineName.F.AsString := ADiscNameInt.ShortDisciplineName;
-    IDCHAR.F.AsInteger := ADiscNameInt.IDChair;
+    IDChair.F.AsInteger := ADiscNameInt.IDChair;
     // Type_Discipline.F.Value := Type_Discipline.DefaultValue;
     TryPost;
   except
@@ -108,6 +132,20 @@ begin
   if (E is EOCINativeException) and ((E as EOCINativeException).ErrorCode = 1)
   then
     E.Message := 'Дисциплина с таким наименованием уже есть в базе данных';
+end;
+
+procedure TQryDiscName.SearchByType(AIDTypeArr: TArray<Integer>);
+var
+  ASQL: string;
+  S: string;
+begin
+  Assert(Length(AIDTypeArr) > 0);
+
+  S := Format('%s in (%s)', [W.FType_Discipline.FieldName,
+    IntArrToStr(AIDTypeArr, ', ')]);
+  ASQL := ReplaceInSQL(SQL, S, 0);
+
+  FDQuery.Open(ASQL);
 end;
 
 end.

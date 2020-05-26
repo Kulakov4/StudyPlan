@@ -3,10 +3,10 @@ unit CourceGroup;
 interface
 
 uses
-  System.Classes, Admissions, DPOStudyPlan, Years, AdmissionsQuery, DPOSPQuery,
-  ChairsQuery, CourceNameQuery, DisciplineNameQuery, System.Contnrs,
-  NotifyEvents, StudentGroupsQuery, CourceEdTypesQuery, FDDumbQuery, YearsQry,
-  EdLvlQry;
+  System.Classes, Admissions, DPOStudyPlan, Years, AdmissionsQuery, ChairsQuery,
+  CourceNameQuery, System.Contnrs, NotifyEvents, StudentGroupsQuery,
+  CourceEdTypesQuery, FDDumbQuery, YearsQry, EdLvlQry, Data.DB,
+  FireDAC.Comp.DataSet, DiscNameQry, CourseStudyPlanQry;
 
 type
   TCourceGroup = class(TComponent)
@@ -15,16 +15,16 @@ type
     FEventList: TObjectList;
     FIDEducationLevel: Integer;
     FOnYearChange: TNotifyEventsEx;
-    FqDPOSP: TQueryDPOSP;
+    FqCourseStudyPlan: TQryCourseStudyPlan;
     FqAdmissions: TQueryAdmissions;
     FqChairs: TQueryChairs;
     FqCourceName: TQueryCourceName;
-    FqDisciplineName: TQueryDisciplineName;
+    FqDiscName: TQryDiscName;
     FqEdLvl: TQryEdLvl;
     FqStudentGroups: TQueryStudentGroups;
     FqYears: TQryYears;
     FYearDumb: TQueryFDDumb;
-    function GetqDisciplineName: TQueryDisciplineName;
+    function GetqDiscName: TQryDiscName;
     function GetqEdLvl: TQryEdLvl;
     function GetqStudentGroups: TQueryStudentGroups;
     function GetYear: Integer;
@@ -33,17 +33,16 @@ type
     procedure DoAfterYearPost(Sender: TObject);
   public
     constructor Create(AOwner: TComponent; AYear, AIDEducationLevel: Integer);
-        reintroduce;
+      reintroduce;
     destructor Destroy; override;
     procedure Copy(AIDArray: TArray<Integer>; AYear: Integer);
-    function GetCurrSPW: TDPOSPW;
     procedure Refresh;
     property AfterLoadData: TNotifyEventsEx read FAfterLoadData;
-    property qDPOSP: TQueryDPOSP read FqDPOSP;
+    property qCourseStudyPlan: TQryCourseStudyPlan read FqCourseStudyPlan;
     property qAdmissions: TQueryAdmissions read FqAdmissions;
     property qChairs: TQueryChairs read FqChairs;
     property qCourceName: TQueryCourceName read FqCourceName;
-    property qDisciplineName: TQueryDisciplineName read GetqDisciplineName;
+    property qDiscName: TQryDiscName read GetqDiscName;
     property qEdLvl: TQryEdLvl read GetqEdLvl;
     property qStudentGroups: TQueryStudentGroups read GetqStudentGroups;
     property qYears: TQryYears read FqYears;
@@ -57,8 +56,8 @@ implementation
 uses
   System.SysUtils, CopyStudyPlanQuery;
 
-constructor TCourceGroup.Create(AOwner: TComponent; AYear, AIDEducationLevel:
-    Integer);
+constructor TCourceGroup.Create(AOwner: TComponent;
+  AYear, AIDEducationLevel: Integer);
 begin
   inherited Create(AOwner);
 
@@ -80,7 +79,7 @@ begin
   FYearDumb := TQueryFDDumb.Create(Self);
   FYearDumb.Name := 'YearDumb';
   // Подписываемся на изменение текущего года
-  TNotifyEventWrap.Create( FYearDumb.W.AfterPost, DoAfterYearPost, FEventList);
+  TNotifyEventWrap.Create(FYearDumb.W.AfterPost, DoAfterYearPost, FEventList);
   FYearDumb.W.RefreshQuery;
 
   // Сами наборы на курсы
@@ -91,7 +90,8 @@ begin
   // FEventList);
 
   // Дисциплины по курсам
-  FqDPOSP := TQueryDPOSP.Create(Self);
+  FqCourseStudyPlan := TQryCourseStudyPlan.Create(Self);
+  FqCourseStudyPlan.Name := 'FqDPOSP_Main';
 
   // Кафедры
   FqChairs := TQueryChairs.Create(Self);
@@ -129,7 +129,7 @@ begin
   Assert(FIDEducationLevel > 0);
 
   // Дисциплины по курсам
-  FqDPOSP.Search(FIDEducationLevel, Year);
+  FqCourseStudyPlan.Search(FIDEducationLevel, Year);
 
   // Сами наборы на курсы
   FqAdmissions.Search(FIDEducationLevel, Year);
@@ -138,14 +138,17 @@ begin
   FOnYearChange.CallEventHandlers(Self);
 end;
 
-function TCourceGroup.GetqDisciplineName: TQueryDisciplineName;
+function TCourceGroup.GetqDiscName: TQryDiscName;
 begin
-  if FqDisciplineName = nil then
+  if FqDiscName = nil then
   begin
-    FqDisciplineName := TQueryDisciplineName.Create(Self);
-    FqDisciplineName.W.TryOpen;
+    // Создаём набор дисциплин курсов
+    FqDiscName := TQryDiscName.Create(Self);
+    FqDiscName.FDQuery.CachedUpdates := True;
+    FqDiscName.SearchByType([3]); // Дисциплины курсов;
   end;
-  Result := FqDisciplineName;
+
+  Result := FqDiscName;
 end;
 
 function TCourceGroup.GetqStudentGroups: TQueryStudentGroups;
@@ -154,14 +157,6 @@ begin
     FqStudentGroups := TQueryStudentGroups.Create(Self);
 
   Result := FqStudentGroups;
-end;
-
-function TCourceGroup.GetCurrSPW: TDPOSPW;
-begin
-  Assert(qAdmissions.W.PK.AsInteger > 0);
-  Result := TDPOSPW.Create(
-    qDPOSP.W.AddClone(Format('%s=%d', [qDPOSP.W.IDSPECIALITYEDUCATION.FieldName,
-    qAdmissions.W.PK.AsInteger])));
 end;
 
 function TCourceGroup.GetqEdLvl: TQryEdLvl;
@@ -179,13 +174,14 @@ end;
 
 procedure TCourceGroup.Refresh;
 begin
-  qDPOSP.W.RefreshQuery;
+  qCourseStudyPlan.W.RefreshQuery;
   qAdmissions.W.RefreshQuery;
 end;
 
 procedure TCourceGroup.SetYear(const Value: Integer);
 begin
-  if Year = Value then  Exit;
+  if Year = Value then
+    Exit;
 
   // Выбираем нужный нам год
   FYearDumb.W.UpdateID(Value);

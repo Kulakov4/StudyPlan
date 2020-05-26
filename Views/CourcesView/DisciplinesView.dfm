@@ -49,19 +49,9 @@ inherited ViewDisciplines: TViewDisciplines
       ImageIndex = 1
       OnExecute = actEditExecute
     end
-    object actSave: TAction
-      Caption = #1057#1086#1093#1088#1072#1085#1080#1090#1100
-      Hint = #1057#1086#1093#1088#1072#1085#1080#1090#1100' '#1089#1076#1077#1083#1072#1085#1085#1099#1077' '#1080#1079#1084#1077#1085#1077#1085#1080#1103
-      ImageIndex = 3
-      OnExecute = actSaveExecute
-    end
   end
   inherited cxStyleRepository: TcxStyleRepository
     PixelsPerInch = 96
-  end
-  object dsDisciplineName: TDataSource
-    Left = 40
-    Top = 336
   end
   object cxImageList: TcxImageList
     SourceDPI = 96
