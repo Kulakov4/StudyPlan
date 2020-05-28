@@ -110,6 +110,10 @@ constructor TQryCourseStudyPlan.Create(AOwner: TComponent);
 begin
   inherited;
   FW := TCourseStudyPlanW.Create(FDQuery);
+
+  // Индекс нужен чтобы при добавлении записи она сразу сортировалась
+  FDQuery.IndexFieldNames := Format('%s;%s', [W.IDSPECIALITYEDUCATION.FieldName,
+    W.ID_StudyPlan.FieldName]);
 end;
 
 procedure TQryCourseStudyPlan.FDQueryUpdateRecord(ASender: TDataSet;
@@ -168,15 +172,16 @@ end;
 
 {$R *.dfm}
 
-procedure TCourseStudyPlanW.Save(ACourseStudyPlanInt: ICourseStudyPlan; AMode:
-    TMode);
+procedure TCourseStudyPlanW.Save(ACourseStudyPlanInt: ICourseStudyPlan;
+  AMode: TMode);
 begin
   if AMode = EditMode then
     TryEdit
   else
     TryAppend;
   try
-    IDSPECIALITYEDUCATION.F.AsInteger := ACourseStudyPlanInt.IDSPECIALITYEDUCATION;
+    IDSPECIALITYEDUCATION.F.AsInteger :=
+      ACourseStudyPlanInt.IDSPECIALITYEDUCATION;
     IDChair.F.AsInteger := ACourseStudyPlanInt.IDChair;
     IDDisciplineName.F.AsInteger := ACourseStudyPlanInt.IDDisciplineName;
     LecData.F.AsInteger := ACourseStudyPlanInt.Lec;

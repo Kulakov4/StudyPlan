@@ -254,14 +254,9 @@ end;
 
 procedure TViewCources.BeginUpdate;
 begin
-  // Inc(UpdateCount);
-  // if UpdateCount = 1 then
-  // DisableCollapsingAndExpanding;
-
-  // cxGrid.BeginUpdate();
-  FCanFocusRecord := False;
-  MainView.DataController.DataModeController.SyncMode := False;
-  cxGridDBBandedTableView2.DataController.DataModeController.SyncMode := False;
+//  FCanFocusRecord := False;
+//  MainView.DataController.DataModeController.SyncMode := False;
+//  cxGridDBBandedTableView2.DataController.DataModeController.SyncMode := False;
 end;
 
 procedure TViewCources.cxdblcbYearsPropertiesChange(Sender: TObject);
@@ -361,9 +356,9 @@ end;
 
 procedure TViewCources.EndUpdate;
 begin
-  MainView.DataController.DataModeController.SyncMode := True;
-  cxGridDBBandedTableView2.DataController.DataModeController.SyncMode := True;
-  FCanFocusRecord := True;
+//  MainView.DataController.DataModeController.SyncMode := True;
+//  cxGridDBBandedTableView2.DataController.DataModeController.SyncMode := True;
+//  FCanFocusRecord := True;
 end;
 
 function TViewCources.GetclIDChair: TcxGridDBBandedColumn;

@@ -51,6 +51,6 @@ inherited QryCourseStudyPlan: TQryCourseStudyPlan
         '            ON exam.idtype = 5 AND exam.idstudyplan = sp.id_stud' +
         'yplan'
       'WHERE 0=0 and 1=1'
-      'order by cse.IDSpecialityEducation')
+      'order by cse.IDSpecialityEducation, sp.id_studyplan')
   end
 end

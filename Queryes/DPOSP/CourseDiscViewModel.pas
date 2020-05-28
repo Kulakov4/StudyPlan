@@ -76,7 +76,7 @@ begin
   if FqCourseStudyPlan.FDQuery.ChangeCount = 0 then
     Exit;
 
-  FqCourseStudyPlan.FDQuery.CachedUpdates;
+  FqCourseStudyPlan.FDQuery.CancelUpdates;
   Assert(FqCourseStudyPlan.FDQuery.ChangeCount = 0);
 end;
 
