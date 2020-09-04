@@ -100,6 +100,7 @@ type
       const Request, Response: IMessageData);
     procedure OnServerError(const Context: ICommContext;
       const Error: TServerError);
+    procedure OpenSpecEd(AIDSpecialityEducation, AStudyPlanID: Integer);
 
     procedure RegisterProgram;
     procedure StartIPCServer;
@@ -113,7 +114,7 @@ type
   public
     destructor Destroy; override;
     procedure CheckSelectStudyPlan(Year, IDSpecialityEducation, x: Integer);
-    procedure SelectStudyPlanByID(IDStudyPlan: Integer);
+    procedure SelectStudyPlanByID(AStudyPlanID: Integer);
     property qSpecEdSimple: TQuerySpecEdSimple read GetqSpecEdSimple;
     { Public declarations }
   end;
@@ -130,7 +131,8 @@ uses DBServConnectionPooler, MyDataAccess, MyConnection, CMdLine,
   SqlExpr, StudyPlanFactorsView2, Qualifications, System.Win.Registry,
   System.IOUtils, EducationalStandarts, AdoptionDatesForm, StudyPlanAdoption,
   UMKAdoption, SoftwareDocument, SoftwareView, SpecEducSimple, DisciplineNames,
-  OptionsHelper, GridViewForm, DiscNameGroup, DiscNameView;
+  OptionsHelper, GridViewForm, DiscNameGroup, DiscNameView, MyDir,
+  GetSpecEdBySP;
 
 {$R *.dfm}
 
@@ -172,8 +174,7 @@ var
 begin
   ADiscNameGroup := TDiscNameGroup.Create(Self);
   F := TfrmGridView.Create(Self, 'Дисциплины',
-    TPath.Combine(StudyProcessOptions.AppDataDir,
-    'DisciplineNameForm.ini'), [mbOk]);
+    TMyDir.AppDataDirFile('DisciplineNameForm.ini'), [mbOk]);
   try
     F.GridViewClass := TViewDiscName;
     (F.GridView as TViewDiscName).DiscNameGroup := ADiscNameGroup;
@@ -923,26 +924,78 @@ begin
   end;
 end;
 
-procedure TfrmMain.SelectStudyPlanByID(IDStudyPlan: Integer);
+procedure TfrmMain.OpenSpecEd(AIDSpecialityEducation, AStudyPlanID: Integer);
 var
-  AMySQLQuery: TMySQLQuery;
-  IDSpecialityEducation: Integer;
+  AcxTabSheet: TcxTabSheet;
 begin
-  AMySQLQuery := TMySQLQuery.Create(Self, 0);
-  try
-    AMySQLQuery.SQL.Text := Format('select CSE.IDSPECIALITYEDUCATION ' +
-      'from studyplans sp ' +
-      'join cyclespecialityeducations cse on SP.IDCYCLESPECIALITYEDUCATION = CSE.ID_CYCLESPECIALITYEDUCATION '
-      + 'where SP.ID_STUDYPLAN = %d', [IDStudyPlan]);
+  Assert(AIDSpecialityEducation > 0);
+  Assert(AStudyPlanID > 0);
 
-    AMySQLQuery.Open;
-    if not AMySQLQuery.IsEmpty then
-    begin
-      IDSpecialityEducation := AMySQLQuery.Fields[0].AsInteger;
-      InternalSelectStudyPlan(IDSpecialityEducation, IDStudyPlan);
-    end;
+  if qSpecEdSimple.SearchByPK(AIDSpecialityEducation) = 0 then
+    Exit;
+
+  // Если нужно перейти на другой год
+  if TOptions.SP.AcademicYear <> FqSpecEdSimple.W.Year.F.AsInteger then
+  begin
+    TOptions.SP.AcademicYear := FqSpecEdSimple.W.Year.F.AsInteger;
+    TOptions.SP.IDSpecEdVO := 0;
+    TOptions.SP.IDSpecEdSPO := 0;
+    TOptions.SP.IDSpecEdRetraining := 0;
+  end;
+
+  TOptions.SP.IDEducationLevel := FqSpecEdSimple.W.IDEducationLevel.F.AsInteger;
+
+  case TOptions.SP.IDEducationLevel of
+    1, 2: // ВО
+      TOptions.SP.IDSpecEdVO := AIDSpecialityEducation;
+    3: // СПО
+      TOptions.SP.IDSpecEdSPO := AIDSpecialityEducation;
+    5: // Переподготовка
+      TOptions.SP.IDSpecEdRetraining := AIDSpecialityEducation;
+  end;
+
+  AcxTabSheet := cxtshVO2;
+  // Определяемся, какую вкладку будем открывать
+  case TOptions.SP.IDEducationLevel of
+    1, 2: // ВО
+      AcxTabSheet := cxtshVO2;
+    3: // СПО
+      AcxTabSheet := cxtshSPO2;
+    4:
+      AcxTabSheet := cxtshDO; // ДО
+    5: // Переподготовка
+      AcxTabSheet := cxtshRetraining2;
+    6:
+      AcxTabSheet := cxtshNewDPO; // ДПО
+  end;
+
+  UpdateView;
+
+  cxpgcntrlMain.ActivePage := nil;
+  // Переходим на нужную вкладку если она доступна текущему пользователю
+  if AcxTabSheet.TabVisible then
+    cxpgcntrlMain.ActivePage := AcxTabSheet
+  else
+    cxpgcntrlMain.ActivePage := cxtshVO2;
+
+  // Скрываем первую вкладку
+  cxtshFirst.TabVisible := False;
+end;
+
+procedure TfrmMain.SelectStudyPlanByID(AStudyPlanID: Integer);
+Var
+  Q: TQryGetSpecEdBySP;
+begin
+  Q := TQryGetSpecEdBySP.Create(Self);
+  try
+    if Q.SearchBy(AStudyPlanID) = 0 then
+      Exit;
+
+    OpenSpecEd(Q.W.ID_SPECIALITYEDUCATION.F.AsInteger, AStudyPlanID);
+
+    // InternalSelectStudyPlan(ASpecialityEducationID, AStudyPlanID);
   finally
-    AMySQLQuery.Free;
+    FreeAndNil(Q);
   end;
 end;
 

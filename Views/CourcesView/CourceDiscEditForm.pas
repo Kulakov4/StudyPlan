@@ -96,7 +96,7 @@ begin
 
   TDBLCB.Init(cxdblcbDisciplineName, FqDisciplineNameDumb.W.DataSource,
     FqDisciplineNameDumb.W.ID.FieldName, FModel.DiscNameW.DataSource,
-    FModel.DiscNameW.DisciplineName);
+    FModel.DiscNameW.DisciplineName, lsEditList);
 end;
 
 procedure TfrmCourceDiscEdit.Check;

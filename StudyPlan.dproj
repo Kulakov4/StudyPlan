@@ -5,7 +5,7 @@
         <FrameworkType>VCL</FrameworkType>
         <MainSource>StudyPlan.dpr</MainSource>
         <Base>True</Base>
-        <Config Condition="'$(Config)'==''">Release</Config>
+        <Config Condition="'$(Config)'==''">Debug</Config>
         <Platform Condition="'$(Platform)'==''">Win32</Platform>
         <TargetedPlatforms>1</TargetedPlatforms>
         <AppType>Application</AppType>
@@ -86,6 +86,7 @@
         <DCC_RemoteDebug>false</DCC_RemoteDebug>
         <AppEnableRuntimeThemes>true</AppEnableRuntimeThemes>
         <BT_BuildType>Debug</BT_BuildType>
+        <Debugger_RunParams>/qqq</Debugger_RunParams>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_2)'!=''">
         <DCC_LocalDebugSymbols>false</DCC_LocalDebugSymbols>
@@ -715,6 +716,13 @@
         <DCCReference Include="Queryes\DPOSP\CourseStudyPlanInterface.pas"/>
         <DCCReference Include="Queryes\DPOSP\CourseDiscViewModel.pas"/>
         <DCCReference Include="Queryes\Admissions\AdmissionsInterface.pas"/>
+        <DCCReference Include="helpers\MyDir.pas"/>
+        <DCCReference Include="Queryes\SP\GetSpecEdBySP.pas">
+            <Form>QryGetSpecEdBySP</Form>
+            <FormType>dfm</FormType>
+            <DesignClass>TFrame</DesignClass>
+        </DCCReference>
+        <DCCReference Include="Queryes\SpecEdSimple\SpecEdSimpleWrap.pas"/>
         <None Include="StudyPlan.todo"/>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>

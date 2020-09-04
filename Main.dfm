@@ -32,7 +32,7 @@ object frmMain: TfrmMain
       Height = 694
       Align = alClient
       TabOrder = 0
-      Properties.ActivePage = cxtshFirst
+      Properties.ActivePage = cxtshVO2
       Properties.CustomButtons.Buttons = <>
       Properties.ShowTabHints = True
       OnChange = cxpgcntrlMainChange
@@ -50,10 +50,6 @@ object frmMain: TfrmMain
       object cxtshVO2: TcxTabSheet
         Caption = #1042#1054
         ImageIndex = 7
-        ExplicitLeft = 0
-        ExplicitTop = 0
-        ExplicitWidth = 0
-        ExplicitHeight = 0
       end
       object cxtshSPO2: TcxTabSheet
         Caption = #1057#1055#1054
@@ -103,7 +99,7 @@ object frmMain: TfrmMain
     Left = 197
     Top = 236
     Bitmap = {
-      494C010107000900780218001800FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C010107000900880218001800FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000600000003000000001002000000000000048
       0000000000000000000000000000000000000000000000000000000000000000
       00000000000000000000000000000000000000006B006B006B0000006B006B00

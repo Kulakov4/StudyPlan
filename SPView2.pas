@@ -214,7 +214,7 @@ uses SPEditForm, DB, SPEditView, SPViewDM, cxDBTL, cxStyles, cxCustomData,
   DisciplineCompetence, DisciplineCompetenceView, ProgressBarForm,
   StudyPlanInfo, System.IOUtils, UMKDataModule, System.UITypes, DisciplineLit,
   DisciplineLitView, CSEView, OptionsHelper, SpecSessGroup, GridViewForm,
-  SpecSessView, FR3, ReportFilesUpdater;
+  SpecSessView, FR3, ReportFilesUpdater, MyDir;
 
 {$R *.dfm}
 
@@ -640,8 +640,8 @@ end;
 
 procedure TviewSP.actPlanGraphByAdmissionReportExecute(Sender: TObject);
 begin
-//  TMyFR.Create(Self).Show('study_plan\plan_graph_by_admission2.fr3',
-//    ['idspecialityeducation'], [Document.IDSpecEducation]);
+  // TMyFR.Create(Self).Show('study_plan\plan_graph_by_admission2.fr3',
+  // ['idspecialityeducation'], [Document.IDSpecEducation]);
   TFR3.Create.Show(TReportFilesUpdater.TryUpdate
     ('study_plan\plan_graph_by_admission2.fr3'), ['idspecialityeducation'],
     [Document.IDSpecEducation]);
@@ -701,8 +701,7 @@ begin
 
   ASpecSessGroup := TSpecSessGroup.Create(Self, Document.IDSpecEducation);
   F := TfrmGridView.Create(Self, 'Сессии / семестры',
-    TPath.Combine(StudyProcessOptions.AppDataDir, 'NewSessionForm.ini'),
-    [mbOk], 500);
+    TMyDir.AppDataDirFile('NewSessionForm.ini'), [mbOk], 500);
   try
     F.GridViewClass := TViewSpecSess;
     (F.GridView as TViewSpecSess).SpecSessGroup := ASpecSessGroup;

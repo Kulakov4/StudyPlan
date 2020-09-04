@@ -221,7 +221,10 @@ uses
   CourceDiscNameViewModel in 'Queryes\CourceDiscNameViewModel.pas',
   CourseStudyPlanInterface in 'Queryes\DPOSP\CourseStudyPlanInterface.pas',
   CourseDiscViewModel in 'Queryes\DPOSP\CourseDiscViewModel.pas',
-  AdmissionsInterface in 'Queryes\Admissions\AdmissionsInterface.pas';
+  AdmissionsInterface in 'Queryes\Admissions\AdmissionsInterface.pas',
+  MyDir in 'helpers\MyDir.pas',
+  GetSpecEdBySP in 'Queryes\SP\GetSpecEdBySP.pas' {QryGetSpecEdBySP: TFrame},
+  SpecEdSimpleWrap in 'Queryes\SpecEdSimple\SpecEdSimpleWrap.pas';
 
 {$R *.res}
 

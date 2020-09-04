@@ -87,6 +87,20 @@ begin
 
   FMode := InsertMode;
 
+  // ********************************************
+  // Названия курсов
+  // ********************************************
+
+  // Создаём обёртку вокруг нового курсора названий курсов
+  FCourceNameW := TCourceNameW.Create(FCourceGroup.qCourceName.W.AddClone(''));
+
+  FqSpecialityDumb := TQueryFDDumb.Create(Self);
+  FqSpecialityDumb.Name := 'qSpecialityDumb';
+
+  TDBLCB.Init(cxdblcbSpeciality, FqSpecialityDumb.DataSource,
+    FqSpecialityDumb.W.ID.FieldName, FCourceNameW.DataSource,
+    FCourceNameW.Speciality, lsEditList);
+
   // *************
   // Кафедры
   // *************
@@ -103,19 +117,6 @@ begin
     FCourceGroup.qChairs.DataSource, FCourceGroup.qChairs.W.Наименование,
     lsFixedList);
 
-  // ********************************************
-  // Названия курсов
-  // ********************************************
-
-  // Создаём обёртку вокруг нового курсора названий курсов
-  FCourceNameW := TCourceNameW.Create(FCourceGroup.qCourceName.W.AddClone(''));
-
-  FqSpecialityDumb := TQueryFDDumb.Create(Self);
-  FqSpecialityDumb.Name := 'qSpecialityDumb';
-
-  TDBLCB.Init(cxdblcbSpeciality, FqSpecialityDumb.DataSource,
-    FqSpecialityDumb.W.ID.FieldName, FCourceNameW.DataSource,
-    FCourceNameW.Speciality, lsEditList);
 end;
 
 destructor TfrmEditCourse.Destroy;

@@ -39,7 +39,7 @@ object frmEditCourse: TfrmEditCourse
     Height = 241
     Align = alTop
     TabOrder = 1
-    Properties.ActivePage = cxtshPlan
+    Properties.ActivePage = cxtshDisciplines
     Properties.CustomButtons.Buttons = <>
     LookAndFeel.Kind = lfUltraFlat
     LookAndFeel.NativeStyle = True

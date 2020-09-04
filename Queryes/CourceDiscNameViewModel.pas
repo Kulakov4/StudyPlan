@@ -65,7 +65,12 @@ var
   OK: Boolean;
 begin
   OK := FCourseStudyPlanW.RestoreBookmark;
-  Assert(OK);
+
+  // если мы редактировали дисциплину,
+  // то обязательно должны вернуться к редактируемой записи, перед сохранением
+  if AMode = EditMode then
+    Assert(OK);
+
   FCourseStudyPlanW.Save(ACourseStudyPlanInt, AMode);
 end;
 
