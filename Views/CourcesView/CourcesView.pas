@@ -254,9 +254,9 @@ end;
 
 procedure TViewCources.BeginUpdate;
 begin
-//  FCanFocusRecord := False;
-//  MainView.DataController.DataModeController.SyncMode := False;
-//  cxGridDBBandedTableView2.DataController.DataModeController.SyncMode := False;
+  // FCanFocusRecord := False;
+  // MainView.DataController.DataModeController.SyncMode := False;
+  // cxGridDBBandedTableView2.DataController.DataModeController.SyncMode := False;
 end;
 
 procedure TViewCources.cxdblcbYearsPropertiesChange(Sender: TObject);
@@ -356,9 +356,9 @@ end;
 
 procedure TViewCources.EndUpdate;
 begin
-//  MainView.DataController.DataModeController.SyncMode := True;
-//  cxGridDBBandedTableView2.DataController.DataModeController.SyncMode := True;
-//  FCanFocusRecord := True;
+  // MainView.DataController.DataModeController.SyncMode := True;
+  // cxGridDBBandedTableView2.DataController.DataModeController.SyncMode := True;
+  // FCanFocusRecord := True;
 end;
 
 function TViewCources.GetclIDChair: TcxGridDBBandedColumn;
@@ -470,8 +470,7 @@ begin
   end;
 
   // Года
-  TDBLCB.Init(cxdblcbYears, FCourceGroup.YearDumb.DataSource,
-    FCourceGroup.YearDumb.W.PKFieldName, FCourceGroup.qYears.DataSource,
+  TDBLCB.Init(cxdblcbYears, FCourceGroup.YearDumb.W.ID,
     FCourceGroup.qYears.W.Year, lsFixedList);
 
   BeginUpdate;

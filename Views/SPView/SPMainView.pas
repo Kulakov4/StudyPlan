@@ -4,14 +4,12 @@ interface
 
 uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants,
-  System.Classes,
-  Vcl.Graphics, Vcl.Controls, Vcl.Forms, Vcl.Dialogs, cxGraphics, cxControls,
-  cxLookAndFeels, cxLookAndFeelPainters, cxContainer, cxEdit, TB2Item, cxLabel,
-  cxDBLabel, cxCheckBox, cxDBEdit, cxTextEdit, Vcl.StdCtrls, TB2Dock,
-  TB2Toolbar,
-  cxMaskEdit, cxDropDownEdit, cxLookupEdit, cxDBLookupEdit,
-  cxDBExtLookupComboBox, SPGroup, SpecEdPopupView, cxGridDBBandedTableView,
-  FDDumbQuery, Data.DB, cxDBLookupComboBox, NotifyEvents, SPView2,
+  System.Classes, Vcl.Graphics, Vcl.Controls, Vcl.Forms, Vcl.Dialogs,
+  cxGraphics, cxControls, cxLookAndFeels, cxLookAndFeelPainters, cxContainer,
+  cxEdit, TB2Item, cxLabel, cxDBLabel, cxCheckBox, cxDBEdit, cxTextEdit,
+  Vcl.StdCtrls, TB2Dock, TB2Toolbar, cxMaskEdit, cxDropDownEdit, cxLookupEdit,
+  cxDBLookupEdit, cxDBExtLookupComboBox, SPGroup, SpecEdPopupView,
+  cxGridDBBandedTableView, Data.DB, cxDBLookupComboBox, NotifyEvents, SPView2,
   System.Contnrs, System.Actions, Vcl.ActnList, System.ImageList, Vcl.ImgList,
   cxImageList, OptionsHelper, Vcl.Menus;
 
@@ -272,15 +270,14 @@ end;
 procedure TViewSPMain.Init;
 begin
   // Года
-  TDBLCB.Init(cxdblcbYears, FSPGroup.YearDumb.DataSource,
-    FSPGroup.YearDumb.W.PKFieldName, FSPGroup.qYears.DataSource,
-    FSPGroup.qYears.W.Year, lsFixedList);
+  TDBLCB.Init(cxdblcbYears, FSPGroup.YearDumb.W.ID, FSPGroup.qYears.W.Year,
+    lsFixedList);
 
   // Подключаем выпадающий список планов
   FViewSpecEdPopup.SPGroup := FSPGroup;
   with cxdbelcbSpeciality do
   begin
-    DataBinding.DataSource := FSPGroup.SpecEdDumb.DataSource;
+    DataBinding.DataSource := FSPGroup.SpecEdDumb.W.DataSource;
     DataBinding.DataField := FSPGroup.SpecEdDumb.W.ID.FieldName;
     Properties.DropDownListStyle := lsFixedList;
     Properties.DropDownRows := 24;
@@ -292,15 +289,12 @@ begin
 
   // Сокращение специальности
   cxdblcbShortSpeciality.Enabled := False;
-  TDBLCB.Init(cxdblcbShortSpeciality, FSPGroup.qSpecEdSimple.DataSource,
-    FSPGroup.qSpecEdSimple.W.IDSpeciality.FieldName,
-    FSPGroup.qCourceName.DataSource, FSPGroup.qCourceName.W.SHORT_SPECIALITY,
-    lsEditFixedList);
+  TDBLCB.Init(cxdblcbShortSpeciality, FSPGroup.qSpecEdSimple.W.IDSpeciality,
+    FSPGroup.qCourceName.W.SHORT_SPECIALITY, lsEditFixedList);
 
   // Кафедра
   cxdblcbChair.Enabled := False;
-  TDBLCB.Init(cxdblcbChair, FSPGroup.qSpecEdSimple.DataSource,
-    FSPGroup.qSpecEdSimple.W.IDChair.FieldName, FSPGroup.qAllChairs.DataSource,
+  TDBLCB.Init(cxdblcbChair, FSPGroup.qSpecEdSimple.W.IDChair,
     FSPGroup.qAllChairs.W.Наименование, lsEditFixedList);
 
   // Идентификатор уч. плана
@@ -359,9 +353,12 @@ begin
   OK := (FSPGroup <> nil);
 
   actCreateStudyPlan.Enabled := OK and IsActionsEnabled;
-  actEditStudyPlan.Enabled := OK and (FSPGroup.qSpecEd.FDQuery.RecordCount > 0) and IsActionsEnabled;
-  actCopyStudyPlan.Enabled := OK and (FSPGroup.qSpecEd.FDQuery.RecordCount > 0) and IsActionsEnabled;
-  actDeleteStudyPlan.Enabled := OK and (FSPGroup.qSpecEd.FDQuery.RecordCount > 0) and IsActionsEnabled;
+  actEditStudyPlan.Enabled := OK and (FSPGroup.qSpecEd.FDQuery.RecordCount > 0)
+    and IsActionsEnabled;
+  actCopyStudyPlan.Enabled := OK and (FSPGroup.qSpecEd.FDQuery.RecordCount > 0)
+    and IsActionsEnabled;
+  actDeleteStudyPlan.Enabled := OK and
+    (FSPGroup.qSpecEd.FDQuery.RecordCount > 0) and IsActionsEnabled;
   tbActions.Visible := IsActionsEnabled;
 
   tbIDSpecEd.Visible := OK and (TOptions.SP.UserName = 'prog1');

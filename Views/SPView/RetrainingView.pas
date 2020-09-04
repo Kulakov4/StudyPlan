@@ -71,8 +71,7 @@ begin
 
   // Сфера
   cxdblcbArea.Enabled := False;
-  TDBLCB.Init(cxdblcbArea, SPGroup.qSpecEdSimple.DataSource,
-    SPGroup.qSpecEdSimple.W.IDArea.FieldName, SPGroup.qAreas.DataSource,
+  TDBLCB.Init(cxdblcbArea, SPGroup.qSpecEdSimple.W.IDArea,
     SPGroup.qAreas.W.AREA, lsEditFixedList);
 end;
 

@@ -5,12 +5,12 @@ interface
 uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants,
   System.Classes, Vcl.Graphics, Vcl.Controls, Vcl.Forms, Vcl.Dialogs,
-  Vcl.StdCtrls, Vcl.DBCtrls, SPGroup, FDDumbQuery, cxGraphics, cxControls,
-  cxLookAndFeels, cxLookAndFeelPainters, cxContainer, cxEdit, cxTextEdit,
-  cxMaskEdit, cxDropDownEdit, cxLookupEdit, cxDBLookupEdit, cxDBLookupComboBox,
+  Vcl.StdCtrls, Vcl.DBCtrls, SPGroup, cxGraphics, cxControls, cxLookAndFeels,
+  cxLookAndFeelPainters, cxContainer, cxEdit, cxTextEdit, cxMaskEdit,
+  cxDropDownEdit, cxLookupEdit, cxDBLookupEdit, cxDBLookupComboBox,
   InsertEditMode, Vcl.Menus, cxButtons, Data.DB, CourceNameQuery, SpecPopupView,
   cxDBExtLookupComboBox, SpecEdSimpleQuery, cxCheckBox, cxDBEdit,
-  SpecEdSimpleInt, System.Generics.Collections, EditSpecFrm;
+  SpecEdSimpleInt, System.Generics.Collections, EditSpecFrm, FDDumb;
 
 type
   TfrmEditStudyPlan = class(TForm, ISpecEdSimple)
@@ -54,12 +54,12 @@ type
     FAddSpecialityHint: TDictionary<Integer, String>;
     FfrmEditSpec: TfrmEditSpec;
     FMode: TMode;
-    FqEdDumb: TQueryFDDumb;
-    FqChairDumb: TQueryFDDumb;
-    FqEdLvlDumb: TQueryFDDumb;
-    FqSpecDumb: TQueryFDDumb;
-    FqQualificationDumb: TQueryFDDumb;
-    FqStandartDumb: TQueryFDDumb;
+    FqEdDumb: TFDDumb;
+    FqChairDumb: TFDDumb;
+    FqEdLvlDumb: TFDDumb;
+    FqSpecDumb: TFDDumb;
+    FqQualificationDumb: TFDDumb;
+    FqStandartDumb: TFDDumb;
     FSpecLabel: TDictionary<Integer, String>;
     FSPGroup: TSPGroup;
     FUpdateCount: Integer;
@@ -150,33 +150,28 @@ begin
   // **********************************************
   // Уровень образования
   // **********************************************
-  FqEdLvlDumb := TQueryFDDumb.Create(Self);
-  FqEdLvlDumb.Name := 'qEdLvlDumb';
+  FqEdLvlDumb := TFDDumb.Create(Self);
 
   // **********************************************
   // Формы обучения
   // **********************************************
-  FqEdDumb := TQueryFDDumb.Create(Self);
-  FqEdDumb.Name := 'qEdDumb';
+  FqEdDumb := TFDDumb.Create(Self);
 
-  TDBLCB.Init(cxdblcbEducations, FqEdDumb.DataSource, FqEdDumb.W.ID.FieldName,
-    FSPGroup.qEd.DataSource, FSPGroup.qEd.W.Education, lsFixedList);
+  TDBLCB.Init(cxdblcbEducations, FqEdDumb.W.ID, FSPGroup.qEd.W.Education,
+    lsFixedList);
 
   // **********************************************
   // Кафедра
   // **********************************************
-  FqChairDumb := TQueryFDDumb.Create(Self);
-  FqChairDumb.Name := 'qEdChair';
+  FqChairDumb := TFDDumb.Create(Self);
 
-  TDBLCB.Init(cxdblcbChairs, FqChairDumb.DataSource, FqChairDumb.W.ID.FieldName,
-    FSPGroup.qEnabledChairs.DataSource, FSPGroup.qEnabledChairs.W.Наименование,
-    lsFixedList);
+  TDBLCB.Init(cxdblcbChairs, FqChairDumb.W.ID,
+    FSPGroup.qEnabledChairs.W.Наименование, lsFixedList);
 
   // **********************************************
   // Специальности
   // **********************************************
-  FqSpecDumb := TQueryFDDumb.Create(Self);
-  FqSpecDumb.Name := 'qSpecDumb';
+  FqSpecDumb := TFDDumb.Create(Self);
 
   FSPGroup.qSpecByChair.Search(100, 100);
 
@@ -198,21 +193,17 @@ begin
   // **********************************************
   // Квалификации
   // **********************************************
-  FqQualificationDumb := TQueryFDDumb.Create(Self);
-  FqQualificationDumb.Name := 'QualificationDumb';
+  FqQualificationDumb := TFDDumb.Create(Self);
 
-  TDBLCB.Init(cxdblcbQualifications, FqQualificationDumb.DataSource,
-    FqQualificationDumb.W.ID.FieldName, FSPGroup.qQualifications.DataSource,
+  TDBLCB.Init(cxdblcbQualifications, FqQualificationDumb.W.ID,
     FSPGroup.qQualifications.W.Qualification, lsEditList);
 
   // **********************************************
   // Стандарты учебных планов
   // **********************************************
-  FqStandartDumb := TQueryFDDumb.Create(Self);
-  FqStandartDumb.Name := 'SPStandartDumb';
+  FqStandartDumb := TFDDumb.Create(Self);
 
-  TDBLCB.Init(cxdblcbStandarts, FqStandartDumb.DataSource,
-    FqStandartDumb.W.ID.FieldName, FSPGroup.qSPStandart.DataSource,
+  TDBLCB.Init(cxdblcbStandarts, FqStandartDumb.W.ID,
     FSPGroup.qSPStandart.W.StudyPlanStandart, lsEditList);
 
   FMode := InsertMode;

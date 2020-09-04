@@ -5,8 +5,8 @@ interface
 uses
   System.Classes, Admissions, DPOStudyPlan, Years, AdmissionsQuery, ChairsQuery,
   CourceNameQuery, System.Contnrs, NotifyEvents, StudentGroupsQuery,
-  CourceEdTypesQuery, FDDumbQuery, YearsQry, EdLvlQry, Data.DB,
-  FireDAC.Comp.DataSet, DiscNameQry, CourseStudyPlanQry;
+  CourceEdTypesQuery, YearsQry, EdLvlQry, Data.DB, FireDAC.Comp.DataSet,
+  DiscNameQry, CourseStudyPlanQry, FDDumb;
 
 type
   TCourceGroup = class(TComponent)
@@ -23,7 +23,7 @@ type
     FqEdLvl: TQryEdLvl;
     FqStudentGroups: TQueryStudentGroups;
     FqYears: TQryYears;
-    FYearDumb: TQueryFDDumb;
+    FYearDumb: TFDDumb;
     function GetqDiscName: TQryDiscName;
     function GetqEdLvl: TQryEdLvl;
     function GetqStudentGroups: TQueryStudentGroups;
@@ -47,7 +47,7 @@ type
     property qStudentGroups: TQueryStudentGroups read GetqStudentGroups;
     property qYears: TQryYears read FqYears;
     property Year: Integer read GetYear write SetYear;
-    property YearDumb: TQueryFDDumb read FYearDumb;
+    property YearDumb: TFDDumb read FYearDumb;
     property OnYearChange: TNotifyEventsEx read FOnYearChange;
   end;
 
@@ -76,8 +76,7 @@ begin
   FqYears.W.LocateByPK(AYear, True);
 
   // Текущий год
-  FYearDumb := TQueryFDDumb.Create(Self);
-  FYearDumb.Name := 'YearDumb';
+  FYearDumb := TFDDumb.Create(Self);
   // Подписываемся на изменение текущего года
   TNotifyEventWrap.Create(FYearDumb.W.AfterPost, DoAfterYearPost, FEventList);
   FYearDumb.W.RefreshQuery;

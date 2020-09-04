@@ -5,9 +5,9 @@ interface
 uses
   System.Classes, ChairsQuery, CourceNameQuery, SpecEdQuery, SpecEdSimpleQuery,
   SPQry, SpecialitySessionsQuery, SPUnit, YearsQry, SpecEdBaseFormQry,
-  NotifyEvents, FDDumbQuery, System.Contnrs, EdQuery, SpecByChairQry,
-  QualificationQuery, AreasQry, SPStandartQuery, SpecEdSimpleInt,
-  InsertEditMode, SpecQry, SpecChiperUniqueQry, SpecNameUniqueQry, SpecInt;
+  NotifyEvents, System.Contnrs, EdQuery, SpecByChairQry, QualificationQuery,
+  AreasQry, SPStandartQuery, SpecEdSimpleInt, InsertEditMode, SpecQry,
+  SpecChiperUniqueQry, SpecNameUniqueQry, SpecInt, FDDumb;
 
 type
   TSPType = (sptVO, sptSPO, sptRetraining);
@@ -37,9 +37,9 @@ type
     FqSS: TQuerySpecialitySessions;
     FqYears: TQryYears;
     FSP: TStudyPlan;
-    FSpecEdDumb: TQueryFDDumb;
+    FSpecEdDumb: TFDDumb;
     FSPType: TSPType;
-    FYearDumb: TQueryFDDumb;
+    FYearDumb: TFDDumb;
     procedure DoAfterSpecEdPost(Sender: TObject);
     procedure DoAfterYearPost(Sender: TObject);
     procedure DoOnSpecialityEducationChange;
@@ -90,10 +90,10 @@ type
     property qSS: TQuerySpecialitySessions read FqSS;
     property qYears: TQryYears read FqYears;
     property SP: TStudyPlan read FSP;
-    property SpecEdDumb: TQueryFDDumb read FSpecEdDumb;
+    property SpecEdDumb: TFDDumb read FSpecEdDumb;
     property SPType: TSPType read FSPType;
     property Year: Integer read GetYear write SetYear;
-    property YearDumb: TQueryFDDumb read FYearDumb;
+    property YearDumb: TFDDumb read FYearDumb;
   end;
 
 implementation
@@ -115,8 +115,7 @@ begin
   FEvents := TObjectList.Create;
 
   // Текущий план
-  FSpecEdDumb := TQueryFDDumb.Create(Self);
-  FSpecEdDumb.Name := 'SpecEdDumb';
+  FSpecEdDumb := TFDDumb.Create(Self);
   TNotifyEventWrap.Create(FSpecEdDumb.W.AfterPost, DoAfterSpecEdPost, FEvents);
 
   // Года
@@ -124,8 +123,7 @@ begin
   FqYears.W.RefreshQuery;
 
   // Текущий год
-  FYearDumb := TQueryFDDumb.Create(Self);
-  FYearDumb.Name := 'YearDumb';
+  FYearDumb := TFDDumb.Create(Self);
   TNotifyEventWrap.Create(FYearDumb.W.AfterPost, DoAfterYearPost, FEvents);
   FYearDumb.W.RefreshQuery;
 

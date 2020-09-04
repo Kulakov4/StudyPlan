@@ -147,7 +147,6 @@ uses
   ChairsQuery in 'Queryes\Chairs\ChairsQuery.pas' {QueryChairs: TFrame},
   CourceNameQuery in 'Queryes\CourceName\CourceNameQuery.pas' {QueryCourceName: TFrame},
   EditCourseForm in 'Views\CourcesView\EditCourseForm.pas' {frmEditCourse},
-  FDDumbQuery in 'Queryes\FDDumbQuery.pas' {QueryFDDumb: TFrame},
   CourceDiscEditForm in 'Views\CourcesView\CourceDiscEditForm.pas' {frmCourceDiscEdit},
   InsertEditMode in 'helpers\InsertEditMode.pas',
   CycleSpecialityEducationQuery in 'Queryes\cyclespecialityeducations\CycleSpecialityEducationQuery.pas' {QueryCycleSpecialityEducations: TFrame},
@@ -224,7 +223,8 @@ uses
   AdmissionsInterface in 'Queryes\Admissions\AdmissionsInterface.pas',
   MyDir in 'helpers\MyDir.pas',
   GetSpecEdBySP in 'Queryes\SP\GetSpecEdBySP.pas' {QryGetSpecEdBySP: TFrame},
-  SpecEdSimpleWrap in 'Queryes\SpecEdSimple\SpecEdSimpleWrap.pas';
+  SpecEdSimpleWrap in 'Queryes\SpecEdSimple\SpecEdSimpleWrap.pas',
+  FDDumb in 'Queryes\Dumb\FDDumb.pas';
 
 {$R *.res}
 

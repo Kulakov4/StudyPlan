@@ -9,7 +9,7 @@ uses
   cxEdit, cxTextEdit, Vcl.StdCtrls, Vcl.Menus, cxButtons, InsertEditMode,
   System.Generics.Collections, cxMaskEdit, cxDropDownEdit, cxLookupEdit,
   cxDBLookupEdit, cxDBLookupComboBox, SpecQry, SpecInt, cxDBExtLookupComboBox,
-  SPGroup, FDDumbQuery, cxDBEdit;
+  SPGroup, cxDBEdit;
 
 type
   TfrmEditSpec = class(TForm, ISpec)
@@ -67,12 +67,10 @@ begin
   FSPGroup := AOwner as TSPGroup;
 
   // Выпадающий список уникальных кодов специальностей
-  TLCB.Init(cxlcbChiper, FSPGroup.qSpecChiper.W.DataSource,
-    FSPGroup.qSpecChiper.W.Chiper_Speciality, lsEditList);
+  TLCB.Init(cxlcbChiper, FSPGroup.qSpecChiper.W.Chiper_Speciality, lsEditList);
 
   // Выпадающий список уникальных наименований специальностей
-  TLCB.Init(cxlcbSpeciality, FSPGroup.qSpecName.W.DataSource,
-    FSPGroup.qSpecName.W.Speciality, lsEditList);
+  TLCB.Init(cxlcbSpeciality, FSPGroup.qSpecName.W.Speciality, lsEditList);
 
   FMode := EditMode;
   Mode := InsertMode;

@@ -4,13 +4,13 @@ interface
 
 uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants,
-  System.Classes, Vcl.Graphics,
-  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, EditStudyPlanForm, cxGraphics,
-  cxControls, cxLookAndFeels, cxLookAndFeelPainters, cxContainer, cxEdit,
-  Vcl.Menus, cxTextEdit, cxDBExtLookupComboBox, Vcl.StdCtrls, cxButtons,
-  cxMaskEdit, cxDropDownEdit, cxLookupEdit, cxDBLookupEdit, cxDBLookupComboBox,
-  FDDumbQuery, InsertEditMode, SpecEdSimpleQuery, cxCheckBox, SpecEdSimpleInt,
-  EditSpecFrm, EditRetrainingSpecFrm;
+  System.Classes, Vcl.Graphics, Vcl.Controls, Vcl.Forms, Vcl.Dialogs,
+  EditStudyPlanForm, cxGraphics, cxControls, cxLookAndFeels,
+  cxLookAndFeelPainters, cxContainer, cxEdit, Vcl.Menus, cxTextEdit,
+  cxDBExtLookupComboBox, Vcl.StdCtrls, cxButtons, cxMaskEdit, cxDropDownEdit,
+  cxLookupEdit, cxDBLookupEdit, cxDBLookupComboBox, InsertEditMode,
+  SpecEdSimpleQuery, cxCheckBox, SpecEdSimpleInt, EditSpecFrm,
+  EditRetrainingSpecFrm, FDDumb;
 
 type
   TfrmEditRetrainingPlan = class(TfrmEditStudyPlan, ISpecEdSimpleEx)
@@ -19,7 +19,7 @@ type
     procedure cxdblcbAreaPropertiesNewLookupDisplayText(Sender: TObject;
       const AText: TCaption);
   private
-    FqAreaDumb: TQueryFDDumb;
+    FqAreaDumb: TFDDumb;
     function GetIDArea: Integer;
     procedure SetIDArea(const Value: Integer);
     { Private declarations }
@@ -47,17 +47,14 @@ begin
   // **********************************************
   // Сферы
   // **********************************************
-  FqAreaDumb := TQueryFDDumb.Create(Self);
-  FqAreaDumb.Name := 'AreaDumb';
+  FqAreaDumb := TFDDumb.Create(Self);
 
-  TDBLCB.Init(cxdblcbArea, FqAreaDumb.DataSource, FqAreaDumb.W.ID.FieldName,
-    SPGroup.qAreas.DataSource, SPGroup.qAreas.W.AREA, lsEditList);
+  TDBLCB.Init(cxdblcbArea, FqAreaDumb.W.ID, SPGroup.qAreas.W.AREA, lsEditList);
 end;
 
 procedure TfrmEditRetrainingPlan.CheckQualification;
-begin
-  ; // Квалификация у переподготовки может быть пустой.
-    // Может она вообще не нужна?
+begin; // Квалификация у переподготовки может быть пустой.
+  // Может она вообще не нужна?
 end;
 
 function TfrmEditRetrainingPlan.CreateEditSpecForm: TfrmEditSpec;

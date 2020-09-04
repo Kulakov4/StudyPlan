@@ -8,9 +8,9 @@ uses
   cxGraphics, cxControls, cxLookAndFeels, cxLookAndFeelPainters, cxContainer,
   cxEdit, cxTextEdit, cxMaskEdit, cxDropDownEdit, cxLookupEdit, cxDBLookupEdit,
   cxDBLookupComboBox, Vcl.StdCtrls, cxSpinEdit, cxCheckBox, Vcl.Menus,
-  cxButtons, CourceGroup, FDDumbQuery, Data.DB, InsertEditMode,
-  FireDAC.Comp.Client, cxLabel, DiscNameQry, CourceDiscNameViewModel,
-  DiscNameInt, CourseStudyPlanInterface;
+  cxButtons, CourceGroup, Data.DB, InsertEditMode, FireDAC.Comp.Client,
+  cxLabel, DiscNameQry, CourceDiscNameViewModel, DiscNameInt,
+  CourseStudyPlanInterface, FDDumb;
 
 type
   TfrmCourceDiscEdit = class(TForm, IDiscName, ICourseStudyPlan)
@@ -43,7 +43,7 @@ type
   private
     FModel: TCourceDiscNameVM;
     FMode: TMode;
-    FqDisciplineNameDumb: TQueryFDDumb;
+    FqDisciplineNameDumb: TFDDumb;
     function GetExam: Boolean; stdcall;
     function GetIDDisciplineName: Integer; stdcall;
     function GetLec: Integer; stdcall;
@@ -92,10 +92,9 @@ begin
   // **********************************************
   // Наименования дисциплин
   // **********************************************
-  FqDisciplineNameDumb := TQueryFDDumb.Create(Self);
+  FqDisciplineNameDumb := TFDDumb.Create(Self);
 
-  TDBLCB.Init(cxdblcbDisciplineName, FqDisciplineNameDumb.W.DataSource,
-    FqDisciplineNameDumb.W.ID.FieldName, FModel.DiscNameW.DataSource,
+  TDBLCB.Init(cxdblcbDisciplineName, FqDisciplineNameDumb.W.ID,
     FModel.DiscNameW.DisciplineName, lsEditList);
 end;
 

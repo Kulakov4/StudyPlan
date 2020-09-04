@@ -126,11 +126,11 @@ implementation
 
 uses DBServConnectionPooler, MyDataAccess, MyConnection, CMdLine,
   cxComboBoxGridView, DataSetView_2, DataSetWrap, DB, NotifyEvents, ViewFormEx,
-  SpecialitySessionsView, SpecialitySessions,
-  SpecEducationView, AdmissionGridView2, DPOPlanView, EssenceGridView, CSEView,
-  SqlExpr, StudyPlanFactorsView2, Qualifications, System.Win.Registry,
-  System.IOUtils, EducationalStandarts, AdoptionDatesForm, StudyPlanAdoption,
-  UMKAdoption, SoftwareDocument, SoftwareView, SpecEducSimple, DisciplineNames,
+  SpecialitySessionsView, SpecialitySessions, SpecEducationView,
+  AdmissionGridView2, DPOPlanView, EssenceGridView, CSEView, SqlExpr,
+  StudyPlanFactorsView2, Qualifications, System.Win.Registry, System.IOUtils,
+  EducationalStandarts, AdoptionDatesForm, StudyPlanAdoption, UMKAdoption,
+  SoftwareDocument, SoftwareView, SpecEducSimple, DisciplineNames,
   OptionsHelper, GridViewForm, DiscNameGroup, DiscNameView, MyDir,
   GetSpecEdBySP;
 

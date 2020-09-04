@@ -3,24 +3,28 @@ unit DBLookupComboBoxHelper;
 interface
 
 uses
-  DSWrap, cxDBLookupComboBox, Data.DB, cxDropDownEdit, cxDBLabel, cxDBEdit,
-  cxGridDBBandedTableView;
+  DSWrap, cxDBLookupComboBox, Data.DB, cxDropDownEdit, cxDBLabel, cxDBEdit;
 
 type
+  TLCB = class(TObject)
+  public
+    class procedure Init(AcxLookupComboBox: TcxLookupComboBox;
+      AListSource: TDataSource; const AListFieldWrap: TFieldWrap;
+      ADropDownListStyle: TcxEditDropDownListStyle = lsEditFixedList); static;
+  end;
+
   TDBLCB = class(TObject)
   private
   public
     class procedure Init(AcxDBLookupComboBox: TcxDBLookupComboBox;
-      const ADataFieldWrap, AListFieldWrap: TFieldWrap;
+      ADataSource: TDataSource; const ADataField: string;
+      AListSource: TDataSource; const AListFieldWrap: TFieldWrap;
       ADropDownListStyle: TcxEditDropDownListStyle = lsEditFixedList);
       overload; static;
     class procedure Init(AcxLookupComboBoxProperties
-      : TcxLookupComboBoxProperties; const AListFieldWrap: TFieldWrap;
-      ADropDownListStyle: TcxEditDropDownListStyle = lsEditFixedList); overload;
-    class function InitColumn(AColumn: TcxGridDBBandedColumn;
+      : TcxLookupComboBoxProperties; AListSource: TDataSource;
       const AListFieldWrap: TFieldWrap;
-      ADropDownListStyle: TcxEditDropDownListStyle = lsEditFixedList)
-      : TcxLookupComboBoxProperties; overload;
+      ADropDownListStyle: TcxEditDropDownListStyle = lsEditFixedList); overload;
   end;
 
   TDBL = class(TObject)
@@ -35,70 +39,43 @@ type
       const ADataField: TFieldWrap); static;
   end;
 
-type
-  TLCB = class(TObject)
-  public
-    class procedure Init(AcxLookupComboBox: TcxLookupComboBox;
-      const AListFieldWrap: TFieldWrap;
-      ADropDownListStyle: TcxEditDropDownListStyle = lsEditFixedList); static;
-  end;
-
 implementation
 
 uses
   System.SysUtils;
 
 class procedure TDBLCB.Init(AcxDBLookupComboBox: TcxDBLookupComboBox;
-  const ADataFieldWrap, AListFieldWrap: TFieldWrap;
+  ADataSource: TDataSource; const ADataField: string; AListSource: TDataSource;
+  const AListFieldWrap: TFieldWrap;
   ADropDownListStyle: TcxEditDropDownListStyle = lsEditFixedList);
 begin
   Assert(AcxDBLookupComboBox <> nil);
-  Assert(ADataFieldWrap <> nil);
+  Assert(ADataSource <> nil);
+  Assert(not ADataField.IsEmpty);
+  Assert(AListSource <> nil);
 
-  AcxDBLookupComboBox.DataBinding.DataSource :=
-    ADataFieldWrap.DataSetWrap.DataSource;
-
-  AcxDBLookupComboBox.DataBinding.DataField := ADataFieldWrap.FieldName;
-
-  AcxDBLookupComboBox.Properties.ListSource :=
-    AListFieldWrap.DataSetWrap.DataSource;
-
+  AcxDBLookupComboBox.DataBinding.DataSource := ADataSource;
+  AcxDBLookupComboBox.DataBinding.DataField := ADataField;
+  AcxDBLookupComboBox.Properties.ListSource := AListSource;
   AcxDBLookupComboBox.Properties.KeyFieldNames :=
     AListFieldWrap.DataSetWrap.PKFieldName;
-
   AcxDBLookupComboBox.Properties.ListFieldNames := AListFieldWrap.FieldName;
-
   AcxDBLookupComboBox.Properties.DropDownListStyle := ADropDownListStyle;
 end;
 
 class procedure TDBLCB.Init(AcxLookupComboBoxProperties
-  : TcxLookupComboBoxProperties; const AListFieldWrap: TFieldWrap;
+  : TcxLookupComboBoxProperties; AListSource: TDataSource;
+  const AListFieldWrap: TFieldWrap;
   ADropDownListStyle: TcxEditDropDownListStyle = lsEditFixedList);
 begin
   Assert(AcxLookupComboBoxProperties <> nil);
-  Assert(AListFieldWrap <> nil);
+  Assert(AListSource <> nil);
 
-  AcxLookupComboBoxProperties.ListSource :=
-    AListFieldWrap.DataSetWrap.DataSource;
-
+  AcxLookupComboBoxProperties.ListSource := AListSource;
   AcxLookupComboBoxProperties.KeyFieldNames :=
     AListFieldWrap.DataSetWrap.PKFieldName;
-
   AcxLookupComboBoxProperties.ListFieldNames := AListFieldWrap.FieldName;
   AcxLookupComboBoxProperties.DropDownListStyle := ADropDownListStyle;
-end;
-
-class function TDBLCB.InitColumn(AColumn: TcxGridDBBandedColumn;
-  const AListFieldWrap: TFieldWrap;
-  ADropDownListStyle: TcxEditDropDownListStyle = lsEditFixedList)
-  : TcxLookupComboBoxProperties;
-begin
-  Assert(AColumn <> nil);
-  Assert(AListFieldWrap <> nil);
-
-  AColumn.PropertiesClass := TcxLookupComboBoxProperties;
-  Result := AColumn.Properties as TcxLookupComboBoxProperties;
-  Init(Result, AListFieldWrap, ADropDownListStyle);
 end;
 
 class procedure TDBL.Init(AcxDBLabel: TcxDBLabel; ADataSource: TDataSource;
@@ -135,17 +112,15 @@ end;
 { TLCB }
 
 class procedure TLCB.Init(AcxLookupComboBox: TcxLookupComboBox;
-  const AListFieldWrap: TFieldWrap;
-  ADropDownListStyle: TcxEditDropDownListStyle = lsEditFixedList);
+  AListSource: TDataSource; const AListFieldWrap: TFieldWrap;
+  ADropDownListStyle: TcxEditDropDownListStyle);
 begin
   Assert(AcxLookupComboBox <> nil);
+  Assert(AListSource <> nil);
 
-  AcxLookupComboBox.Properties.ListSource :=
-    AListFieldWrap.DataSetWrap.DataSource;
-
+  AcxLookupComboBox.Properties.ListSource := AListSource;
   AcxLookupComboBox.Properties.KeyFieldNames :=
     AListFieldWrap.DataSetWrap.PKFieldName;
-
   AcxLookupComboBox.Properties.ListFieldNames := AListFieldWrap.FieldName;
   AcxLookupComboBox.Properties.DropDownListStyle := ADropDownListStyle;
 end;

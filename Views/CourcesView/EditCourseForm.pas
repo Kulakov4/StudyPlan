@@ -4,14 +4,13 @@ interface
 
 uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants,
-  System.Classes, Vcl.Graphics,
-  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, cxGraphics, cxControls, cxLookAndFeels,
-  cxLookAndFeelPainters, cxContainer, cxEdit, Vcl.Menus, Vcl.StdCtrls,
-  cxButtons, cxTextEdit, cxMaskEdit, cxDropDownEdit, cxLookupEdit,
-  cxDBLookupEdit, cxDBLookupComboBox, FDDumbQuery, CourceGroup, Data.DB,
-  CourceNameQuery, FireDAC.Comp.Client, InsertEditMode, Vcl.ExtCtrls,
+  System.Classes, Vcl.Graphics, Vcl.Controls, Vcl.Forms, Vcl.Dialogs,
+  cxGraphics, cxControls, cxLookAndFeels, cxLookAndFeelPainters, cxContainer,
+  cxEdit, Vcl.Menus, Vcl.StdCtrls, cxButtons, cxTextEdit, cxMaskEdit,
+  cxDropDownEdit, cxLookupEdit, cxDBLookupEdit, cxDBLookupComboBox, CourceGroup,
+  Data.DB, CourceNameQuery, FireDAC.Comp.Client, InsertEditMode, Vcl.ExtCtrls,
   StudentGroupsView, dxNavBarCollns, cxClasses, dxNavBarBase, dxNavBar,
-  dxBarBuiltInMenu, cxPC, DisciplinesView, AdmissionsInterface;
+  dxBarBuiltInMenu, cxPC, DisciplinesView, AdmissionsInterface, FDDumb;
 
 type
   TfrmEditCourse = class(TForm, IAdmission)
@@ -41,8 +40,8 @@ type
     FCourceNameW: TCourceNameW;
     FID: Integer;
     FMode: TMode;
-    FqChairDumb: TQueryFDDumb;
-    FqSpecialityDumb: TQueryFDDumb;
+    FqChairDumb: TFDDumb;
+    FqSpecialityDumb: TFDDumb;
     FViewDisciplines: TViewDisciplines;
     FViewStudentGroups: TViewStudentGroups;
     function GetData: Integer; stdcall;
@@ -94,18 +93,15 @@ begin
   // Создаём обёртку вокруг нового курсора названий курсов
   FCourceNameW := TCourceNameW.Create(FCourceGroup.qCourceName.W.AddClone(''));
 
-  FqSpecialityDumb := TQueryFDDumb.Create(Self);
-  FqSpecialityDumb.Name := 'qSpecialityDumb';
+  FqSpecialityDumb := TFDDumb.Create(Self);
 
-  TDBLCB.Init(cxdblcbSpeciality, FqSpecialityDumb.DataSource,
-    FqSpecialityDumb.W.ID.FieldName, FCourceNameW.DataSource,
-    FCourceNameW.Speciality, lsEditList);
+  TDBLCB.Init(cxdblcbSpeciality, FqSpecialityDumb.W.ID, FCourceNameW.Speciality,
+    lsEditList);
 
   // *************
   // Кафедры
   // *************
-  FqChairDumb := TQueryFDDumb.Create(Self);
-  FqChairDumb.Name := 'qChairDumb';
+  FqChairDumb := TFDDumb.Create(Self);
 
   if StudyProcessOptions.IDChair > 0 then
   begin
@@ -113,10 +109,8 @@ begin
     cxdblcbChair.Enabled := False;
   end;
 
-  TDBLCB.Init(cxdblcbChair, FqChairDumb.DataSource, FqChairDumb.W.ID.FieldName,
-    FCourceGroup.qChairs.DataSource, FCourceGroup.qChairs.W.Наименование,
-    lsFixedList);
-
+  TDBLCB.Init(cxdblcbChair, FqChairDumb.W.ID,
+    FCourceGroup.qChairs.W.Наименование, lsFixedList);
 end;
 
 destructor TfrmEditCourse.Destroy;

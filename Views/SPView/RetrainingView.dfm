@@ -12,26 +12,35 @@ inherited ViewRetraining: TViewRetraining
         ExplicitLeft = 95
       end
     end
+    inherited tbShortSpeciality: TTBToolbar
+      ExplicitWidth = 230
+      inherited cxdblcbShortSpeciality: TcxDBLookupComboBox
+        Left = 220
+        Top = 21
+        ExplicitLeft = 220
+        ExplicitTop = 21
+      end
+    end
     inherited tbChairs: TTBToolbar
-      Left = 631
-      ExplicitLeft = 631
+      Left = 580
+      ExplicitLeft = 580
     end
     inherited tbActions: TTBToolbar
       Left = 1149
       ExplicitLeft = 1149
     end
     inherited tbIDSpecEd: TTBToolbar
-      Left = 1322
+      Left = 1336
       TabOrder = 7
-      ExplicitLeft = 1322
+      ExplicitLeft = 1336
     end
     inherited tbLocked: TTBToolbar
-      Left = 1256
-      ExplicitLeft = 1256
+      Left = 1205
+      ExplicitLeft = 1205
     end
     object tbArea: TTBToolbar
-      Left = 281
-      Top = 28
+      Left = 230
+      Top = 26
       DockPos = 10
       DockRow = 1
       SystemFont = False
@@ -44,7 +53,7 @@ inherited ViewRetraining: TViewRetraining
       end
       object Label1: TLabel
         Left = 0
-        Top = 4
+        Top = 2
         Width = 52
         Height = 16
         Caption = #1057#1092#1077#1088#1072':  '

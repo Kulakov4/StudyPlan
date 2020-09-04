@@ -4,11 +4,11 @@ interface
 
 uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants,
-  System.Classes, Vcl.Graphics,
-  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, cxGraphics, cxControls,
-  cxLookAndFeels, cxLookAndFeelPainters, cxContainer, cxEdit, cxTextEdit,
-  cxMaskEdit, cxDropDownEdit, cxLookupEdit, cxDBLookupEdit, cxDBLookupComboBox,
-  Vcl.Menus, cxButtons, DiscNameGroup, FDDumbQuery, InsertEditMode, DiscNameInt;
+  System.Classes, Vcl.Graphics, Vcl.Controls, Vcl.Forms, Vcl.Dialogs,
+  Vcl.StdCtrls, cxGraphics, cxControls, cxLookAndFeels, cxLookAndFeelPainters,
+  cxContainer, cxEdit, cxTextEdit, cxMaskEdit, cxDropDownEdit, cxLookupEdit,
+  cxDBLookupEdit, cxDBLookupComboBox, Vcl.Menus, cxButtons, DiscNameGroup,
+  InsertEditMode, DiscNameInt, FDDumb;
 
 type
   TfrmEditDisciplineName = class(TForm, IDiscName)
@@ -27,7 +27,7 @@ type
   private
     FDiscNameGroup: TDiscNameGroup;
     FMode: TMode;
-    FqChairDumb: TQueryFDDumb;
+    FqChairDumb: TFDDumb;
     procedure SetDisciplineName(const Value: string);
     procedure SetShortDisciplineName(const Value: String);
     procedure SetIDChair(const Value: Integer);
@@ -64,12 +64,10 @@ begin
   // **********************************************
   // Кафедра
   // **********************************************
-  FqChairDumb := TQueryFDDumb.Create(Self);
-  FqChairDumb.Name := 'qChair';
+  FqChairDumb := TFDDumb.Create(Self);
 
-  TDBLCB.Init(cxdblcbChairs, FqChairDumb.DataSource, FqChairDumb.W.ID.FieldName,
-    FDiscNameGroup.qChairs.DataSource, FDiscNameGroup.qChairs.W.Наименование,
-    lsFixedList);
+  TDBLCB.Init(cxdblcbChairs, FqChairDumb.W.ID,
+    FDiscNameGroup.qChairs.W.Наименование, lsFixedList);
 end;
 
 procedure TfrmEditDisciplineName.Check;
@@ -83,8 +81,8 @@ end;
 
 procedure TfrmEditDisciplineName.FormClose(Sender: TObject;
   var Action: TCloseAction);
-//var
-//  S: string;
+// var
+// S: string;
 begin
   if ModalResult <> mrOK then
   begin
