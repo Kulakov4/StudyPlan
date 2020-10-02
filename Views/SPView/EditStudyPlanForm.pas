@@ -177,7 +177,7 @@ begin
 
   // Подключаем выпадающий список специальностей
   FViewSpecPopup := TViewSpecPopup.Create(Self);
-  FViewSpecPopup.QrySpecByChair := FSPGroup.qSpecByChair;
+  FViewSpecPopup.W := FSPGroup.qSpecByChair.W;
   with cxdbextlcbSpecialitys do
   begin
     DataBinding.DataSource := FqSpecDumb.DataSource;

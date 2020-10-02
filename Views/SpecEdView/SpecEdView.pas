@@ -13,11 +13,10 @@ uses
   System.Actions, Vcl.ActnList, cxClasses, dxBar, Vcl.ComCtrls, cxGridLevel,
   cxGridCustomView, cxGridCustomTableView, cxGridTableView,
   cxGridBandedTableView, cxGridDBBandedTableView, cxGrid, SpecEdQuery,
-  SpecEdGroup;
+  SpecEdGroup, dxDateRanges;
 
 type
   TViewSpecEd = class(TfrmGrid)
-    dsChairs: TDataSource;
   private
     FSpecEdGr: TSpecEdGroup;
     function GetclIDChair: TcxGridDBBandedColumn;
@@ -26,6 +25,8 @@ type
     function GetclYear: TcxGridDBBandedColumn;
     procedure SetSpecEdGr(const Value: TSpecEdGroup);
     { Private declarations }
+  protected
+    procedure InitColumns(AView: TcxGridDBBandedTableView); override;
   public
     procedure InitView(AView: TcxGridDBBandedTableView); override;
     property clIDChair: TcxGridDBBandedColumn read GetclIDChair;
@@ -65,13 +66,11 @@ begin
   Result := MainView.GetColumnByFieldName(FSpecEdGr.qSpecEd.W.Year.FieldName);
 end;
 
-procedure TViewSpecEd.InitView(AView: TcxGridDBBandedTableView);
+procedure TViewSpecEd.InitColumns(AView: TcxGridDBBandedTableView);
 begin
   inherited;
-  MainView.OptionsView.ColumnAutoWidth := False;
-
   // Настраиваем подстановочную колонку Кафедра
-  InitializeLookupColumn(clIDChair, dsChairs, lsFixedList,
+  InitializeLookupColumn(clIDChair, FSpecEdGr.qChairs.W.DataSource, lsFixedList,
     FSpecEdGr.qChairs.W.Short_Name.FieldName,
     FSpecEdGr.qChairs.W.ID_CHAIR.FieldName);
 
@@ -90,12 +89,20 @@ begin
 
   // Сортируем по году
   ApplySort(MainView, clYear);
-  FocusTopLeft(FSpecEdGr.qSpecEd.W.IDSpeciality.FieldName );
+  FocusTopLeft(FSpecEdGr.qSpecEd.W.IDSpeciality.FieldName);
 
   clYear.GroupIndex := 0;
   clYear.Visible := False;
   clIDChair.GroupIndex := 1;
   clIDChair.Visible := False;
+
+  MyApplyBestFitForView(MainView);
+end;
+
+procedure TViewSpecEd.InitView(AView: TcxGridDBBandedTableView);
+begin
+  inherited;
+  MainView.OptionsView.ColumnAutoWidth := False;
 end;
 
 procedure TViewSpecEd.SetSpecEdGr(const Value: TSpecEdGroup);
@@ -107,31 +114,12 @@ begin
 
   if FSpecEdGr = nil then
   begin
-    dsChairs.DataSet := nil;
-    DataSource.DataSet := nil;
+    DSWrap := nil;
     Exit;
   end;
 
-  BeginUpdate;
-  try
-    DataSource.DataSet := FSpecEdGr.qSpecEd.FDQuery;
-    dsChairs.DataSet := FSpecEdGr.qChairs.FDQuery;
+  DSWrap := FSpecEdGr.qSpecEd.W;
 
-    // Настраиваем представление планов
-    with MainView.DataController do
-    begin
-      KeyFieldNames := FSpecEdGr.qSpecEd.W.PKFieldName;
-
-      // Создаём все колонки
-      CreateAllItems();
-    end;
-
-    InitView(MainView);
-  finally
-    EndUpdate;
-  end;
-
-  MyApplyBestFitForView(MainView);
   UpdateView;
 end;
 

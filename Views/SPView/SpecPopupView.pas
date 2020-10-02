@@ -12,25 +12,27 @@ uses
   dxBarBuiltInMenu, cxGridCustomPopupMenu, cxGridPopupMenu, Vcl.Menus,
   System.Actions, Vcl.ActnList, cxClasses, dxBar, Vcl.ComCtrls, cxGridLevel,
   cxGridCustomView, cxGridCustomTableView, cxGridTableView,
-  cxGridBandedTableView, cxGridDBBandedTableView, cxGrid, SpecByChairQry;
+  cxGridBandedTableView, cxGridDBBandedTableView, cxGrid, SpecByChairQry,
+  dxDateRanges;
 
 type
   TViewSpecPopup = class(TfrmGrid)
   private
-    FQrySpecByChair: TQrySpecByChair;
     function GetclCalcSpeciality: TcxGridDBBandedColumn;
     function GetclChiper_Speciality: TcxGridDBBandedColumn;
     function GetclSpeciality: TcxGridDBBandedColumn;
-    procedure SetQrySpecByChair(const Value: TQrySpecByChair);
+    function GetW: TSpecByChairW;
+    procedure SetW(const Value: TSpecByChairW);
     { Private declarations }
+  protected
+    procedure InitColumns(AView: TcxGridDBBandedTableView); override;
   public
     procedure InitView(AView: TcxGridDBBandedTableView); override;
     property clCalcSpeciality: TcxGridDBBandedColumn read GetclCalcSpeciality;
     property clChiper_Speciality: TcxGridDBBandedColumn
       read GetclChiper_Speciality;
     property clSpeciality: TcxGridDBBandedColumn read GetclSpeciality;
-    property QrySpecByChair: TQrySpecByChair read FQrySpecByChair
-      write SetQrySpecByChair;
+    property W: TSpecByChairW read GetW write SetW;
     { Public declarations }
   end;
 
@@ -43,20 +45,35 @@ uses
 
 function TViewSpecPopup.GetclCalcSpeciality: TcxGridDBBandedColumn;
 begin
-  Result := MainView.GetColumnByFieldName
-    (FQrySpecByChair.W.CalcSpeciality.FieldName);
+  Result := MainView.GetColumnByFieldName(W.CalcSpeciality.FieldName);
 end;
 
 function TViewSpecPopup.GetclChiper_Speciality: TcxGridDBBandedColumn;
 begin
-  Result := MainView.GetColumnByFieldName
-    (FQrySpecByChair.W.CHIPER_SPECIALITY.FieldName);
+  Result := MainView.GetColumnByFieldName(W.CHIPER_SPECIALITY.FieldName);
 end;
 
 function TViewSpecPopup.GetclSpeciality: TcxGridDBBandedColumn;
 begin
-  Result := MainView.GetColumnByFieldName
-    (FQrySpecByChair.W.Speciality.FieldName);
+  Result := MainView.GetColumnByFieldName(W.Speciality.FieldName);
+end;
+
+function TViewSpecPopup.GetW: TSpecByChairW;
+begin
+  Result := DSWrap as TSpecByChairW;
+end;
+
+procedure TViewSpecPopup.InitColumns(AView: TcxGridDBBandedTableView);
+begin
+  inherited;
+  clCalcSpeciality.Visible := False;
+
+  GridSort.Add(TSortVariant.Create(clSpeciality,
+    [clSpeciality, clChiper_Speciality] ));
+
+  // Сортируем по специальности
+  ApplySort(MainView, clSpeciality);
+  FocusTopLeft(W.Chiper_Speciality.FieldName);
 end;
 
 procedure TViewSpecPopup.InitView(AView: TcxGridDBBandedTableView);
@@ -69,51 +86,11 @@ begin
   MainView.OptionsSelection.MultiSelect := False;
   MainView.OptionsSelection.CellSelect := False;
   MainView.OptionsSelection.InvertSelect := False;
-
-  clCalcSpeciality.Visible := False;
-
-  GridSort.Add(TSortVariant.Create(clSpeciality,
-    [clSpeciality, clChiper_Speciality] ));
-
-  // Сортируем по специальности
-  ApplySort(MainView, clSpeciality);
-  FocusTopLeft(FQrySpecByChair.W.Chiper_Speciality.FieldName);
 end;
 
-procedure TViewSpecPopup.SetQrySpecByChair(const Value: TQrySpecByChair);
+procedure TViewSpecPopup.SetW(const Value: TSpecByChairW);
 begin
-  if FQrySpecByChair = Value then
-    Exit;
-
-  FQrySpecByChair := Value;
-
-  if FQrySpecByChair = nil then
-  begin
-    DataSource := nil;
-    Exit;
-  end;
-
-  BeginUpdate;
-  try
-    DataSource.DataSet := FQrySpecByChair.FDQuery;
-
-    // Настраиваем представление планов
-    with MainView.DataController do
-    begin
-      KeyFieldNames := FQrySpecByChair.W.PKFieldName;
-
-      // Создаём все колонки
-      CreateAllItems();
-    end;
-
-    InitView(MainView);
-  finally
-    EndUpdate;
-  end;
-
-  MyApplyBestFitForView(MainView);
-  UpdateView;
-
+  DSWrap := Value;
 end;
 
 end.

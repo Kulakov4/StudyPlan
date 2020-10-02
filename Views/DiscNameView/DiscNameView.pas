@@ -33,7 +33,9 @@ type
     procedure SetDiscNameGroup(const Value: TDiscNameGroup);
     { Private declarations }
   protected
+    procedure InitColumns(AView: TcxGridDBBandedTableView); override;
   public
+    procedure InitView(AView: TcxGridDBBandedTableView); override;
     procedure UpdateView; override;
     property clIDChair: TcxGridDBBandedColumn read GetclIDChair;
     property clDisciplineName: TcxGridDBBandedColumn read GetclDisciplineName;
@@ -89,6 +91,38 @@ begin
     (FDiscNameGroup.qDiscName.W.DisciplineName.FieldName);
 end;
 
+procedure TViewDiscName.InitColumns(AView: TcxGridDBBandedTableView);
+begin
+  inherited;
+  clDisciplineName.BestFitMaxWidth := 600;
+
+  // Настраиваем подстановочную колонку кафедра
+  InitializeLookupColumn(clIDChair, FDiscNameGroup.qChairs.DataSource,
+    lsEditList, FDiscNameGroup.qChairs.W.Shortening.FieldName,
+    FDiscNameGroup.qChairs.W.ID_CHAIR.FieldName);
+
+  clIDChair.Options.SortByDisplayText := isbtOn;
+  GridSort.Add(TSortVariant.Create(clIDChair, [clIDChair, clDisciplineName]));
+  GridSort.Add(TSortVariant.Create(clDisciplineName, [clDisciplineName,
+    clIDChair]));
+  ApplySort(MainView, clDisciplineName);
+
+  MyApplyBestFitForView(MainView);
+
+  UpdateView;
+end;
+
+procedure TViewDiscName.InitView(AView: TcxGridDBBandedTableView);
+begin
+  inherited;
+  MainView.OptionsView.ColumnAutoWidth := False;
+  MainView.OptionsBehavior.ImmediateEditor := False;
+  MainView.OptionsBehavior.IncSearch := True;
+  MainView.OptionsData.Editing := False;
+  MainView.OptionsData.Inserting := False;
+  MainView.OptionsData.Deleting := False;
+end;
+
 procedure TViewDiscName.SetDiscNameGroup(const Value: TDiscNameGroup);
 begin
   if FDiscNameGroup = Value then
@@ -97,48 +131,10 @@ begin
   FDiscNameGroup := Value;
 
   if FDiscNameGroup = nil then
-  begin
-    UpdateView;
-    Exit;
-  end;
+    DSWrap := nil
+  else
+    DSWrap := FDiscNameGroup.qDiscName.W;
 
-  BeginUpdate;
-  try
-    DataSource.DataSet := FDiscNameGroup.qDiscName.FDQuery;
-
-    // Настраиваем представление дисциплин
-    with MainView.DataController do
-    begin
-      KeyFieldNames := FDiscNameGroup.qDiscName.W.PKFieldName;
-
-      // Создаём все колонки
-      CreateAllItems();
-    end;
-
-    clDisciplineName.BestFitMaxWidth := 600;
-
-    // Настраиваем подстановочную колонку кафедра
-    InitializeLookupColumn(clIDChair, FDiscNameGroup.qChairs.DataSource,
-      lsEditList, FDiscNameGroup.qChairs.W.Shortening.FieldName,
-      FDiscNameGroup.qChairs.W.ID_CHAIR.FieldName);
-
-    InitView(MainView);
-    MainView.OptionsView.ColumnAutoWidth := False;
-    MainView.OptionsBehavior.ImmediateEditor := False;
-    MainView.OptionsBehavior.IncSearch := True;
-    MainView.OptionsData.Editing := False;
-    MainView.OptionsData.Inserting := False;
-    MainView.OptionsData.Deleting := False;
-
-    clIDChair.Options.SortByDisplayText := isbtOn;
-    GridSort.Add(TSortVariant.Create(clIDChair, [clIDChair, clDisciplineName]));
-    GridSort.Add(TSortVariant.Create(clDisciplineName, [clDisciplineName, clIDChair]));
-    ApplySort(MainView, clDisciplineName);
-
-  finally
-    EndUpdate;
-  end;
-  MyApplyBestFitForView(MainView);
   UpdateView;
 end;
 

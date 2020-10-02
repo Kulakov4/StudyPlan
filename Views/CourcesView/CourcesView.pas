@@ -483,6 +483,22 @@ begin
     InitializeLookupColumn(clIDChair, FCourceGroup.qChairs.DataSource,
       lsFixedList, FCourceGroup.qChairs.W.Short_Name.FieldName,
       FCourceGroup.qChairs.W.ID_CHAIR.FieldName);
+    clIDChair.Options.SortByDisplayText := isbtOn;
+
+    clIDSpeciality.BestFitMaxWidth := 900;
+    clIDSpeciality.Options.SortByDisplayText := isbtOn;
+
+    // *****************************
+    // Сортировка
+    // *****************************
+
+    GridSort.Add(TSortVariant.Create(clIDChair, [clIDChair, clIDSpeciality,
+      clData]));
+    GridSort.Add(TSortVariant.Create(clIDSpeciality, [clIDSpeciality, clData,
+      clIDChair]));
+    GridSort.Add(TSortVariant.Create(clData, [clData, clIDSpeciality,
+      clIDChair]));
+    ApplySort(MainView, clIDSpeciality);
   end
   else
   begin
@@ -491,6 +507,29 @@ begin
       FCourceGroup.qDiscName.DataSource, lsEditList,
       FCourceGroup.qDiscName.W.DisciplineName.FieldName,
       FCourceGroup.qDiscName.W.PKFieldName);
+
+    clIDDisciplineName.Options.SortByDisplayText := isbtOn;
+
+    clLec.Options.AutoWidthSizable := False;
+    clLec.Width := 100;
+    clLab.Options.AutoWidthSizable := False;
+    clLab.Width := 100;
+    clSem.Options.AutoWidthSizable := False;
+    clSem.Width := 100;
+    clZach.Options.AutoWidthSizable := False;
+    clZach.Width := 100;
+    clExam.Options.AutoWidthSizable := False;
+    clExam.Width := 100;
+
+    clZach.PropertiesClass := TcxCheckBoxProperties;
+    (clZach.Properties as TcxCheckBoxProperties).ValueChecked := 2;
+    (clZach.Properties as TcxCheckBoxProperties).NullStyle := nssUnchecked;
+    (clZach.Properties as TcxCheckBoxProperties).ValueUnchecked := 0;
+
+    clExam.PropertiesClass := TcxCheckBoxProperties;
+    (clExam.Properties as TcxCheckBoxProperties).ValueChecked := 2;
+    (clExam.Properties as TcxCheckBoxProperties).NullStyle := nssUnchecked;
+    (clExam.Properties as TcxCheckBoxProperties).ValueUnchecked := 0;
   end;
 end;
 
@@ -513,6 +552,7 @@ begin
   cxGridDBBandedTableView2.OptionsBehavior.CellHints := True;
   cxGridDBBandedTableView2.OptionsView.ColumnAutoWidth := True;
 
+  DeleteMessages.Clear;
   DeleteMessages.Add(cxGridLevel, 'Удалить выделенные планы?');
   DeleteMessages.Add(cxGridLevel2, 'Удалить выделенные дисциплины?');
 end;
@@ -560,42 +600,7 @@ begin
 
   BeginUpdate;
   try
-    clIDSpeciality.BestFitMaxWidth := 900;
 
-    clIDDisciplineName.Options.SortByDisplayText := isbtOn;
-    clLec.Options.AutoWidthSizable := False;
-    clLec.Width := 100;
-    clLab.Options.AutoWidthSizable := False;
-    clLab.Width := 100;
-    clSem.Options.AutoWidthSizable := False;
-    clSem.Width := 100;
-    clZach.Options.AutoWidthSizable := False;
-    clZach.Width := 100;
-    clExam.Options.AutoWidthSizable := False;
-    clExam.Width := 100;
-
-    clZach.PropertiesClass := TcxCheckBoxProperties;
-    (clZach.Properties as TcxCheckBoxProperties).ValueChecked := 2;
-    (clZach.Properties as TcxCheckBoxProperties).NullStyle := nssUnchecked;
-    (clZach.Properties as TcxCheckBoxProperties).ValueUnchecked := 0;
-
-    clExam.PropertiesClass := TcxCheckBoxProperties;
-    (clExam.Properties as TcxCheckBoxProperties).ValueChecked := 2;
-    (clExam.Properties as TcxCheckBoxProperties).NullStyle := nssUnchecked;
-    (clExam.Properties as TcxCheckBoxProperties).ValueUnchecked := 0;
-
-    // *****************************
-    // Сортировка
-    // *****************************
-    clIDSpeciality.Options.SortByDisplayText := isbtOn;
-    clIDChair.Options.SortByDisplayText := isbtOn;
-    GridSort.Add(TSortVariant.Create(clIDChair, [clIDChair, clIDSpeciality,
-      clData]));
-    GridSort.Add(TSortVariant.Create(clIDSpeciality, [clIDSpeciality, clData,
-      clIDChair]));
-    GridSort.Add(TSortVariant.Create(clData, [clData, clIDSpeciality,
-      clIDChair]));
-    ApplySort(MainView, clIDSpeciality);
 
     // ApplyBestFitForDetail := True;
 
