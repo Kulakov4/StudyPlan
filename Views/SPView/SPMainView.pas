@@ -274,7 +274,7 @@ begin
     lsFixedList);
 
   // Подключаем выпадающий список планов
-  FViewSpecEdPopup.SPGroup := FSPGroup;
+  FViewSpecEdPopup.W := FSPGroup.qSpecEd.W;
   with cxdbelcbSpeciality do
   begin
     DataBinding.DataSource := FSPGroup.SpecEdDumb.W.DataSource;

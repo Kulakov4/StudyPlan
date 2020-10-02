@@ -7,7 +7,8 @@ uses
   SPQry, SpecialitySessionsQuery, SPUnit, YearsQry, SpecEdBaseFormQry,
   NotifyEvents, System.Contnrs, EdQuery, SpecByChairQry, QualificationQuery,
   AreasQry, SPStandartQuery, SpecEdSimpleInt, InsertEditMode, SpecQry,
-  SpecChiperUniqueQry, SpecNameUniqueQry, SpecInt, FDDumb;
+  SpecChiperUniqueQry, SpecNameUniqueQry, SpecInt, FDDumb,
+  SpecEdPopupViewInterface;
 
 type
   TSPType = (sptVO, sptSPO, sptRetraining);

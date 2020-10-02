@@ -719,6 +719,8 @@
         </DCCReference>
         <DCCReference Include="Queryes\SpecEdSimple\SpecEdSimpleWrap.pas"/>
         <DCCReference Include="Queryes\Dumb\FDDumb.pas"/>
+        <DCCReference Include="Interfaces\SpecEdPopupViewInterface.pas"/>
+        <DCCReference Include="Interfaces\SPViewInterface.pas"/>
         <None Include="StudyPlan.todo"/>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>

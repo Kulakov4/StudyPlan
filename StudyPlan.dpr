@@ -224,7 +224,9 @@ uses
   MyDir in 'helpers\MyDir.pas',
   GetSpecEdBySP in 'Queryes\SP\GetSpecEdBySP.pas' {QryGetSpecEdBySP: TFrame},
   SpecEdSimpleWrap in 'Queryes\SpecEdSimple\SpecEdSimpleWrap.pas',
-  FDDumb in 'Queryes\Dumb\FDDumb.pas';
+  FDDumb in 'Queryes\Dumb\FDDumb.pas',
+  SpecEdPopupViewInterface in 'Interfaces\SpecEdPopupViewInterface.pas',
+  SPViewInterface in 'Interfaces\SPViewInterface.pas';
 
 {$R *.res}
 

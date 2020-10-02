@@ -12,7 +12,7 @@ uses
   dxBarBuiltInMenu, cxGridCustomPopupMenu, cxGridPopupMenu, Vcl.Menus,
   System.Actions, Vcl.ActnList, cxClasses, dxBar, Vcl.ComCtrls, cxGridLevel,
   cxGridCustomView, cxGridCustomTableView, cxGridTableView,
-  cxGridBandedTableView, cxGridDBBandedTableView, cxGrid, SpecEdQuery, SPGroup,
+  cxGridBandedTableView, cxGridDBBandedTableView, cxGrid, SpecEdQuery,
   cxCheckBox, dxDateRanges;
 
 type
@@ -22,14 +22,13 @@ type
       ARecordIndex: Integer; var AText: string);
     procedure clCalcGetDisplayText(Sender: TcxCustomGridTableItem;
       ARecord: TcxCustomGridRecord; var AText: string);
-    procedure cxGridDBBandedTableViewCustomDrawCell(Sender: TcxCustomGridTableView;
-        ACanvas: TcxCanvas; AViewInfo: TcxGridTableDataCellViewInfo; var ADone:
-        Boolean);
+    procedure cxGridDBBandedTableViewCustomDrawCell
+      (Sender: TcxCustomGridTableView; ACanvas: TcxCanvas;
+      AViewInfo: TcxGridTableDataCellViewInfo; var ADone: Boolean);
     procedure cxGridDBBandedTableViewStylesGetContentStyle
       (Sender: TcxCustomGridTableView; ARecord: TcxCustomGridRecord;
       AItem: TcxCustomGridTableItem; var AStyle: TcxStyle);
   private
-    FSPGroup: TSPGroup;
     function GetCalcColumnText(Sender: TcxCustomGridTableItem;
       ARecordIndex: Integer): String;
     function GetclChiper_Speciality: TcxGridDBBandedColumn;
@@ -44,7 +43,8 @@ type
     function GetclEnable: TcxGridDBBandedColumn;
     function GetclSpecialityEx: TcxGridDBBandedColumn;
     function GetclYear: TcxGridDBBandedColumn;
-    procedure SetSPGroup(const Value: TSPGroup);
+    function GetW: TSpecEdW;
+    procedure SetW(const Value: TSpecEdW);
     { Private declarations }
   protected
     procedure InitColumns(AView: TcxGridDBBandedTableView); override;
@@ -63,7 +63,7 @@ type
     property clEnable: TcxGridDBBandedColumn read GetclEnable;
     property clSpecialityEx: TcxGridDBBandedColumn read GetclSpecialityEx;
     property clYear: TcxGridDBBandedColumn read GetclYear;
-    property SPGroup: TSPGroup read FSPGroup write SetSPGroup;
+    property W: TSpecEdW read GetW write SetW;
     { Public declarations }
   end;
 
@@ -83,8 +83,7 @@ var
 begin
   AView := Sender.GridView as TcxGridDBBandedTableView;
 
-  AclIDSpec := AView.GetColumnByFieldName
-    (SPGroup.qSpecEd.W.IDSpeciality.FieldName);
+  AclIDSpec := AView.GetColumnByFieldName(W.IDSpeciality.FieldName);
 
   Assert(AclIDSpec <> nil);
 
@@ -100,28 +99,31 @@ begin
   AText := GetCalcColumnText(Sender, ARecord.RecordIndex);
 end;
 
-procedure TViewSpecEdPopup.cxGridDBBandedTableViewCustomDrawCell(Sender:
-    TcxCustomGridTableView; ACanvas: TcxCanvas; AViewInfo:
-    TcxGridTableDataCellViewInfo; var ADone: Boolean);
+procedure TViewSpecEdPopup.cxGridDBBandedTableViewCustomDrawCell
+  (Sender: TcxCustomGridTableView; ACanvas: TcxCanvas;
+  AViewInfo: TcxGridTableDataCellViewInfo; var ADone: Boolean);
 var
   ACol: TcxGridDBBandedColumn;
   V: Variant;
 begin
   inherited;
-  if not AViewInfo.GridRecord.IsData then Exit;
-  if AViewInfo.Selected then Exit;
-//  if AViewInfo.Focused then Exit;
-//  if AViewInfo.IsHotTracked then Exit;
+  if not AViewInfo.GridRecord.IsData then
+    Exit;
+  if AViewInfo.Selected then
+    Exit;
+  // if AViewInfo.Focused then Exit;
+  // if AViewInfo.IsHotTracked then Exit;
 
   ACol := AViewInfo.Item as TcxGridDBBandedColumn;
-  if ACol.Options.CellMerging then Exit;
+  if ACol.Options.CellMerging then
+    Exit;
   V := AViewInfo.GridRecord.Values[4];
   if VarIsNull(V) then
     Exit;
 
   if V = 0 then
   begin
-    ACanvas.Brush.Color:=  cxDisabledStyle.Color;
+    ACanvas.Brush.Color := cxDisabledStyle.Color;
   end;
 end;
 
@@ -129,7 +131,7 @@ procedure TViewSpecEdPopup.cxGridDBBandedTableViewStylesGetContentStyle
   (Sender: TcxCustomGridTableView; ARecord: TcxCustomGridRecord;
   AItem: TcxCustomGridTableItem; var AStyle: TcxStyle);
 {
-var
+  var
   ACol: TcxGridDBBandedColumn;
   AEnabled: Integer;
   AView: TcxGridDBBandedTableView;
@@ -137,32 +139,32 @@ var
 }
 begin
   inherited;
-{
-  if ARecord = nil then
+  {
+    if ARecord = nil then
     Exit;
-  if not ARecord.IsData then
+    if not ARecord.IsData then
     Exit;
-  if Sender = nil then
+    if Sender = nil then
     Exit;
-  // if AItem = nil then Exit;
-  // if MainView = nil then Exit;
+    // if AItem = nil then Exit;
+    // if MainView = nil then Exit;
 
-  AView := Sender as TcxGridDBBandedTableView;
-  ACol := AView.GetColumnByFieldName
+    AView := Sender as TcxGridDBBandedTableView;
+    ACol := AView.GetColumnByFieldName
     (FSPGroup.qSpecEd.W.ENABLE_SPECIALITYEDUCATION.FieldName);
 
-  V := ARecord.Values[ACol.Index];
+    V := ARecord.Values[ACol.Index];
 
-  if VarIsNull(V) then
+    if VarIsNull(V) then
     Exit;
 
-  AEnabled := V; // ARecord.Values[clEnable.Index];
-  if AEnabled = 0 then
-  begin
+    AEnabled := V; // ARecord.Values[clEnable.Index];
+    if AEnabled = 0 then
+    begin
     ACol := AItem as TcxGridDBBandedColumn;
     if ACol.DataBinding.FieldName <> SPGroup.qSpecEd.W.SpecialityEx.FieldName then
-      AStyle := cxDisabledStyle;
-  end;
+    AStyle := cxDisabledStyle;
+    end;
   }
 end;
 
@@ -175,8 +177,7 @@ var
 begin
   AView := Sender.GridView as TcxGridDBBandedTableView;
 
-  AclIDSpec := AView.GetColumnByFieldName
-    (SPGroup.qSpecEd.W.IDSpeciality.FieldName);
+  AclIDSpec := AView.GetColumnByFieldName(W.IDSpeciality.FieldName);
 
   Assert(AclIDSpec <> nil);
 
@@ -187,69 +188,68 @@ end;
 
 function TViewSpecEdPopup.GetclChiper_Speciality: TcxGridDBBandedColumn;
 begin
-  Result := MainView.GetColumnByFieldName
-    (FSPGroup.qSpecEd.W.CHIPER_SPECIALITY.FieldName);
+  Result := MainView.GetColumnByFieldName(W.CHIPER_SPECIALITY.FieldName);
 end;
 
 function TViewSpecEdPopup.GetclData: TcxGridDBBandedColumn;
 begin
-  Result := MainView.GetColumnByFieldName(FSPGroup.qSpecEd.W.Data.FieldName);
+  Result := MainView.GetColumnByFieldName(W.Data.FieldName);
 end;
 
 function TViewSpecEdPopup.GetclEducationOrder: TcxGridDBBandedColumn;
 begin
-  Result := MainView.GetColumnByFieldName
-    (FSPGroup.qSpecEd.W.Education_Order.FieldName);
+  Result := MainView.GetColumnByFieldName(W.Education_Order.FieldName);
 end;
 
 function TViewSpecEdPopup.GetclEducation: TcxGridDBBandedColumn;
 begin
-  Result := MainView.GetColumnByFieldName
-    (FSPGroup.qSpecEd.W.Education.FieldName);
+  Result := MainView.GetColumnByFieldName(W.Education.FieldName);
 end;
 
 function TViewSpecEdPopup.GetclIDChair: TcxGridDBBandedColumn;
 begin
-  Result := MainView.GetColumnByFieldName(FSPGroup.qSpecEd.W.IDChair.FieldName);
+  Result := MainView.GetColumnByFieldName(W.IDChair.FieldName);
 end;
 
 function TViewSpecEdPopup.GetclLocked: TcxGridDBBandedColumn;
 begin
-  Result := MainView.GetColumnByFieldName(FSPGroup.qSpecEd.W.Locked.FieldName);
+  Result := MainView.GetColumnByFieldName(W.Locked.FieldName);
 end;
 
 function TViewSpecEdPopup.GetclIDSpeciality: TcxGridDBBandedColumn;
 begin
-  Result := MainView.GetColumnByFieldName
-    (FSPGroup.qSpecEd.W.IDSpeciality.FieldName);
+  Result := MainView.GetColumnByFieldName(W.IDSpeciality.FieldName);
 end;
 
 function TViewSpecEdPopup.GetclSpeciality: TcxGridDBBandedColumn;
 begin
-  Result := MainView.GetColumnByFieldName
-    (FSPGroup.qSpecEd.W.Speciality.FieldName);
+  Result := MainView.GetColumnByFieldName(W.Speciality.FieldName);
 end;
 
 function TViewSpecEdPopup.GetclPK: TcxGridDBBandedColumn;
 begin
-  Result := MainView.GetColumnByFieldName(SPGroup.qSpecEd.W.PKFieldName);
+  Result := MainView.GetColumnByFieldName(W.PKFieldName);
 end;
 
 function TViewSpecEdPopup.GetclEnable: TcxGridDBBandedColumn;
 begin
   Result := MainView.GetColumnByFieldName
-    (FSPGroup.qSpecEd.W.ENABLE_SPECIALITYEDUCATION.FieldName);
+    (W.ENABLE_SPECIALITYEDUCATION.FieldName);
 end;
 
 function TViewSpecEdPopup.GetclSpecialityEx: TcxGridDBBandedColumn;
 begin
-  Result := MainView.GetColumnByFieldName
-    (FSPGroup.qSpecEd.W.SpecialityEx.FieldName);
+  Result := MainView.GetColumnByFieldName(W.SpecialityEx.FieldName);
 end;
 
 function TViewSpecEdPopup.GetclYear: TcxGridDBBandedColumn;
 begin
-  Result := MainView.GetColumnByFieldName(FSPGroup.qSpecEd.W.Year.FieldName);
+  Result := MainView.GetColumnByFieldName(W.Year.FieldName);
+end;
+
+function TViewSpecEdPopup.GetW: TSpecEdW;
+begin
+  Result := DSWrap as TSpecEdW;
 end;
 
 procedure TViewSpecEdPopup.InitColumns(AView: TcxGridDBBandedTableView);
@@ -276,7 +276,7 @@ begin
   // Сортируем по году
   ApplySort(MainView, clYear);
   MyApplyBestFitForView(MainView);
-  FocusTopLeft(FSPGroup.qSpecEd.W.IDSpeciality.FieldName);
+  FocusTopLeft;
 end;
 
 procedure TViewSpecEdPopup.InitView(AView: TcxGridDBBandedTableView);
@@ -290,22 +290,9 @@ begin
   MainView.OptionsSelection.InvertSelect := False;
 end;
 
-procedure TViewSpecEdPopup.SetSPGroup(const Value: TSPGroup);
+procedure TViewSpecEdPopup.SetW(const Value: TSpecEdW);
 begin
-  if FSPGroup = Value then
-    Exit;
-
-  FSPGroup := Value;
-
-  if FSPGroup = nil then
-  begin
-    DSWrap := nil;
-    Exit;
-  end;
-
-  DSWrap := FSPGroup.qSpecEd.W;
-
-  UpdateView;
+  DSWrap := Value;
 end;
 
 end.
