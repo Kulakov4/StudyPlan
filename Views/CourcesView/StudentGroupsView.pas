@@ -13,7 +13,8 @@ uses
   System.Actions, Vcl.ActnList, cxClasses, dxBar, Vcl.ComCtrls, cxGridLevel,
   cxGridCustomView, cxGridCustomTableView, cxGridTableView,
   cxGridBandedTableView, cxGridDBBandedTableView, cxGrid, StudentGroupsQuery,
-  System.ImageList, Vcl.ImgList, cxImageList, TB2Dock, TB2Toolbar, TB2Item;
+  System.ImageList, Vcl.ImgList, cxImageList, TB2Dock, TB2Toolbar, TB2Item,
+  dxDateRanges;
 
 type
   TViewStudentGroups = class(TfrmGrid)
@@ -25,13 +26,15 @@ type
     TBItem2: TTBItem;
     procedure actAddExecute(Sender: TObject);
   private
-    FSGW: TStudentGroupsW;
     function GetclName: TcxGridDBBandedColumn;
+    function GetSGW: TStudentGroupsW;
     procedure SetSGW(const Value: TStudentGroupsW);
     { Private declarations }
+  protected
+    procedure InitColumns(AView: TcxGridDBBandedTableView); override;
   public
     property clName: TcxGridDBBandedColumn read GetclName;
-    property SGW: TStudentGroupsW read FSGW write SetSGW;
+    property SGW: TStudentGroupsW read GetSGW write SetSGW;
     { Public declarations }
   end;
 
@@ -53,26 +56,25 @@ end;
 
 function TViewStudentGroups.GetclName: TcxGridDBBandedColumn;
 begin
-  Result := MainView.GetColumnByFieldName(FSGW.Name.FieldName);
+  Result := MainView.GetColumnByFieldName(SGW.Name.FieldName);
+end;
+
+function TViewStudentGroups.GetSGW: TStudentGroupsW;
+begin
+  Result := DSWrap as TStudentGroupsW;
+end;
+
+procedure TViewStudentGroups.InitColumns(AView: TcxGridDBBandedTableView);
+begin
+  inherited;
+  MyApplyBestFitForView(MainView);
+
+  PostOnEnterFields.Add(SGW.Name.FieldName);
 end;
 
 procedure TViewStudentGroups.SetSGW(const Value: TStudentGroupsW);
 begin
-  if FSGW = Value then
-    Exit;
-
-  FSGW := Value;
-
-  if FSGW = nil then
-  begin
-    Exit;
-  end;
-
-  DataSource.DataSet := FSGW.DataSet;
-  MainView.DataController.CreateAllItems;
-  MyApplyBestFitForView(MainView);
-
-  PostOnEnterFields.Add(FSGW.Name.FieldName);
+  DSWrap := Value;
 end;
 
 end.

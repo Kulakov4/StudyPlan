@@ -67,6 +67,7 @@ type
     procedure ShowCellEdit;
     { Private declarations }
   protected
+    procedure InitColumns(AView: TcxGridDBBandedTableView); override;
     property CellEdit: TcxTextEdit read GetCellEdit;
     property W: TSpecSessW read GetW;
   public
@@ -280,12 +281,11 @@ begin
   Result := FSpecSessGroup.qSpecSess.W;
 end;
 
-procedure TViewSpecSess.InitView(AView: TcxGridDBBandedTableView);
+procedure TViewSpecSess.InitColumns(AView: TcxGridDBBandedTableView);
+var
+  I: Integer;
 begin
   inherited;
-  MainView.OptionsView.ColumnAutoWidth := False;
-  MainView.OptionsData.Deleting := False;
-
   // Настраиваем подстановочную наименование сессии
   InitializeLookupColumn(clSession, FSpecSessGroup.qSessType.W.DataSource,
     lsFixedList, FSpecSessGroup.qSessType.W.SessionType.FullName,
@@ -303,7 +303,20 @@ begin
   clLevel.Options.CellMerging := True;
   clLevel_Year.Options.CellMerging := True;
 
+  MyApplyBestFitForView(MainView);
+  for I := 0 to MainView.ColumnCount - 1 do
+    MainView.Columns[I].MinWidth := MainView.Columns[I].Width;
+
+  MainView.OptionsView.ColumnAutoWidth := True;
+
   FocusTopLeft(W.Level_.FieldName);
+end;
+
+procedure TViewSpecSess.InitView(AView: TcxGridDBBandedTableView);
+begin
+  inherited;
+  MainView.OptionsView.ColumnAutoWidth := False;
+  MainView.OptionsData.Deleting := False;
 end;
 
 procedure TViewSpecSess.SetSpecSessGroup(const Value: TSpecSessGroup);
@@ -317,32 +330,12 @@ begin
 
   if FSpecSessGroup = nil then
   begin
-    DataSource.DataSet := nil;
+    DSWrap := nil;
     Exit;
   end;
 
-  BeginUpdate;
-  try
-    DataSource.DataSet := FSpecSessGroup.qSpecSess.FDQuery;
+  DSWrap := FSpecSessGroup.qSpecSess.W;
 
-    with MainView.DataController do
-    begin
-      KeyFieldNames := FSpecSessGroup.qSpecSess.W.PKFieldName;
-
-      // Создаём все колонки
-      CreateAllItems();
-    end;
-
-    InitView(MainView);
-  finally
-    EndUpdate;
-  end;
-
-  MyApplyBestFitForView(MainView);
-  for I := 0 to MainView.ColumnCount - 1 do
-    MainView.Columns[I].MinWidth := MainView.Columns[I].Width;
-
-  MainView.OptionsView.ColumnAutoWidth := True;
   UpdateView;
 end;
 

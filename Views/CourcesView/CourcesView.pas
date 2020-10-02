@@ -16,7 +16,7 @@ uses
   System.ImageList, Vcl.ImgList, cxImageList, cxDBLookupComboBox, cxCheckBox,
   TB2Item, TB2Dock, TB2Toolbar, Vcl.StdCtrls, NotifyEvents, Vcl.Samples.Spin,
   cxContainer, cxTextEdit, cxMaskEdit, cxDropDownEdit, cxLookupEdit,
-  cxDBLookupEdit, OptionsHelper, dxDateRanges, InsertEditMode;
+  cxDBLookupEdit, OptionsHelper, dxDateRanges, InsertEditMode, DSWrap;
 
 type
   TViewCources = class(TfrmGrid)
@@ -97,6 +97,7 @@ type
     FAccessLevel: TAccessLevel;
     FCanFocusRecord: Boolean;
     FCourceGroup: TCourceGroup;
+    FDetailViewWrap: TGridViewWrap;
     function GetclIDChair: TcxGridDBBandedColumn;
     function GetclIDSpeciality: TcxGridDBBandedColumn;
     function GetclData: TcxGridDBBandedColumn;
@@ -109,18 +110,23 @@ type
     function GetclExam: TcxGridDBBandedColumn;
     function GetclGroupCount: TcxGridDBBandedColumn;
     function GetclIDSpecialityEducation: TcxGridDBBandedColumn;
+    function GetDSWrap2: TDSWrap;
     procedure SetAccessLevel(const Value: TAccessLevel);
     procedure SetCourceGroup(const Value: TCourceGroup);
+    procedure SetDSWrap2(const Value: TDSWrap);
     procedure ShowEditCourceForm(AMode: TMode);
     procedure ShowEditDisciplineForm(AMode: TMode);
     { Private declarations }
   protected
     procedure DoAfterLoadData(Sender: TObject);
     function GetFocusedTableView: TcxGridDBBandedTableView; override;
+    procedure InitColumns(AView: TcxGridDBBandedTableView); override;
+    property DSWrap2: TDSWrap read GetDSWrap2 write SetDSWrap2;
   public
     constructor Create(AOwner: TComponent); override;
     procedure BeginUpdate; override;
     procedure EndUpdate; override;
+    procedure InitView(AView: TcxGridDBBandedTableView); override;
     procedure UpdateView; override;
     property AccessLevel: TAccessLevel read FAccessLevel write SetAccessLevel;
     property clIDChair: TcxGridDBBandedColumn read GetclIDChair;
@@ -153,6 +159,7 @@ uses
 constructor TViewCources.Create(AOwner: TComponent);
 begin
   inherited;
+  InitView(cxGridDBBandedTableView2);
   seYears.Value := CurrentYear + 1;
   FCanFocusRecord := True;
 end;
@@ -433,6 +440,14 @@ begin
     (FCourceGroup.qAdmissions.W.PKFieldName);
 end;
 
+function TViewCources.GetDSWrap2: TDSWrap;
+begin
+  Result := nil;
+
+  if FDetailViewWrap <> nil then
+    Result := FDetailViewWrap.DSWrap;
+end;
+
 function TViewCources.GetFocusedTableView: TcxGridDBBandedTableView;
 begin
   Result := inherited;
@@ -445,6 +460,61 @@ begin
       Result := nil;
   end;
 
+end;
+
+procedure TViewCources.InitColumns(AView: TcxGridDBBandedTableView);
+begin
+  inherited;
+
+  if AView = MainView then
+  begin
+    // Настраиваем подстановочную Наименование
+    InitializeLookupColumn(clIDSpeciality, FCourceGroup.qCourceName.DataSource,
+      lsEditList, FCourceGroup.qCourceName.W.Speciality.FieldName,
+      FCourceGroup.qCourceName.W.ID_Speciality.FieldName);
+
+    // Настраиваем подстановочную сокращённое наименование
+    InitializeLookupColumn(clIDShortSpeciality,
+      FCourceGroup.qCourceName.DataSource, lsEditList,
+      FCourceGroup.qCourceName.W.SHORT_SPECIALITY.FieldName,
+      FCourceGroup.qCourceName.W.ID_Speciality.FieldName);
+
+    // Настраиваем подстановочную колонку Кафедра
+    InitializeLookupColumn(clIDChair, FCourceGroup.qChairs.DataSource,
+      lsFixedList, FCourceGroup.qChairs.W.Short_Name.FieldName,
+      FCourceGroup.qChairs.W.ID_CHAIR.FieldName);
+  end
+  else
+  begin
+    // Настраиваем подстановочную колонку Наименование дисциплины
+    InitializeLookupColumn(clIDDisciplineName,
+      FCourceGroup.qDiscName.DataSource, lsEditList,
+      FCourceGroup.qDiscName.W.DisciplineName.FieldName,
+      FCourceGroup.qDiscName.W.PKFieldName);
+  end;
+end;
+
+procedure TViewCources.InitView(AView: TcxGridDBBandedTableView);
+begin
+  inherited;
+  MainView.OptionsData.Deleting := False;
+  MainView.OptionsData.Appending := False;
+  MainView.OptionsData.Inserting := False;
+  MainView.OptionsData.Editing := False;
+  MainView.OptionsView.CellAutoHeight := False;
+  MainView.OptionsBehavior.CellHints := True;
+  MainView.OptionsView.ExpandButtonsForEmptyDetails := False;
+  MainView.OptionsBehavior.IncSearch := True;
+
+  cxGridDBBandedTableView2.OptionsData.Deleting := False;
+  cxGridDBBandedTableView2.OptionsData.Appending := False;
+  cxGridDBBandedTableView2.OptionsData.Inserting := False;
+  cxGridDBBandedTableView2.OptionsData.Editing := False;
+  cxGridDBBandedTableView2.OptionsBehavior.CellHints := True;
+  cxGridDBBandedTableView2.OptionsView.ColumnAutoWidth := True;
+
+  DeleteMessages.Add(cxGridLevel, 'Удалить выделенные планы?');
+  DeleteMessages.Add(cxGridLevel2, 'Удалить выделенные дисциплины?');
 end;
 
 procedure TViewCources.SetAccessLevel(const Value: TAccessLevel);
@@ -465,6 +535,7 @@ begin
 
   if FCourceGroup = nil then
   begin
+    DSWrap := nil;
     UpdateView;
     Exit;
   end;
@@ -473,68 +544,23 @@ begin
   TDBLCB.Init(cxdblcbYears, FCourceGroup.YearDumb.W.ID,
     FCourceGroup.qYears.W.Year, lsFixedList);
 
+  // **************************************
+  // Связываем подчинённый набор с главным
+  // **************************************
+  with cxGridDBBandedTableView2.DataController do
+  begin
+    DetailKeyFieldNames := FCourceGroup.qCourseStudyPlan.W.
+      IDSPECIALITYEDUCATION.FieldName;
+
+    MasterKeyFieldNames := FCourceGroup.qAdmissions.W.PKFieldName;
+  end;
+
+  DSWrap := FCourceGroup.qAdmissions.W;
+  DSWrap2 := FCourceGroup.qCourseStudyPlan.W;
+
   BeginUpdate;
   try
-    DataSource.DataSet := FCourceGroup.qAdmissions.FDQuery;
-
-    // Настраиваем представление планов
-    with MainView.DataController do
-    begin
-      KeyFieldNames := FCourceGroup.qAdmissions.W.PKFieldName;
-
-      // Создаём все колонки
-      CreateAllItems();
-    end;
-
-    // **************************************
-    // Связываем подчинённый набор с главным
-    // **************************************
-    with cxGridDBBandedTableView2.DataController do
-    begin
-      DataSource := FCourceGroup.qCourseStudyPlan.W.DataSource;
-      KeyFieldNames := FCourceGroup.qCourseStudyPlan.W.PKFieldName;
-
-      DetailKeyFieldNames := FCourceGroup.qCourseStudyPlan.W.
-        IDSPECIALITYEDUCATION.FieldName;
-
-      MasterKeyFieldNames := FCourceGroup.qAdmissions.W.PKFieldName;
-
-      // Создаём все колонки
-      CreateAllItems();
-    end;
-    InitView(cxGridDBBandedTableView2);
-    cxGridDBBandedTableView2.OptionsView.ColumnAutoWidth := True;
-    // ApplyBestFitForDetail := True;
-
-    // Настраиваем подстановочную Наименование
-    InitializeLookupColumn(clIDSpeciality, FCourceGroup.qCourceName.DataSource,
-      lsEditList, FCourceGroup.qCourceName.W.Speciality.FieldName,
-      FCourceGroup.qCourceName.W.ID_Speciality.FieldName);
-
-    // Настраиваем подстановочную сокращённое наименование
-    InitializeLookupColumn(clIDShortSpeciality,
-      FCourceGroup.qCourceName.DataSource, lsEditList,
-      FCourceGroup.qCourceName.W.SHORT_SPECIALITY.FieldName,
-      FCourceGroup.qCourceName.W.ID_Speciality.FieldName);
-
-    // Настраиваем подстановочную колонку Кафедра
-    InitializeLookupColumn(clIDChair, FCourceGroup.qChairs.DataSource,
-      lsFixedList, FCourceGroup.qChairs.W.Short_Name.FieldName,
-      FCourceGroup.qChairs.W.ID_CHAIR.FieldName);
-
-    // Настраиваем подстановочную колонку Наименование дисциплины
-    InitializeLookupColumn(clIDDisciplineName,
-      FCourceGroup.qDiscName.DataSource, lsEditList,
-      FCourceGroup.qDiscName.W.DisciplineName.FieldName,
-      FCourceGroup.qDiscName.W.PKFieldName);
-
-    InitView(MainView);
-    InitView(cxGridDBBandedTableView2);
-
     clIDSpeciality.BestFitMaxWidth := 900;
-    MainView.OptionsView.CellAutoHeight := False;
-    MainView.OptionsBehavior.CellHints := True;
-    cxGridDBBandedTableView2.OptionsBehavior.CellHints := True;
 
     clIDDisciplineName.Options.SortByDisplayText := isbtOn;
     clLec.Options.AutoWidthSizable := False;
@@ -558,16 +584,6 @@ begin
     (clExam.Properties as TcxCheckBoxProperties).NullStyle := nssUnchecked;
     (clExam.Properties as TcxCheckBoxProperties).ValueUnchecked := 0;
 
-    MainView.OptionsData.Deleting := False;
-    MainView.OptionsData.Appending := False;
-    MainView.OptionsData.Inserting := False;
-    MainView.OptionsData.Editing := False;
-
-    cxGridDBBandedTableView2.OptionsData.Deleting := False;
-    cxGridDBBandedTableView2.OptionsData.Appending := False;
-    cxGridDBBandedTableView2.OptionsData.Inserting := False;
-    cxGridDBBandedTableView2.OptionsData.Editing := False;
-
     // *****************************
     // Сортировка
     // *****************************
@@ -582,11 +598,6 @@ begin
     ApplySort(MainView, clIDSpeciality);
 
     // ApplyBestFitForDetail := True;
-    MainView.OptionsView.ExpandButtonsForEmptyDetails := False;
-    MainView.OptionsBehavior.IncSearch := True;
-
-    DeleteMessages.Add(cxGridLevel, 'Удалить выделенные планы?');
-    DeleteMessages.Add(cxGridLevel2, 'Удалить выделенные дисциплины?');
 
     TNotifyEventWrap.Create(FCourceGroup.AfterLoadData, DoAfterLoadData,
       FEventList);
@@ -594,6 +605,22 @@ begin
     EndUpdate;
   end;
   DoAfterLoadData(nil);
+end;
+
+procedure TViewCources.SetDSWrap2(const Value: TDSWrap);
+begin
+  if DSWrap2 = Value then
+    Exit;
+
+  if Value = nil then
+  begin
+    FreeAndNil(FDetailViewWrap);
+  end
+  else
+  begin
+    FDetailViewWrap := TGridViewWrap.Create(cxGridDBBandedTableView2, Value);
+    FDetailViewWrap.Init;
+  end;
 end;
 
 procedure TViewCources.ShowEditCourceForm(AMode: TMode);

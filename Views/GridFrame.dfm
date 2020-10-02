@@ -18,7 +18,7 @@ object frmGrid: TfrmGrid
       OnMouseDown = cxGridDBBandedTableViewMouseDown
       Navigator.Buttons.CustomButtons = <>
       OnEditKeyDown = cxGridDBBandedTableViewEditKeyDown
-      DataController.DataSource = DataSource
+      OnSelectionChanged = cxGridDBBandedTableViewSelectionChanged
       DataController.Summary.DefaultGroupSummaryItems = <>
       DataController.Summary.FooterSummaryItems = <>
       DataController.Summary.SummaryGroups = <>
@@ -126,10 +126,6 @@ object frmGrid: TfrmGrid
     OnPopup = cxGridPopupMenuPopup
     Left = 512
     Top = 184
-  end
-  object DataSource: TDataSource
-    Left = 592
-    Top = 120
   end
   object cxStyleRepository: TcxStyleRepository
     Left = 40

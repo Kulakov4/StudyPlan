@@ -23,12 +23,4 @@ inherited ViewSpecEdPopup: TViewSpecEdPopup
       Color = clSkyBlue
     end
   end
-  object dsChairs: TDataSource
-    Left = 40
-    Top = 136
-  end
-  object dsSpeciality: TDataSource
-    Left = 40
-    Top = 192
-  end
 end

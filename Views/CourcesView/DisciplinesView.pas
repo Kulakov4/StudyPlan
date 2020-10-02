@@ -41,8 +41,11 @@ type
     procedure SetModel(const Value: TCourseDiscViewModel);
     procedure ShowDisciplineEditForm(AMode: TMode);
     { Private declarations }
+  protected
+    procedure InitColumns(AView: TcxGridDBBandedTableView); override;
   public
     destructor Destroy; override;
+    procedure InitView(AView: TcxGridDBBandedTableView); override;
     procedure UpdateView; override;
     property clExam: TcxGridDBBandedColumn read GetclExam;
     property clIDDisciplineName: TcxGridDBBandedColumn
@@ -132,24 +135,9 @@ begin
     (Model.CourseStudyPlanW.ZachData.FieldName);
 end;
 
-procedure TViewDisciplines.SetModel(const Value: TCourseDiscViewModel);
+procedure TViewDisciplines.InitColumns(AView: TcxGridDBBandedTableView);
 begin
-  if FModel = Value then
-    Exit;
-
-  FModel := Value;
-
-  if FModel = nil then
-  begin
-    Exit;
-  end;
-
-  DataSource.DataSet := Model.CourseStudyPlanW.DataSet;
-  MainView.DataController.CreateAllItems;
-
-  InitView(MainView);
-  MainView.OptionsBehavior.CellHints := True;
-
+  inherited;
   // Настраиваем подстановочную колонку Наименование дисциплины
   InitializeLookupColumn(clIDDisciplineName, Model.DiscNameW.DataSource,
     lsEditList, Model.DiscNameW.DisciplineName.FieldName,
@@ -186,16 +174,30 @@ begin
   (clExam.Properties as TcxCheckBoxProperties).OnEditValueChanged :=
     DoOnExamChange;
 
-  {
-    MainView.OptionsData.Deleting := False;
-    MainView.OptionsData.Appending := False;
-    MainView.OptionsData.Inserting := False;
-    MainView.OptionsData.Editing := False;
-  }
-
-  DeleteMessages.Add(cxGridLevel, 'Удалить выбранные дисциплины?');
-
   MyApplyBestFitForView(MainView);
+end;
+
+procedure TViewDisciplines.InitView(AView: TcxGridDBBandedTableView);
+begin
+  inherited;
+  AView.OptionsBehavior.CellHints := True;
+  DeleteMessages.Add(cxGridLevel, 'Удалить выбранные дисциплины?');
+end;
+
+procedure TViewDisciplines.SetModel(const Value: TCourseDiscViewModel);
+begin
+  if FModel = Value then
+    Exit;
+
+  FModel := Value;
+
+  if FModel = nil then
+  begin
+    DSWrap := nil;
+    Exit;
+  end;
+
+  DSWrap := Model.CourseStudyPlanW;
 
   UpdateView;
 end;
