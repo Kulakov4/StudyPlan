@@ -9,7 +9,7 @@ uses
   cxEdit, cxTextEdit, Vcl.StdCtrls, Vcl.Menus, cxButtons, InsertEditMode,
   System.Generics.Collections, cxMaskEdit, cxDropDownEdit, cxLookupEdit,
   cxDBLookupEdit, cxDBLookupComboBox, SpecQry, SpecInt, cxDBExtLookupComboBox,
-  SPGroup, cxDBEdit;
+  cxDBEdit, SpecEditInterface;
 
 type
   TfrmEditSpec = class(TForm, ISpec)
@@ -30,6 +30,7 @@ type
     FIDChair: Integer;
     FInsertModeCaption: TDictionary<Integer, String>;
     FMode: TMode;
+    FSpecEditI: ISpecEdit;
     function GetChiperSpeciality: string; stdcall;
     function GetSpeciality: string; stdcall;
     function GetShortSpeciality: string; stdcall;
@@ -38,11 +39,12 @@ type
     procedure SetShortSpeciality(const Value: string);
     { Private declarations }
   protected
-    FSPGroup: TSPGroup;
     procedure Check; virtual;
     procedure SetMode(const Value: TMode); virtual;
+    property SpecEditI: ISpecEdit read FSpecEditI;
   public
-    constructor Create(AOwner: TComponent); override;
+    constructor Create(AOwner: TComponent; ASpecEditI: ISpecEdit; AMode: TMode);
+        reintroduce;
     destructor Destroy; override;
     property ChiperSpeciality: string read GetChiperSpeciality
       write SetChiperSpeciality;
@@ -60,20 +62,21 @@ uses
 
 {$R *.dfm}
 
-constructor TfrmEditSpec.Create(AOwner: TComponent);
+constructor TfrmEditSpec.Create(AOwner: TComponent; ASpecEditI: ISpecEdit;
+    AMode: TMode);
 begin
-  inherited;
-  Assert(AOwner is TSPGroup);
-  FSPGroup := AOwner as TSPGroup;
+  inherited Create(AOwner);
+  Assert(Assigned(ASpecEditI));
+  FSpecEditI := ASpecEditI;
 
   // ¬ыпадающий список уникальных кодов специальностей
-  TLCB.Init(cxlcbChiper, FSPGroup.qSpecChiper.W.Chiper_Speciality, lsEditList);
+  TLCB.Init(cxlcbChiper, FSpecEditI.SpecChiperW.Chiper_Speciality, lsEditList);
 
   // ¬ыпадающий список уникальных наименований специальностей
-  TLCB.Init(cxlcbSpeciality, FSPGroup.qSpecName.W.Speciality, lsEditList);
+  TLCB.Init(cxlcbSpeciality, FSpecEditI.SpecNameUniqueW.Speciality, lsEditList);
 
   FMode := EditMode;
-  Mode := InsertMode;
+  Mode := AMode;
 end;
 
 procedure TfrmEditSpec.cxlcbChiperPropertiesChange(Sender: TObject);
@@ -84,10 +87,10 @@ begin
     Exit;
 
     // ≈сли есть специальность, соответствующа€ выбранному коду
-  if FSPGroup.qSpec.SearchByChiper(cxlcbChiper.Text) > 0 then
+  if FSpecEditI.SpecSearchByChiper(cxlcbChiper.Text) > 0 then
   begin
-    cxlcbSpeciality.Text := FSPGroup.qSpec.W.Speciality.F.AsString;
-    cxteShortSpeciality.Text := FSPGroup.qSpec.W.SHORT_SPECIALITY.F.AsString;
+    cxlcbSpeciality.Text := FSpecEditI.SpecW.Speciality.F.AsString;
+    cxteShortSpeciality.Text := FSpecEditI.SpecW.SHORT_SPECIALITY.F.AsString;
   end
   else
   begin
@@ -127,7 +130,7 @@ begin
     Check;
 
     // ѕросим сохранить данные
-    FSPGroup.qSpecByChair.W.Save(Self, Mode);
+    FSpecEditI.SpecByChairW.Save(Self, Mode);
   except
     Action := caNone;
     raise;
@@ -171,21 +174,18 @@ end;
 
 procedure TfrmEditSpec.SetMode(const Value: TMode);
 begin
-  if FMode = Value then
-    Exit;
-
   FMode := Value;
 
   case FMode of
     EditMode:
       begin
-        Assert(FSPGroup.qSpecByChair.FDQuery.RecordCount >= 0);
+        Assert(FSpecEditI.SpecByChairW.RecordCount >= 0);
 
-        with FSPGroup.qSpecByChair do
+        with FSpecEditI do
         begin
-          ChiperSpeciality := W.Chiper_Speciality.F.AsString;
-          Speciality := W.Speciality.F.AsString;
-          ShortSpeciality := W.SHORT_SPECIALITY.F.AsString;
+          ChiperSpeciality := SpecByChairW.Chiper_Speciality.F.AsString;
+          Speciality := SpecByChairW.Speciality.F.AsString;
+          ShortSpeciality := SpecByChairW.SHORT_SPECIALITY.F.AsString;
         end;
 
         Caption := '»зменение специальности (направлени€ подготовки)';

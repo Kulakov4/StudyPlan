@@ -3,7 +3,8 @@ unit SPOView;
 interface
 
 uses
-  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants,
+  System.Classes, Vcl.Graphics,
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, SPMainView, cxGraphics, cxControls,
   cxLookAndFeels, cxLookAndFeelPainters, cxContainer, cxEdit, TB2Item,
   cxDBExtLookupComboBox, cxTextEdit, cxMaskEdit, cxDropDownEdit, cxLookupEdit,
@@ -21,6 +22,7 @@ type
     function IsActionsEnabled: Boolean; override;
     function IsReadOnly: Boolean; override;
   public
+    property SPViewI;
     { Public declarations }
   end;
 
@@ -35,9 +37,9 @@ procedure TViewSPO.CreateStudyPlan;
 var
   Afrm: TfrmEditStudyPlan;
 begin
-  Afrm := TfrmEditStudyPlan.Create(SPGroup);
+  Afrm := TfrmEditStudyPlan.Create(Self, SPViewI.GetSPEditInterface,
+    InsertMode);
   try
-    Afrm.Mode := InsertMode;
     Afrm.IDEducationLevel := 3; // ÑÏÎ
     Afrm.ShowModal;
   finally
@@ -49,9 +51,8 @@ procedure TViewSPO.EditStudyPlan;
 var
   Afrm: TfrmEditStudyPlan;
 begin
-  Afrm := TfrmEditStudyPlan.Create(SPGroup);
+  Afrm := TfrmEditStudyPlan.Create(Self, SPViewI.GetSPEditInterface, EditMode);
   try
-    Afrm.Mode := EditMode;
     Afrm.ShowModal;
   finally
     FreeAndNil(Afrm);

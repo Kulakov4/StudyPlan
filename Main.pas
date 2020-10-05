@@ -546,7 +546,7 @@ begin
         Name := 'ViewRetraining';
         Align := alClient;
         Parent := cxtshRetraining2;
-        SPGroup := FSPGrpRetraining;
+        SPRetViewI := FSPGrpRetraining;
       end;
     end
     else
@@ -578,7 +578,7 @@ begin
         Name := 'ViewSPO';
         Align := alClient;
         Parent := cxtshSPO2;
-        SPGroup := FSPGrpSPO;
+        SPViewI := FSPGrpSPO;
       end;
     end
     else
@@ -609,7 +609,7 @@ begin
         Name := 'ViewVO';
         Align := alClient;
         Parent := cxtshVO2;
-        SPGroup := FSPGrpVO;
+        SPViewI := FSPGrpVO;
       end;
     end
     else

@@ -5,12 +5,13 @@ interface
 uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants,
   System.Classes, Vcl.Graphics, Vcl.Controls, Vcl.Forms, Vcl.Dialogs,
-  Vcl.StdCtrls, Vcl.DBCtrls, SPGroup, cxGraphics, cxControls, cxLookAndFeels,
+  Vcl.StdCtrls, Vcl.DBCtrls, cxGraphics, cxControls, cxLookAndFeels,
   cxLookAndFeelPainters, cxContainer, cxEdit, cxTextEdit, cxMaskEdit,
   cxDropDownEdit, cxLookupEdit, cxDBLookupEdit, cxDBLookupComboBox,
   InsertEditMode, Vcl.Menus, cxButtons, Data.DB, CourceNameQuery, SpecPopupView,
   cxDBExtLookupComboBox, SpecEdSimpleQuery, cxCheckBox, cxDBEdit,
-  SpecEdSimpleInt, System.Generics.Collections, EditSpecFrm, FDDumb;
+  SpecEdSimpleInt, System.Generics.Collections, EditSpecFrm, FDDumb,
+  SPEditInterface;
 
 type
   TfrmEditStudyPlan = class(TForm, ISpecEdSimple)
@@ -61,7 +62,7 @@ type
     FqQualificationDumb: TFDDumb;
     FqStandartDumb: TFDDumb;
     FSpecLabel: TDictionary<Integer, String>;
-    FSPGroup: TSPGroup;
+    FSPEditI: ISPEdit;
     FUpdateCount: Integer;
     FViewSpecPopup: TViewSpecPopup;
     procedure BeginUpdate;
@@ -106,12 +107,13 @@ type
   protected
     procedure Check;
     procedure CheckQualification; virtual;
-    function CreateEditSpecForm: TfrmEditSpec; virtual;
+    function CreateEditSpecForm(AMode: TMode): TfrmEditSpec; virtual;
     procedure SetMode(const Value: TMode); virtual;
     property IDStandart: Integer read GetIDStandart write SetIDStandart;
-    property SPGroup: TSPGroup read FSPGroup;
+    property SPEditI: ISPEdit read FSPEditI;
   public
-    constructor Create(AOwner: TComponent); override;
+    constructor Create(AOwner: TComponent; ASPEditI: ISPEdit; AMode: TMode);
+        reintroduce;
     destructor Destroy; override;
     procedure AfterConstruction; override;
     property IDEducationLevel: Integer read GetIDEducationLevel
@@ -130,10 +132,12 @@ uses
 
 {$R *.dfm}
 
-constructor TfrmEditStudyPlan.Create(AOwner: TComponent);
+constructor TfrmEditStudyPlan.Create(AOwner: TComponent; ASPEditI: ISPEdit;
+    AMode: TMode);
 begin
-  inherited;
-  FSPGroup := (AOwner as TSPGroup);
+  inherited Create(AOwner);
+  Assert(ASPEditI <> nil);
+  FSPEditI := ASPEditI;
 
   FSpecLabel := TDictionary<Integer, String>.Create;
   FSpecLabel.Add(1, 'Специальность');
@@ -157,7 +161,7 @@ begin
   // **********************************************
   FqEdDumb := TFDDumb.Create(Self);
 
-  TDBLCB.Init(cxdblcbEducations, FqEdDumb.W.ID, FSPGroup.qEd.W.Education,
+  TDBLCB.Init(cxdblcbEducations, FqEdDumb.W.ID, FSPEditI.EdW.Education,
     lsFixedList);
 
   // **********************************************
@@ -166,18 +170,18 @@ begin
   FqChairDumb := TFDDumb.Create(Self);
 
   TDBLCB.Init(cxdblcbChairs, FqChairDumb.W.ID,
-    FSPGroup.qEnabledChairs.W.Наименование, lsFixedList);
+    FSPEditI.EnabledChairsW.Наименование, lsFixedList);
 
   // **********************************************
   // Специальности
   // **********************************************
   FqSpecDumb := TFDDumb.Create(Self);
 
-  FSPGroup.qSpecByChair.Search(100, 100);
+  FSPEditI.SearchSpecByChair(100, 100);
 
   // Подключаем выпадающий список специальностей
   FViewSpecPopup := TViewSpecPopup.Create(Self);
-  FViewSpecPopup.W := FSPGroup.qSpecByChair.W;
+  FViewSpecPopup.W := FSPEditI.SpecByChairW;
   with cxdbextlcbSpecialitys do
   begin
     DataBinding.DataSource := FqSpecDumb.DataSource;
@@ -186,7 +190,7 @@ begin
     Properties.DropDownRows := 24;
     Properties.DropDownSizeable := True;
     Properties.View := FViewSpecPopup.MainView;
-    Properties.KeyFieldNames := FSPGroup.qSpecByChair.W.PKFieldName;
+    Properties.KeyFieldNames := FSPEditI.SpecByChairW.PKFieldName;
     Properties.ListFieldItem := FViewSpecPopup.clCalcSpeciality;
   end;
 
@@ -196,7 +200,7 @@ begin
   FqQualificationDumb := TFDDumb.Create(Self);
 
   TDBLCB.Init(cxdblcbQualifications, FqQualificationDumb.W.ID,
-    FSPGroup.qQualifications.W.Qualification, lsEditList);
+    FSPEditI.QualificationsW.Qualification, lsEditList);
 
   // **********************************************
   // Стандарты учебных планов
@@ -204,9 +208,9 @@ begin
   FqStandartDumb := TFDDumb.Create(Self);
 
   TDBLCB.Init(cxdblcbStandarts, FqStandartDumb.W.ID,
-    FSPGroup.qSPStandart.W.StudyPlanStandart, lsEditList);
+    FSPEditI.SPStandartW.StudyPlanStandart, lsEditList);
 
-  FMode := InsertMode;
+  Mode := AMode;
 end;
 
 procedure TfrmEditStudyPlan.cxbtnAddSpecialityClick(Sender: TObject);
@@ -214,12 +218,11 @@ begin
   if FfrmEditSpec <> nil then
     FreeAndNil(FfrmEditSpec);
 
-  FfrmEditSpec := CreateEditSpecForm;
+  FfrmEditSpec := CreateEditSpecForm(InsertMode);
 
-  FfrmEditSpec.Mode := InsertMode;
   if FfrmEditSpec.ShowModal = mrOK then
     // Выбираем добавленную в выпадающий список специальность
-    IDSpeciality := FSPGroup.qSpecByChair.W.ID_Speciality.F.AsInteger
+    IDSpeciality := FSPEditI.SpecByChairW.ID_Speciality.F.AsInteger
   else
     FreeAndNil(FfrmEditSpec)
 end;
@@ -236,12 +239,12 @@ begin
   if FUpdateCount > 0 then
     Exit;
 
-  if (FSPGroup.qSpecByChair.FDQuery.Active) and
-    FSPGroup.qSpecByChair.W.LocateByPK(IDSpeciality) then
+  if (FSPEditI.SpecByChairW.DataSet.Active) and FSPEditI.SpecByChairW.LocateByPK
+    (IDSpeciality) then
   begin
     // Выбираем квалификацию как у выбранной специальности
     FqQualificationDumb.W.UpdateID
-      (FSPGroup.qSpecByChair.W.QUALIFICATION_ID.F.AsInteger);
+      (FSPEditI.SpecByChairW.QUALIFICATION_ID.F.AsInteger);
   end;
 end;
 
@@ -265,11 +268,10 @@ begin
   Assert(IDChair > 0);
 
   // Фильтруем специальности по кафедре и образованию
-  FSPGroup.qSpecByChair.Search(IDEducationLevel, IDChair);
+  FSPEditI.SearchSpecByChair(IDEducationLevel, IDChair);
 
   AIDEdLvl := StrToIntDef
-    (VarToStrDef(FSPGroup.qSpecByChair.W.IDEducationLevel.DefaultValue,
-    '2'), 2);
+    (VarToStrDef(FSPEditI.SpecByChairW.IDEducationLevel.DefaultValue, '2'), 2);
 
   lblSpeciality.Caption := FSpecLabel[AIDEdLvl];
   cxbtnAddSpeciality.Hint := FAddSpecialityHint[AIDEdLvl];
@@ -292,7 +294,7 @@ procedure TfrmEditStudyPlan.cxdblcbStandartsPropertiesNewLookupDisplayText
   (Sender: TObject; const AText: TCaption);
 begin
   if AText <> '' then
-    SPGroup.qSPStandart.W.Append(AText);
+    FSPEditI.SPStandartW.Append(AText);
 end;
 
 procedure TfrmEditStudyPlan.cxteYearsPropertiesValidate(Sender: TObject;
@@ -347,9 +349,9 @@ begin
     raise Exception.Create('Не задана квалификация');
 end;
 
-function TfrmEditStudyPlan.CreateEditSpecForm: TfrmEditSpec;
+function TfrmEditStudyPlan.CreateEditSpecForm(AMode: TMode): TfrmEditSpec;
 begin
-  Result := TfrmEditSpec.Create(FSPGroup);
+  Result := TfrmEditSpec.Create(Self, FSPEditI.GetSpecEditI, AMode);
 end;
 
 procedure TfrmEditStudyPlan.EndUpdate;
@@ -364,7 +366,7 @@ begin
   if ModalResult <> mrOK then
   begin
     // НЕ сохраняем сделанные изменения в БД
-    FSPGroup.Cancel();
+    FSPEditI.Cancel();
     Exit;
   end;
 
@@ -375,7 +377,7 @@ begin
     Check;
 
     // Просим учебный план сохранить информацию
-    FSPGroup.Save(Self, FMode, FfrmEditSpec);
+    FSPEditI.Save(Self, FMode, FfrmEditSpec);
   except
     Action := caNone;
     raise;
@@ -419,7 +421,7 @@ end;
 
 function TfrmEditStudyPlan.GetYear: Integer;
 begin
-  Result := FSPGroup.YearDumb.W.ID.F.AsInteger;
+  Result := FSPEditI.IDYearW.ID.F.AsInteger;
 end;
 
 function TfrmEditStudyPlan.GetIDQualification: Integer;
@@ -481,46 +483,47 @@ end;
 
 procedure TfrmEditStudyPlan.SetMode(const Value: TMode);
 begin
-  // if FMode = Value then
-  // Exit;
-
   FMode := Value;
 
   case FMode of
     EditMode:
       begin
-        Assert(FSPGroup.qSpecEdSimple.FDQuery.RecordCount = 1);
+        Assert(FSPEditI.SpecEdSimpleW.RecordCount = 1);
 
         BeginUpdate;
         try
-          with FSPGroup.qSpecEdSimple do
+          with FSPEditI do
           begin
-            IDEducationLevel := W.IDEducationLevel.F.AsInteger;
-            IDEducation2 := W.IDEducation2.F.AsInteger;
-            IDChair := W.IDChair.F.AsInteger;
-            IDStandart := W.IDStudyPlanStandart.F.AsInteger;
+            IDEducationLevel := SpecEdSimpleW.IDEducationLevel.F.AsInteger;
+            IDEducation2 := SpecEdSimpleW.IDEducation2.F.AsInteger;
+            IDChair := SpecEdSimpleW.IDChair.F.AsInteger;
+            IDStandart := SpecEdSimpleW.IDStudyPlanStandart.F.AsInteger;
 
             // Если квалификацию нужно брать из специальности
-            if W.IDQualification.F.AsInteger = 0 then
+            if SpecEdSimpleW.IDQualification.F.AsInteger = 0 then
             begin
               // Выбираем все подходящие специальности
-              FSPGroup.qSpecByChair.Search(W.IDEducationLevel.F.AsInteger,
-                W.IDChair.F.AsInteger);
-              FSPGroup.qSpecByChair.W.LocateByPK
-                (W.IDSpeciality.F.AsInteger, True);
-              IDQualification := FSPGroup.qSpecByChair.W.QUALIFICATION_ID.
-                F.AsInteger;
+              SearchSpecByChair(SpecEdSimpleW.IDEducationLevel.F.AsInteger,
+                SpecEdSimpleW.IDChair.F.AsInteger);
+
+              // Ищем специальность
+              SpecByChairW.LocateByPK
+                (SpecEdSimpleW.IDSpeciality.F.AsInteger, True);
+
+              // Берём квалификацию из найденной специальности
+              IDQualification := SpecByChairW.QUALIFICATION_ID.F.AsInteger;
             end
             else
-              IDQualification := W.IDQualification.F.AsInteger;
+              IDQualification := SpecEdSimpleW.IDQualification.F.AsInteger;
 
-            IDSpeciality := W.IDSpeciality.F.AsInteger;
-            Years := W.Years.F.AsInteger;
-            Months := W.Months.F.AsInteger;
-            Annotation := W.Annotation.F.AsString;
-            IsEnabled := W.Enable_SpecialityEducation.F.AsInteger = 1;
-            Locked := W.Locked.F.AsInteger = 1;
-            Portal := W.Portal.F.AsInteger = 1;
+            IDSpeciality := SpecEdSimpleW.IDSpeciality.F.AsInteger;
+            Years := SpecEdSimpleW.Years.F.AsInteger;
+            Months := SpecEdSimpleW.Months.F.AsInteger;
+            Annotation := SpecEdSimpleW.Annotation.F.AsString;
+            IsEnabled := SpecEdSimpleW.Enable_SpecialityEducation.F.
+              AsInteger = 1;
+            Locked := SpecEdSimpleW.Locked.F.AsInteger = 1;
+            Portal := SpecEdSimpleW.Portal.F.AsInteger = 1;
           end;
         finally
           EndUpdate;

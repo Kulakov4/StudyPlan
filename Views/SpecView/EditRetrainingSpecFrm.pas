@@ -44,9 +44,9 @@ begin
     Exit;
 
   // Если есть специальность, соответствующая названию
-  if FSPGroup.qSpec.SearchByChiperAndName('', cxlcbSpeciality.Text) = 1 then
+  if SpecEditI.SpecSearchByChiperAndName('', cxlcbSpeciality.Text) = 1 then
   begin
-    cxteShortSpeciality.Text := FSPGroup.qSpec.W.SHORT_SPECIALITY.F.AsString;
+    cxteShortSpeciality.Text := SpecEditI.SpecW.SHORT_SPECIALITY.F.AsString;
   end
   else
   begin

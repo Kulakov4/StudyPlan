@@ -4,13 +4,13 @@ interface
 
 uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants,
-  System.Classes, Vcl.Graphics,
-  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, SPMainView, cxGraphics, cxControls,
-  cxLookAndFeels, cxLookAndFeelPainters, cxContainer, cxEdit, TB2Item,
-  cxDBExtLookupComboBox, cxTextEdit, cxMaskEdit, cxDropDownEdit, cxLookupEdit,
-  cxDBLookupEdit, cxDBLookupComboBox, Vcl.StdCtrls, TB2Dock, TB2Toolbar,
-  System.ImageList, Vcl.ImgList, cxImageList, System.Actions, Vcl.ActnList,
-  cxLabel, cxDBLabel, cxCheckBox, cxDBEdit, Vcl.Menus;
+  System.Classes, Vcl.Graphics, Vcl.Controls, Vcl.Forms, Vcl.Dialogs,
+  SPMainView, cxGraphics, cxControls, cxLookAndFeels, cxLookAndFeelPainters,
+  cxContainer, cxEdit, TB2Item, cxDBExtLookupComboBox, cxTextEdit, cxMaskEdit,
+  cxDropDownEdit, cxLookupEdit, cxDBLookupEdit, cxDBLookupComboBox,
+  Vcl.StdCtrls, TB2Dock, TB2Toolbar, System.ImageList, Vcl.ImgList, cxImageList,
+  System.Actions, Vcl.ActnList, cxLabel, cxDBLabel, cxCheckBox, cxDBEdit,
+  Vcl.Menus, SPRetrainingViewInterface;
 
 type
   TViewRetraining = class(TViewSPMain)
@@ -19,6 +19,8 @@ type
     Label1: TLabel;
     cxdblcbArea: TcxDBLookupComboBox;
   private
+    FSPRetViewI: ISPRetView;
+    procedure SetSPRetViewI(const Value: ISPRetView);
     { Private declarations }
   protected
     procedure CreateStudyPlan; override;
@@ -27,6 +29,7 @@ type
     function IsActionsEnabled: Boolean; override;
     function IsReadOnly: Boolean; override;
   public
+    property SPRetViewI: ISPRetView read FSPRetViewI write SetSPRetViewI;
     { Public declarations }
   end;
 
@@ -41,9 +44,9 @@ procedure TViewRetraining.CreateStudyPlan;
 var
   Afrm: TfrmEditRetrainingPlan;
 begin
-  Afrm := TfrmEditRetrainingPlan.Create(SPGroup);
+  Afrm := TfrmEditRetrainingPlan.Create(Self, FSPRetViewI.GetSPRetrainingEditI,
+    InsertMode);
   try
-    Afrm.Mode := InsertMode;
     Afrm.IDEducationLevel := 5; // Переподготовка
     Afrm.ShowModal;
   finally
@@ -55,9 +58,9 @@ procedure TViewRetraining.EditStudyPlan;
 var
   Afrm: TfrmEditRetrainingPlan;
 begin
-  Afrm := TfrmEditRetrainingPlan.Create(SPGroup);
+  Afrm := TfrmEditRetrainingPlan.Create(Self, FSPRetViewI.GetSPRetrainingEditI,
+    EditMode);
   try
-    Afrm.Mode := EditMode;
     Afrm.ShowModal;
   finally
     FreeAndNil(Afrm);
@@ -71,8 +74,8 @@ begin
 
   // Сфера
   cxdblcbArea.Enabled := False;
-  TDBLCB.Init(cxdblcbArea, SPGroup.qSpecEdSimple.W.IDArea,
-    SPGroup.qAreas.W.AREA, lsEditFixedList);
+  TDBLCB.Init(cxdblcbArea, FSPRetViewI.SpecEdSimpleW.IDArea,
+    FSPRetViewI.AreasW.AREA, lsEditFixedList);
 end;
 
 function TViewRetraining.IsActionsEnabled: Boolean;
@@ -83,6 +86,12 @@ end;
 function TViewRetraining.IsReadOnly: Boolean;
 begin
   Result := AccessLevel < alManager;
+end;
+
+procedure TViewRetraining.SetSPRetViewI(const Value: ISPRetView);
+begin
+  FSPRetViewI := Value;
+  SPViewI := Value;
 end;
 
 end.

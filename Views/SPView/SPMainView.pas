@@ -8,10 +8,10 @@ uses
   cxGraphics, cxControls, cxLookAndFeels, cxLookAndFeelPainters, cxContainer,
   cxEdit, TB2Item, cxLabel, cxDBLabel, cxCheckBox, cxDBEdit, cxTextEdit,
   Vcl.StdCtrls, TB2Dock, TB2Toolbar, cxMaskEdit, cxDropDownEdit, cxLookupEdit,
-  cxDBLookupEdit, cxDBExtLookupComboBox, SPGroup, SpecEdPopupView,
+  cxDBLookupEdit, cxDBExtLookupComboBox, SpecEdPopupView,
   cxGridDBBandedTableView, Data.DB, cxDBLookupComboBox, NotifyEvents, SPView2,
   System.Contnrs, System.Actions, Vcl.ActnList, System.ImageList, Vcl.ImgList,
-  cxImageList, OptionsHelper, Vcl.Menus;
+  cxImageList, OptionsHelper, Vcl.Menus, SPViewInterface;
 
 type
   TViewSPMain = class(TFrame)
@@ -76,12 +76,12 @@ type
   private
     FAccessLevel: TAccessLevel;
     FEventList: TObjectList;
-    FSPGroup: TSPGroup;
+    FSPViewI: ISPView;
     FViewSpecEdPopup: TViewSpecEdPopup;
     FViewSP: TviewSP;
     procedure DoOnReportPlanGraphBySpecExec(Sender: TObject);
     procedure SetAccessLevel(const Value: TAccessLevel);
-    procedure SetSPGroup(const Value: TSPGroup);
+    procedure SetSPViewI(const Value: ISPView);
     { Private declarations }
   protected
     procedure CreateStudyPlan; virtual;
@@ -90,12 +90,13 @@ type
     function IsActionsEnabled: Boolean; virtual;
     function IsReadOnly: Boolean; virtual;
     procedure UpdateView; virtual;
+    property SPViewI: ISPView read FSPViewI write SetSPViewI;
+    property ViewSP: TviewSP read FViewSP;
     property ViewSpecEdPopup: TViewSpecEdPopup read FViewSpecEdPopup;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
     property AccessLevel: TAccessLevel read FAccessLevel write SetAccessLevel;
-    property SPGroup: TSPGroup read FSPGroup write SetSPGroup;
     { Public declarations }
   end;
 
@@ -127,7 +128,7 @@ end;
 procedure TViewSPMain.actActivePlansExecute(Sender: TObject);
 begin
   actActivePlans.Checked := True;
-  SPGroup.ActivePlansOnly := True;
+  SPViewI.ActivePlansOnly := True;
 end;
 
 procedure TViewSPMain.actCopyStudyPlanExecute(Sender: TObject);
@@ -136,12 +137,12 @@ var
   AYear: Integer;
   frmMessage: TfrmMessage;
 begin
-  Assert(FSPGroup.qSpecEd.FDQuery.RecordCount > 0);
+  Assert(SPViewI.SpecEdW.RecordCount > 0);
 
   AYear := 0;
   Afrm := TfrmCopyPlan.Create(Self);
   try
-    Afrm.Year := FSPGroup.qSpecEdSimple.W.Year.F.AsInteger + 1;
+    Afrm.Year := SPViewI.SpecEdSimpleW.Year.F.AsInteger + 1;
     if Afrm.ShowModal = mrOk then
     begin
       AYear := Afrm.Year;
@@ -165,7 +166,7 @@ begin
   Application.ProcessMessages;
   try
     // Вызываем копирование
-    SPGroup.CopyStudyPlan(AYear);
+    SPViewI.CopyStudyPlan(AYear);
 
     // Обновляем окно сообщения
     with frmMessage do
@@ -187,13 +188,13 @@ end;
 
 procedure TViewSPMain.actDeleteStudyPlanExecute(Sender: TObject);
 begin
-  Assert(SPGroup.qSpecEd.FDQuery.RecordCount > 0);
+  Assert(SPViewI.SpecEdW.RecordCount > 0);
 
   if not TDialog.Create.DeletePlanDialog
-    (SPGroup.qSpecEd.W.SpecialityEx.F.AsString) then
+    (SPViewI.SpecEdW.SpecialityEx.F.AsString) then
     Exit;
 
-  SPGroup.DeleteStudyPlan;
+  SPViewI.DeleteStudyPlan;
 end;
 
 procedure TViewSPMain.actEditStudyPlanExecute(Sender: TObject);
@@ -208,7 +209,7 @@ end;
 
 procedure TViewSPMain.actLockAllStudyPlansExecute(Sender: TObject);
 begin
-  SPGroup.LockAllStudyPlans;
+  SPViewI.LockAllStudyPlans;
 end;
 
 procedure TViewSPMain.CreateStudyPlan;
@@ -218,7 +219,7 @@ end;
 procedure TViewSPMain.actShowAllExecute(Sender: TObject);
 begin
   actShowAll.Checked := True;
-  SPGroup.ActivePlansOnly := False;
+  SPViewI.ActivePlansOnly := False;
 end;
 
 procedure TViewSPMain.cxdbelcbSpecialityMouseDown(Sender: TObject;
@@ -237,7 +238,7 @@ end;
 procedure TViewSPMain.cxdbelcbSpecialityPropertiesChange(Sender: TObject);
 begin
   (Sender as TcxDBExtLookupComboBox).PostEditValue;
-  FSPGroup.SpecEdDumb.W.TryPost;
+  SPViewI.IDSpecEdW.TryPost;
   UpdateView;
 end;
 
@@ -253,14 +254,13 @@ end;
 procedure TViewSPMain.cxdblcbYearsPropertiesChange(Sender: TObject);
 begin
   (Sender as TcxDBLookupComboBox).PostEditValue;
-  FSPGroup.YearDumb.W.TryPost;
+  SPViewI.IDYearW.TryPost;
   UpdateView;
 end;
 
 procedure TViewSPMain.DoOnReportPlanGraphBySpecExec(Sender: TObject);
 begin
-  FSPGroup.DoOnReportPlanGraphBySpecExec;
-
+  SPViewI.DoOnReportPlanGraphBySpecExec;
 end;
 
 procedure TViewSPMain.EditStudyPlan;
@@ -269,44 +269,47 @@ end;
 
 procedure TViewSPMain.Init;
 begin
+  if not Assigned(FSPViewI) then
+    Exit;
+
   // Года
-  TDBLCB.Init(cxdblcbYears, FSPGroup.YearDumb.W.ID, FSPGroup.qYears.W.Year,
+  TDBLCB.Init(cxdblcbYears, FSPViewI.IDYearW.ID, FSPViewI.YearsW.Year,
     lsFixedList);
 
   // Подключаем выпадающий список планов
-  FViewSpecEdPopup.W := FSPGroup.qSpecEd.W;
+  FViewSpecEdPopup.W := FSPViewI.SpecEdW;
   with cxdbelcbSpeciality do
   begin
-    DataBinding.DataSource := FSPGroup.SpecEdDumb.W.DataSource;
-    DataBinding.DataField := FSPGroup.SpecEdDumb.W.ID.FieldName;
+    DataBinding.DataSource := FSPViewI.IDSpecEdW.DataSource;
+    DataBinding.DataField := FSPViewI.IDSpecEdW.ID.FieldName;
     Properties.DropDownListStyle := lsFixedList;
     Properties.DropDownRows := 24;
     Properties.DropDownSizeable := True;
     Properties.View := FViewSpecEdPopup.MainView;
-    Properties.KeyFieldNames := FSPGroup.qSpecEd.W.PKFieldName;
+    Properties.KeyFieldNames := FSPViewI.SpecEdW.PKFieldName;
     Properties.ListFieldItem := FViewSpecEdPopup.clSpecialityEx;
   end;
 
   // Сокращение специальности
   cxdblcbShortSpeciality.Enabled := False;
-  TDBLCB.Init(cxdblcbShortSpeciality, FSPGroup.qSpecEdSimple.W.IDSpeciality,
-    FSPGroup.qCourceName.W.SHORT_SPECIALITY, lsEditFixedList);
+  TDBLCB.Init(cxdblcbShortSpeciality, FSPViewI.SpecEdSimpleW.IDSpeciality,
+    FSPViewI.CourceNameW.SHORT_SPECIALITY, lsEditFixedList);
 
   // Кафедра
   cxdblcbChair.Enabled := False;
-  TDBLCB.Init(cxdblcbChair, FSPGroup.qSpecEdSimple.W.IDChair,
-    FSPGroup.qAllChairs.W.Наименование, lsEditFixedList);
+  TDBLCB.Init(cxdblcbChair, FSPViewI.SpecEdSimpleW.IDChair,
+    FSPViewI.AllChairsW.Наименование, lsEditFixedList);
 
   // Идентификатор уч. плана
-  TDBL.Init(cxdblID, FSPGroup.qSpecEdSimple.DataSource,
-    FSPGroup.qSpecEdSimple.W.ID_SPECIALITYEDUCATION);
+  TDBL.Init(cxdblID, FSPViewI.SpecEdSimpleW.DataSource,
+    FSPViewI.SpecEdSimpleW.ID_SPECIALITYEDUCATION);
 
   // Флажок "Заблокировано"
-  TDBChB.Init(cxdbcbLocked, FSPGroup.qSpecEdSimple.DataSource,
-    FSPGroup.qSpecEdSimple.W.Locked);
+  TDBChB.Init(cxdbcbLocked, FSPViewI.SpecEdSimpleW.DataSource,
+    FSPViewI.SpecEdSimpleW.Locked);
 
   // Содержимое учебного плана
-  FViewSP.SetDocument(FSPGroup.SP);
+  FViewSP.SetDocument(FSPViewI.SP);
 
   TNotifyEventWrap.Create(FViewSP.OnReportPlanGraphBySpecExec,
     DoOnReportPlanGraphBySpecExec, FEventList);
@@ -328,19 +331,13 @@ begin
   UpdateView;
 end;
 
-procedure TViewSPMain.SetSPGroup(const Value: TSPGroup);
+procedure TViewSPMain.SetSPViewI(const Value: ISPView);
 begin
-  if FSPGroup = Value then
+  if FSPViewI = Value then
     Exit;
 
   FEventList.Clear;
-  FSPGroup := Value;
-
-  if FSPGroup = nil then
-  begin
-    UpdateView;
-    Exit;
-  end;
+  FSPViewI := Value;
 
   Init;
   UpdateView;
@@ -350,15 +347,15 @@ procedure TViewSPMain.UpdateView;
 var
   OK: Boolean;
 begin
-  OK := (FSPGroup <> nil);
+  OK := (SPViewI <> nil);
 
   actCreateStudyPlan.Enabled := OK and IsActionsEnabled;
-  actEditStudyPlan.Enabled := OK and (FSPGroup.qSpecEd.FDQuery.RecordCount > 0)
+  actEditStudyPlan.Enabled := OK and (SPViewI.SpecEdW.RecordCount > 0)
     and IsActionsEnabled;
-  actCopyStudyPlan.Enabled := OK and (FSPGroup.qSpecEd.FDQuery.RecordCount > 0)
+  actCopyStudyPlan.Enabled := OK and (SPViewI.SpecEdW.RecordCount > 0)
     and IsActionsEnabled;
   actDeleteStudyPlan.Enabled := OK and
-    (FSPGroup.qSpecEd.FDQuery.RecordCount > 0) and IsActionsEnabled;
+    (SPViewI.SpecEdW.RecordCount > 0) and IsActionsEnabled;
   tbActions.Visible := IsActionsEnabled;
 
   tbIDSpecEd.Visible := OK and (TOptions.SP.UserName = 'prog1');

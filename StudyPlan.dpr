@@ -225,8 +225,11 @@ uses
   GetSpecEdBySP in 'Queryes\SP\GetSpecEdBySP.pas' {QryGetSpecEdBySP: TFrame},
   SpecEdSimpleWrap in 'Queryes\SpecEdSimple\SpecEdSimpleWrap.pas',
   FDDumb in 'Queryes\Dumb\FDDumb.pas',
-  SpecEdPopupViewInterface in 'Interfaces\SpecEdPopupViewInterface.pas',
-  SPViewInterface in 'Interfaces\SPViewInterface.pas';
+  SPViewInterface in 'Interfaces\SPViewInterface.pas',
+  SPRetrainingViewInterface in 'Interfaces\SPRetrainingViewInterface.pas',
+  SPEditInterface in 'Interfaces\SPEditInterface.pas',
+  SpecEditInterface in 'Interfaces\SpecEditInterface.pas',
+  SPRetrainingEditInterface in 'Interfaces\SPRetrainingEditInterface.pas';
 
 {$R *.res}
 

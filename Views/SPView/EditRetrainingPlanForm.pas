@@ -10,7 +10,7 @@ uses
   cxDBExtLookupComboBox, Vcl.StdCtrls, cxButtons, cxMaskEdit, cxDropDownEdit,
   cxLookupEdit, cxDBLookupEdit, cxDBLookupComboBox, InsertEditMode,
   SpecEdSimpleQuery, cxCheckBox, SpecEdSimpleInt, EditSpecFrm,
-  EditRetrainingSpecFrm, FDDumb;
+  EditRetrainingSpecFrm, FDDumb, SPRetrainingEditInterface;
 
 type
   TfrmEditRetrainingPlan = class(TfrmEditStudyPlan, ISpecEdSimpleEx)
@@ -20,15 +20,17 @@ type
       const AText: TCaption);
   private
     FqAreaDumb: TFDDumb;
+    FSPRetrainingEditI: ISPRetrainingEdit;
     function GetIDArea: Integer;
     procedure SetIDArea(const Value: Integer);
     { Private declarations }
   protected
     procedure CheckQualification; override;
-    function CreateEditSpecForm: TfrmEditSpec; override;
+    function CreateEditSpecForm(AMode: TMode): TfrmEditSpec; override;
     procedure SetMode(const Value: TMode); override;
   public
-    constructor Create(AOwner: TComponent); override;
+    constructor Create(AOwner: TComponent;
+      ASPRetrainingEditI: ISPRetrainingEdit; AMode: TMode); reintroduce;
     { Public declarations }
   published
     property IDArea: Integer read GetIDArea write SetIDArea;
@@ -41,15 +43,19 @@ uses
 
 {$R *.dfm}
 
-constructor TfrmEditRetrainingPlan.Create(AOwner: TComponent);
+constructor TfrmEditRetrainingPlan.Create(AOwner: TComponent;
+  ASPRetrainingEditI: ISPRetrainingEdit; AMode: TMode);
 begin
-  inherited;
+  inherited Create(AOwner, ASPRetrainingEditI, AMode);
+  FSPRetrainingEditI := ASPRetrainingEditI;
+
   // **********************************************
   // Сферы
   // **********************************************
   FqAreaDumb := TFDDumb.Create(Self);
 
-  TDBLCB.Init(cxdblcbArea, FqAreaDumb.W.ID, SPGroup.qAreas.W.AREA, lsEditList);
+  TDBLCB.Init(cxdblcbArea, FqAreaDumb.W.ID, ASPRetrainingEditI.AreasW.AREA,
+    lsEditList);
 end;
 
 procedure TfrmEditRetrainingPlan.CheckQualification;
@@ -57,9 +63,9 @@ begin; // Квалификация у переподготовки может быть пустой.
   // Может она вообще не нужна?
 end;
 
-function TfrmEditRetrainingPlan.CreateEditSpecForm: TfrmEditSpec;
+function TfrmEditRetrainingPlan.CreateEditSpecForm(AMode: TMode): TfrmEditSpec;
 begin
-  Result := TfrmEditRetrainingSpec.Create(SPGroup);
+  Result := TfrmEditRetrainingSpec.Create(Self, SPEditI.GetSpecEditI, AMode);
 end;
 
 procedure TfrmEditRetrainingPlan.cxdblcbAreaPropertiesNewLookupDisplayText
@@ -67,7 +73,7 @@ procedure TfrmEditRetrainingPlan.cxdblcbAreaPropertiesNewLookupDisplayText
 begin
   inherited;
   if AText <> '' then
-    SPGroup.qAreas.W.Append(AText);
+    FSPRetrainingEditI.AreasW.Append(AText);
 end;
 
 function TfrmEditRetrainingPlan.GetIDArea: Integer;
@@ -90,8 +96,8 @@ begin
   case Mode of
     EditMode:
       begin
-        Assert(SPGroup.qSpecEdSimple.FDQuery.RecordCount = 1);
-        IDArea := SPGroup.qSpecEdSimple.W.IDArea.F.AsInteger;
+        Assert(SPEditI.SpecEdSimpleW.RecordCount = 1);
+        IDArea := SPEditI.SpecEdSimpleW.IDArea.F.AsInteger;
       end;
     InsertMode:
       begin

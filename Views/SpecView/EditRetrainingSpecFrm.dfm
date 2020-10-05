@@ -21,10 +21,12 @@ inherited frmEditRetrainingSpec: TfrmEditRetrainingSpec
     Top = 133
     Visible = False
     ExplicitTop = 133
+    ExplicitHeight = 21
   end
   inherited cxteShortSpeciality: TcxTextEdit [4]
     Top = 80
     ExplicitTop = 80
+    ExplicitHeight = 21
   end
   inherited btnClose: TcxButton [5]
     Top = 129
@@ -34,5 +36,6 @@ inherited frmEditRetrainingSpec: TfrmEditRetrainingSpec
     Top = 24
     Properties.OnChange = cxlcbSpecialityPropertiesChange
     ExplicitTop = 24
+    ExplicitHeight = 21
   end
 end

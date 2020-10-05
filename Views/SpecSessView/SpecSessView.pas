@@ -320,8 +320,6 @@ begin
 end;
 
 procedure TViewSpecSess.SetSpecSessGroup(const Value: TSpecSessGroup);
-var
-  I: Integer;
 begin
   if FSpecSessGroup = Value then
     Exit;
