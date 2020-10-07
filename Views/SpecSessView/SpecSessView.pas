@@ -87,7 +87,8 @@ type
 implementation
 
 uses
-  cxDropDownEdit, System.Generics.Collections, System.Types;
+  cxDropDownEdit, System.Generics.Collections, System.Types,
+  DBLookupComboBoxHelper;
 
 {$R *.dfm}
 
@@ -129,11 +130,11 @@ procedure TViewSpecSess.actDropLevelExecute(Sender: TObject);
 var
   ALevel: Variant;
   I: Integer;
-//  src: Integer;
+  // src: Integer;
 begin
   inherited;
   ALevel := MainView.Controller.SelectedRows[0].Values[clLevel.Index];
-//  src := MainView.Controller.SelectedRowCount;
+  // src := MainView.Controller.SelectedRowCount;
 
   MainView.Controller.ClearSelection;
 
@@ -179,7 +180,7 @@ procedure TViewSpecSess.cxCellTextEditPropertiesEditValueChanged
 var
   AValue: Integer;
   AcxTextEdit: TcxTextEdit;
-//  S: string;
+  // S: string;
 begin
   inherited;
   AcxTextEdit := Sender as TcxTextEdit;
@@ -287,9 +288,8 @@ var
 begin
   inherited;
   // Настраиваем подстановочную наименование сессии
-  InitializeLookupColumn(clSession, FSpecSessGroup.qSessType.W.DataSource,
-    lsFixedList, FSpecSessGroup.qSessType.W.SessionType.FullName,
-    FSpecSessGroup.qSessType.W.PKFieldName);
+  TDBLCB.InitColumn(clSession, FSpecSessGroup.qSessType.W.SessionType,
+    lsFixedList);
 
   // Группируем планы по году
   // clYear.GroupIndex := 0;

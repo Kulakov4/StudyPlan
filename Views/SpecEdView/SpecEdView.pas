@@ -40,7 +40,7 @@ type
 implementation
 
 uses
-  cxDropDownEdit, GridSort;
+  cxDropDownEdit, GridSort, DBLookupComboBoxHelper;
 
 {$R *.dfm}
 
@@ -70,9 +70,7 @@ procedure TViewSpecEd.InitColumns(AView: TcxGridDBBandedTableView);
 begin
   inherited;
   // Настраиваем подстановочную колонку Кафедра
-  InitializeLookupColumn(clIDChair, FSpecEdGr.qChairs.W.DataSource, lsFixedList,
-    FSpecEdGr.qChairs.W.Short_Name.FieldName,
-    FSpecEdGr.qChairs.W.ID_CHAIR.FieldName);
+  TDBLCB.InitColumn(clIDChair, FSpecEdGr.qChairs.W.Short_Name, lsFixedList);
 
   // Группируем планы по году
   // clYear.GroupIndex := 0;

@@ -148,6 +148,20 @@ type
     procedure DoOnMyApplyBestFit(var Message: TMessage);
       message WM_MY_APPLY_BEST_FIT;
     function GetFocusedTableView: TcxGridDBBandedTableView; virtual;
+    procedure InitializeLookupColumn(AColumn: TcxGridDBBandedColumn;
+      ADataSource: TDataSource; ADropDownListStyle: TcxEditDropDownListStyle;
+      const AListFieldNames: string;
+      const AKeyFieldNames: string = 'ID'); overload;
+    procedure InitializeComboBoxColumn(AColumn: TcxGridDBBandedColumn;
+      ADropDownListStyle: TcxEditDropDownListStyle; AField: TField); overload;
+    procedure InitializeComboBoxColumn(AView: TcxGridDBBandedTableView;
+      AFieldName: string; ADropDownListStyle: TcxEditDropDownListStyle;
+      AField: TField); overload;
+    procedure InitializeLookupColumn(AView: TcxGridDBBandedTableView;
+      const AFieldName: string; ADataSource: TDataSource;
+      ADropDownListStyle: TcxEditDropDownListStyle;
+      const AListFieldNames: string;
+      const AKeyFieldNames: string = 'ID'); overload;
     procedure OnGridRecordCellPopupMenu(AColumn: TcxGridDBBandedColumn;
       var AllowPopup: Boolean); virtual;
     procedure DoStatusBarResize(AEmptyPanelIndex: Integer);
@@ -948,6 +962,49 @@ begin
     Result := AcxGridDBBandedTableView.ViewData.Rows[i];
 end;
 
+procedure TfrmGrid.InitializeLookupColumn(AColumn: TcxGridDBBandedColumn;
+  ADataSource: TDataSource; ADropDownListStyle: TcxEditDropDownListStyle;
+  const AListFieldNames: string; const AKeyFieldNames: string = 'ID');
+var
+  AcxLookupComboBoxProperties: TcxLookupComboBoxProperties;
+begin
+  Assert(AColumn <> nil);
+  Assert(ADataSource <> nil);
+  Assert(not AListFieldNames.IsEmpty);
+  Assert(not AKeyFieldNames.IsEmpty);
+
+  Assert(AColumn <> nil);
+
+  AColumn.PropertiesClass := TcxLookupComboBoxProperties;
+  AcxLookupComboBoxProperties :=
+    AColumn.Properties as TcxLookupComboBoxProperties;
+  AcxLookupComboBoxProperties.ListSource := ADataSource;
+  AcxLookupComboBoxProperties.ListFieldNames := AListFieldNames;
+  AcxLookupComboBoxProperties.KeyFieldNames := AKeyFieldNames;
+  AcxLookupComboBoxProperties.DropDownListStyle := ADropDownListStyle;
+end;
+
+procedure TfrmGrid.InitializeComboBoxColumn(AColumn: TcxGridDBBandedColumn;
+  ADropDownListStyle: TcxEditDropDownListStyle; AField: TField);
+var
+  AcxComboBoxProperties: TcxComboBoxProperties;
+begin
+  Assert(AColumn <> nil);
+
+  AColumn.PropertiesClass := TcxComboBoxProperties;
+  AcxComboBoxProperties := AColumn.Properties as TcxComboBoxProperties;
+  AcxComboBoxProperties.DropDownListStyle := ADropDownListStyle;
+
+  // «аполн€ем выпадающий список значени€ми из запроса
+  AcxComboBoxProperties.Items.Clear;
+  AField.DataSet.First;
+  while not AField.DataSet.Eof do
+  begin
+    AcxComboBoxProperties.Items.Add(AField.AsString);
+    AField.DataSet.Next;
+  end;
+end;
+
 procedure TfrmGrid.MyApplyBestFit;
 begin
   MyApplyBestFitForView(MainView);
@@ -988,6 +1045,29 @@ function TfrmGrid.GridView(ALevel: TcxGridLevel): TcxGridDBBandedTableView;
 begin
   Assert(ALevel <> nil);
   Result := ALevel.GridView as TcxGridDBBandedTableView;
+end;
+
+procedure TfrmGrid.InitializeComboBoxColumn(AView: TcxGridDBBandedTableView;
+  AFieldName: string; ADropDownListStyle: TcxEditDropDownListStyle;
+  AField: TField);
+begin
+  Assert(AView <> nil);
+  Assert(not AFieldName.IsEmpty);
+
+  InitializeComboBoxColumn(AView.GetColumnByFieldName(AFieldName),
+    ADropDownListStyle, AField);
+end;
+
+procedure TfrmGrid.InitializeLookupColumn(AView: TcxGridDBBandedTableView;
+  const AFieldName: string; ADataSource: TDataSource;
+  ADropDownListStyle: TcxEditDropDownListStyle; const AListFieldNames: string;
+  const AKeyFieldNames: string = 'ID');
+begin
+  Assert(AView <> nil);
+  Assert(not AFieldName.IsEmpty);
+
+  InitializeLookupColumn(AView.GetColumnByFieldName(AFieldName), ADataSource,
+    ADropDownListStyle, AListFieldNames, AKeyFieldNames);
 end;
 
 procedure TfrmGrid.OnGridRecordCellPopupMenu(AColumn: TcxGridDBBandedColumn;

@@ -47,7 +47,8 @@ type
 implementation
 
 uses
-  cxDropDownEdit, GridSort, EditDisciplineFrm, InsertEditMode, DialogUnit;
+  cxDropDownEdit, GridSort, EditDisciplineFrm, InsertEditMode, DialogUnit,
+  DBLookupComboBoxHelper;
 
 {$R *.dfm}
 
@@ -97,9 +98,7 @@ begin
   clDisciplineName.BestFitMaxWidth := 600;
 
   // Настраиваем подстановочную колонку кафедра
-  InitializeLookupColumn(clIDChair, FDiscNameGroup.qChairs.DataSource,
-    lsEditList, FDiscNameGroup.qChairs.W.Shortening.FieldName,
-    FDiscNameGroup.qChairs.W.ID_CHAIR.FieldName);
+  TDBLCB.InitColumn(clIDChair, FDiscNameGroup.qChairs.W.Shortening);
 
   clIDChair.Options.SortByDisplayText := isbtOn;
   GridSort.Add(TSortVariant.Create(clIDChair, [clIDChair, clDisciplineName]));

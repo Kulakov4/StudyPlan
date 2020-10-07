@@ -6,10 +6,28 @@ uses
   System.Classes, Admissions, DPOStudyPlan, Years, AdmissionsQuery, ChairsQuery,
   CourceNameQuery, System.Contnrs, NotifyEvents, StudentGroupsQuery,
   CourceEdTypesQuery, YearsQry, EdLvlQry, Data.DB, FireDAC.Comp.DataSet,
-  DiscNameQry, CourseStudyPlanQry, FDDumb;
+  DiscNameQry, CourseStudyPlanQry, FDDumb, CourceViewInterface,
+  CourceEditInterface, CourceStudyPlanViewInterface;
 
 type
-  TCourceGroup = class(TComponent)
+  TCourceGroup = class(TComponent, ICourceView, ICourceEdit)
+  strict private
+    procedure AdmissionMove(AIDArr: TArray<Integer>;
+      AIDEducationLevel: Integer);
+    procedure CancelCourceEdit;
+    function GetAdmissionsW: TAdmissionsW;
+    function GetAfterLoadData: TNotifyEventsEx;
+    function GetChairsW: TChairsW;
+    function GetCourceEditI: ICourceEdit;
+    function GetCourceNameW: TCourceNameW;
+    function GetCourceStudyPlanViewI: ICourceStudyPlanView;
+    function GetCourseStudyPlanW: TCourseStudyPlanW;
+    function GetDiscNameW: TDiscNameW;
+    function GetEdLvlW: TEdLvlW;
+    function GetIDYearW: TDumbW;
+    function GetStudentGroupsW: TStudentGroupsW;
+    function GetYearsW: TYearsW;
+    procedure SearchStudGroups;
   private
     FAfterLoadData: TNotifyEventsEx;
     FEventList: TObjectList;
@@ -67,7 +85,6 @@ begin
   FIDEducationLevel := AIDEducationLevel;
 
   FEventList := TObjectList.Create;
-  FAfterLoadData := TNotifyEventsEx.Create(Self);
   FOnYearChange := TNotifyEventsEx.Create(Self);
 
   // Года
@@ -115,6 +132,22 @@ begin
   inherited;
 end;
 
+procedure TCourceGroup.AdmissionMove(AIDArr: TArray<Integer>;
+  AIDEducationLevel: Integer);
+begin
+  qAdmissions.Move(AIDArr, AIDEducationLevel);
+end;
+
+procedure TCourceGroup.CancelCourceEdit;
+begin
+  // НЕ сохраняем сделанные изменения в БД
+  qCourceName.FDQuery.CancelUpdates;
+
+  // Отменяем сделанные изменения в группах
+  if qStudentGroups.FDQuery.Active then
+    qStudentGroups.FDQuery.CancelUpdates;
+end;
+
 procedure TCourceGroup.Copy(AIDArray: TArray<Integer>; AYear: Integer);
 begin
   Assert(Length(AIDArray) > 0);
@@ -135,6 +168,59 @@ begin
 
   FAfterLoadData.CallEventHandlers(Self);
   FOnYearChange.CallEventHandlers(Self);
+end;
+
+function TCourceGroup.GetAdmissionsW: TAdmissionsW;
+begin
+  Result := qAdmissions.W;
+end;
+
+function TCourceGroup.GetAfterLoadData: TNotifyEventsEx;
+begin
+  if FAfterLoadData = nil then
+    FAfterLoadData := TNotifyEventsEx.Create(Self);
+
+  Result := FAfterLoadData;
+end;
+
+function TCourceGroup.GetChairsW: TChairsW;
+begin
+  Result := qChairs.W;
+end;
+
+function TCourceGroup.GetCourceEditI: ICourceEdit;
+begin
+  Result := Self;
+end;
+
+function TCourceGroup.GetCourceNameW: TCourceNameW;
+begin
+  Result := qCourceName.W;
+end;
+
+function TCourceGroup.GetCourceStudyPlanViewI: ICourceStudyPlanView;
+begin
+  // TODO -cMM: TCourceGroup.GetCourceStudyPlanViewI default body inserted
+end;
+
+function TCourceGroup.GetCourseStudyPlanW: TCourseStudyPlanW;
+begin
+  Result := qCourseStudyPlan.W;
+end;
+
+function TCourceGroup.GetDiscNameW: TDiscNameW;
+begin
+  Result := qDiscName.W;
+end;
+
+function TCourceGroup.GetEdLvlW: TEdLvlW;
+begin
+  Result := qEdLvl.W;
+end;
+
+function TCourceGroup.GetIDYearW: TDumbW;
+begin
+  Result := YearDumb.W;
 end;
 
 function TCourceGroup.GetqDiscName: TQryDiscName;
@@ -166,15 +252,33 @@ begin
   Result := FqEdLvl;
 end;
 
+function TCourceGroup.GetStudentGroupsW: TStudentGroupsW;
+begin
+  Result := qStudentGroups.W;
+end;
+
 function TCourceGroup.GetYear: Integer;
 begin
   Result := FYearDumb.W.ID.F.AsInteger;
+end;
+
+function TCourceGroup.GetYearsW: TYearsW;
+begin
+  Result := qYears.W;
 end;
 
 procedure TCourceGroup.Refresh;
 begin
   qCourseStudyPlan.W.RefreshQuery;
   qAdmissions.W.RefreshQuery;
+end;
+
+procedure TCourceGroup.SearchStudGroups;
+begin
+  qStudentGroups.Search(qAdmissions.W.PK.AsInteger, True);
+
+  // Значение по умолчанию для поля Start_Year!
+  qStudentGroups.W.Start_Year_DefaultValue := qAdmissions.W.Year.F.AsInteger;
 end;
 
 procedure TCourceGroup.SetYear(const Value: Integer);

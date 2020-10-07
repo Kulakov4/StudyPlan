@@ -7,10 +7,11 @@ uses
   System.Classes, Vcl.Graphics, Vcl.Controls, Vcl.Forms, Vcl.Dialogs,
   cxGraphics, cxControls, cxLookAndFeels, cxLookAndFeelPainters, cxContainer,
   cxEdit, Vcl.Menus, Vcl.StdCtrls, cxButtons, cxTextEdit, cxMaskEdit,
-  cxDropDownEdit, cxLookupEdit, cxDBLookupEdit, cxDBLookupComboBox, CourceGroup,
+  cxDropDownEdit, cxLookupEdit, cxDBLookupEdit, cxDBLookupComboBox,
   Data.DB, CourceNameQuery, FireDAC.Comp.Client, InsertEditMode, Vcl.ExtCtrls,
   StudentGroupsView, dxNavBarCollns, cxClasses, dxNavBarBase, dxNavBar,
-  dxBarBuiltInMenu, cxPC, DisciplinesView, AdmissionsInterface, FDDumb;
+  dxBarBuiltInMenu, cxPC, DisciplinesView, AdmissionsInterface, FDDumb,
+  CourceEditInterface;
 
 type
   TfrmEditCourse = class(TForm, IAdmission)
@@ -36,7 +37,7 @@ type
     procedure cxPageControlPageChanging(Sender: TObject; NewPage: TcxTabSheet;
       var AllowChange: Boolean);
   private
-    FCourceGroup: TCourceGroup;
+    FCourceEditI: ICourceEdit;
     FCourceNameW: TCourceNameW;
     FID: Integer;
     FMode: TMode;
@@ -57,7 +58,8 @@ type
   protected
     procedure CheckPlan;
   public
-    constructor Create(AOwner: TComponent); override;
+    constructor Create(AOwner: TComponent; ACourceEditI: ICourceEdit; AMode:
+        TMode); reintroduce;
     destructor Destroy; override;
     property Data: Integer read GetData write SetData;
     property IDChair: Integer read GetIDChair write SetIDChair;
@@ -73,25 +75,22 @@ uses
 
 {$R *.dfm}
 
-constructor TfrmEditCourse.Create(AOwner: TComponent);
+constructor TfrmEditCourse.Create(AOwner: TComponent; ACourceEditI:
+    ICourceEdit; AMode: TMode);
 begin
-  inherited;
-  Assert(AOwner is TCourceGroup);
+  inherited Create(AOwner);
+  FCourceEditI := ACourceEditI;
 
-  FCourceGroup := AOwner as TCourceGroup;
-
-  FID := FCourceGroup.qAdmissions.W.PK.AsInteger;
+  FID := FCourceEditI.AdmissionsW.PK.AsInteger;
 
   cxPageControl.ActivePage := cxtshPlan;
-
-  FMode := InsertMode;
 
   // ********************************************
   // Названия курсов
   // ********************************************
 
   // Создаём обёртку вокруг нового курсора названий курсов
-  FCourceNameW := TCourceNameW.Create(FCourceGroup.qCourceName.W.AddClone(''));
+  FCourceNameW := TCourceNameW.Create(FCourceEditI.CourceNameW.AddClone(''));
 
   FqSpecialityDumb := TFDDumb.Create(Self);
 
@@ -110,14 +109,16 @@ begin
   end;
 
   TDBLCB.Init(cxdblcbChair, FqChairDumb.W.ID,
-    FCourceGroup.qChairs.W.Наименование, lsFixedList);
+    FCourceEditI.ChairsW.Наименование, lsFixedList);
+
+  Mode := AMode;
 end;
 
 destructor TfrmEditCourse.Destroy;
 begin
   inherited;
   // Удаляем клон
-  FCourceGroup.qCourceName.W.DropClone(FCourceNameW.DataSet as TFDMemTable);
+  FCourceEditI.CourceNameW.DropClone(FCourceNameW.DataSet as TFDMemTable);
 end;
 
 procedure TfrmEditCourse.CheckPlan;
@@ -195,15 +196,18 @@ begin
   then
   begin
     // К этому моменту план должет быть уже сохранён
-    Assert(FCourceGroup.qAdmissions.W.PK.AsInteger > 0);
+    Assert(FCourceEditI.AdmissionsW.PK.AsInteger > 0);
 
     // Создаём представление
     FViewDisciplines := TViewDisciplines.Create(Self);
     FViewDisciplines.Place(cxtshDisciplines);
-    FViewDisciplines.Model := TCourseDiscViewModel.Create(Self,
+    FViewDisciplines.CourceDiscViewI := FCourceEditI.GetCourceDiscViewI;
+{
+    TCourseDiscViewModel.Create(Self,
       FCourceGroup.qAdmissions.W.ID_SpecialityEducation.F.AsInteger,
       FCourceGroup.qAdmissions.W.IDChair.F.AsInteger,
       FCourceGroup.qCourseStudyPlan.W, FCourceGroup.qDiscName);
+}
   end;
 
   // Переход на вкладку группы
@@ -211,18 +215,17 @@ begin
   then
   begin
     // К этому моменту план должет быть уже сохранён
-    Assert(FCourceGroup.qAdmissions.W.PK.AsInteger > 0);
+    Assert(FCourceEditI.AdmissionsW.PK.AsInteger > 0);
 
-    FCourceGroup.qStudentGroups.Search
-      (FCourceGroup.qAdmissions.W.PK.AsInteger, True);
+    // Идентификатор плана должен быть такой же как в момент создания формы!!!
+    if FID > 0 then
+      Assert(FCourceEditI.AdmissionsW.PK.AsInteger = FID);
 
-    // Значение по умолчанию для поля Start_Year!
-    FCourceGroup.qStudentGroups.W.Start_Year_DefaultValue :=
-      FCourceGroup.qAdmissions.W.Year.F.AsInteger;
+    FCourceEditI.SearchStudGroups;
 
     FViewStudentGroups := TViewStudentGroups.Create(Self);
     FViewStudentGroups.Place(cxtshGroups);
-    FViewStudentGroups.SGW := FCourceGroup.qStudentGroups.W;
+    FViewStudentGroups.SGW := FCourceEditI.StudentGroupsW;
   end;
 end;
 
@@ -245,15 +248,13 @@ procedure TfrmEditCourse.FormClose(Sender: TObject; var Action: TCloseAction);
 begin
   if ModalResult <> mrOK then
   begin
-    // НЕ сохраняем сделанные изменения в БД
-    FCourceGroup.qCourceName.FDQuery.CancelUpdates;
-
     // Отменяем изменения в дисциплинах
     if FViewDisciplines <> nil then
-      FViewDisciplines.Model.CancelUpdates;
+      FViewDisciplines.CourceDiscViewI.CancelUpdates;
 
-    if FCourceGroup.qStudentGroups.FDQuery.Active then
-      FCourceGroup.qStudentGroups.FDQuery.CancelUpdates;
+
+    // НЕ сохраняем сделанные изменения в БД
+    FCourceEditI.CancelCourceEdit;
 
     Exit;
   end;
@@ -272,7 +273,7 @@ begin
 
     // Сохраняем изменения в дисциплинах учебного плана курсов
     if FViewDisciplines <> nil then
-      FViewDisciplines.Model.ApplyUpdates;
+      FViewDisciplines.CourceDiscViewI.ApplyUpdates;
 
     SaveGroups;
 
@@ -348,9 +349,6 @@ end;
 
 procedure TfrmEditCourse.SetMode(const Value: TMode);
 begin
-  // if FMode = Value then
-  // Exit;
-
   FMode := Value;
 
   case FMode of

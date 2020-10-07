@@ -14,7 +14,7 @@ uses
   SpecEducationGridComboBoxView, Cromis.Comm.IPC, Cromis.Comm.Custom,
   dxBarBuiltInMenu, System.Actions, cxClasses, cxLocalization,
   System.ImageList, cxMaskEdit, cxDropDownEdit, cxLookupEdit, cxDBLookupEdit,
-  cxDBLookupComboBox, DisciplineLit, KDBClient, CourceGroup, CourcesView,
+  cxDBLookupComboBox, DisciplineLit, KDBClient, CourceGroup,
   SpecEdGroup, SpecEdView, SPGroup, SPMainView, System.Contnrs, SPOView, VOView,
   RetrainingView, SpecEdSimpleQuery, SpecEdSimpleQuery2, CommissionOptions,
   Vcl.Menus;

@@ -22,12 +22,14 @@ type
     FqAreaDumb: TFDDumb;
     FSPRetrainingEditI: ISPRetrainingEdit;
     function GetIDArea: Integer;
+    function GetqAreaDumb: TFDDumb;
     procedure SetIDArea(const Value: Integer);
     { Private declarations }
   protected
     procedure CheckQualification; override;
     function CreateEditSpecForm(AMode: TMode): TfrmEditSpec; override;
     procedure SetMode(const Value: TMode); override;
+    property qAreaDumb: TFDDumb read GetqAreaDumb;
   public
     constructor Create(AOwner: TComponent;
       ASPRetrainingEditI: ISPRetrainingEdit; AMode: TMode); reintroduce;
@@ -52,9 +54,7 @@ begin
   // **********************************************
   // —феры
   // **********************************************
-  FqAreaDumb := TFDDumb.Create(Self);
-
-  TDBLCB.Init(cxdblcbArea, FqAreaDumb.W.ID, ASPRetrainingEditI.AreasW.AREA,
+  TDBLCB.Init(cxdblcbArea, qAreaDumb.W.ID, ASPRetrainingEditI.AreasW.AREA,
     lsEditList);
 end;
 
@@ -78,7 +78,15 @@ end;
 
 function TfrmEditRetrainingPlan.GetIDArea: Integer;
 begin
-  Result := FqAreaDumb.W.ID.F.AsInteger;
+  Result := qAreaDumb.W.ID.F.AsInteger;
+end;
+
+function TfrmEditRetrainingPlan.GetqAreaDumb: TFDDumb;
+begin
+  if FqAreaDumb = nil then
+    FqAreaDumb := TFDDumb.Create(Self);
+
+  Result := FqAreaDumb;
 end;
 
 procedure TfrmEditRetrainingPlan.SetIDArea(const Value: Integer);
@@ -86,7 +94,7 @@ begin
   if IDArea = Value then
     Exit;
 
-  FqAreaDumb.W.UpdateID(Value);
+  qAreaDumb.W.UpdateID(Value);
 end;
 
 procedure TfrmEditRetrainingPlan.SetMode(const Value: TMode);

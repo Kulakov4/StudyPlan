@@ -184,7 +184,7 @@ begin
   FViewSpecPopup.W := FSPEditI.SpecByChairW;
   with cxdbextlcbSpecialitys do
   begin
-    DataBinding.DataSource := FqSpecDumb.DataSource;
+    DataBinding.DataSource := FqSpecDumb.W.DataSource;
     DataBinding.DataField := FqSpecDumb.W.ID.FieldName;
     Properties.DropDownListStyle := lsFixedList;
     Properties.DropDownRows := 24;

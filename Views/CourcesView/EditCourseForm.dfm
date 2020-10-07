@@ -39,7 +39,7 @@ object frmEditCourse: TfrmEditCourse
     Height = 241
     Align = alTop
     TabOrder = 1
-    Properties.ActivePage = cxtshDisciplines
+    Properties.ActivePage = cxtshGroups
     Properties.CustomButtons.Buttons = <>
     LookAndFeel.Kind = lfUltraFlat
     LookAndFeel.NativeStyle = True
@@ -52,10 +52,6 @@ object frmEditCourse: TfrmEditCourse
     object cxtshPlan: TcxTabSheet
       Caption = #1055#1083#1072#1085
       ImageIndex = 0
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object Label10: TLabel
         Left = 24
         Top = 27
@@ -125,10 +121,6 @@ object frmEditCourse: TfrmEditCourse
     object cxtshGroups: TcxTabSheet
       Caption = #1043#1088#1091#1087#1087#1099
       ImageIndex = 2
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
     end
   end
 end

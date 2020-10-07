@@ -4,16 +4,22 @@ interface
 
 uses
   System.Classes, DiscNameQry, DiscNameInt, InsertEditMode, CourseStudyPlanQry,
-  CourseStudyPlanInterface;
+  CourseStudyPlanInterface, CourceDiscEditInterface;
 
 type
-  TCourceDiscNameVM = class(TComponent)
+  TCourceDiscNameVM = class(TComponent, ICourceDiscEdit)
+  strict private
+    function GetCourseStudyPlanW: TCourseStudyPlanW;
+    function GetIDChair: Integer;
+    function GetIDSpecialityEducation: Integer;
   private
     FCourseStudyPlanW: TCourseStudyPlanW;
     FIDChair: Integer;
     FIDSPECIALITYEDUCATION: Integer;
     FqDiscName: TQryDiscName;
     function GetDiscNameW: TDiscNameW;
+  protected
+    property DiscNameW: TDiscNameW read GetDiscNameW;
   public
     constructor Create(AOwner: TComponent; ACourseStudyPlanW: TCourseStudyPlanW;
       AQryDiscName: TQryDiscName; AIDChair, AIDSPECIALITYEDUCATION: Integer);
@@ -23,10 +29,6 @@ type
     procedure ApplyCourseStudyPlan(ACourseStudyPlanInt: ICourseStudyPlan;
       AMode: TMode);
     procedure CancelUpdates;
-    property DiscNameW: TDiscNameW read GetDiscNameW;
-    property CourseStudyPlanW: TCourseStudyPlanW read FCourseStudyPlanW;
-    property IDChair: Integer read FIDChair;
-    property IDSPECIALITYEDUCATION: Integer read FIDSPECIALITYEDUCATION;
   end;
 
 implementation
@@ -79,9 +81,24 @@ begin
   FqDiscName.FDQuery.CancelUpdates;
 end;
 
+function TCourceDiscNameVM.GetCourseStudyPlanW: TCourseStudyPlanW;
+begin
+  Result := FCourseStudyPlanW;
+end;
+
 function TCourceDiscNameVM.GetDiscNameW: TDiscNameW;
 begin
   Result := FqDiscName.W;
+end;
+
+function TCourceDiscNameVM.GetIDChair: Integer;
+begin
+  Result := FIDChair;
+end;
+
+function TCourceDiscNameVM.GetIDSpecialityEducation: Integer;
+begin
+  Result := FIDSPECIALITYEDUCATION;
 end;
 
 end.

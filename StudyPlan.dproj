@@ -367,7 +367,6 @@
         <DCCReference Include="ThemeQuestionTypes.pas"/>
         <DCCReference Include="ThemeQuestions.pas"/>
         <DCCReference Include="helpers\StrHelper.pas"/>
-        <DCCReference Include="helpers\GridExtension.pas"/>
         <DCCReference Include="AbitConnector.pas"/>
         <DCCReference Include="ClipboardUnit.pas"/>
         <DCCReference Include="DisciplineLit.pas"/>
@@ -480,8 +479,8 @@
             <FormType>dfm</FormType>
             <DesignClass>TFrame</DesignClass>
         </DCCReference>
-        <DCCReference Include="Views\CourcesView\DisciplinesView.pas">
-            <Form>ViewDisciplines</Form>
+        <DCCReference Include="Views\CourcesView\CourceStudyPlanView.pas">
+            <Form>CourceStudyPlanView2</Form>
             <FormType>dfm</FormType>
             <DesignClass>TFrame</DesignClass>
         </DCCReference>
@@ -709,7 +708,7 @@
         </DCCReference>
         <DCCReference Include="Queryes\CourceDiscNameViewModel.pas"/>
         <DCCReference Include="Queryes\DPOSP\CourseStudyPlanInterface.pas"/>
-        <DCCReference Include="Queryes\DPOSP\CourseDiscViewModel.pas"/>
+        <DCCReference Include="Queryes\DPOSP\CourseStudyPlanModel.pas"/>
         <DCCReference Include="Queryes\Admissions\AdmissionsInterface.pas"/>
         <DCCReference Include="helpers\MyDir.pas"/>
         <DCCReference Include="Queryes\SP\GetSpecEdBySP.pas">
@@ -724,6 +723,11 @@
         <DCCReference Include="Interfaces\SPEditInterface.pas"/>
         <DCCReference Include="Interfaces\SpecEditInterface.pas"/>
         <DCCReference Include="Interfaces\SPRetrainingEditInterface.pas"/>
+        <DCCReference Include="helpers\GridExtension.pas"/>
+        <DCCReference Include="Interfaces\CourceViewInterface.pas"/>
+        <DCCReference Include="Interfaces\CourceEditInterface.pas"/>
+        <DCCReference Include="Interfaces\CourceStudyPlanViewInterface.pas"/>
+        <DCCReference Include="Interfaces\CourceDiscEditInterface.pas"/>
         <None Include="StudyPlan.todo"/>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>

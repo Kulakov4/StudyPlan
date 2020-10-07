@@ -27,9 +27,7 @@ type
   TQueryBase = class(TFrame)
     FDQuery: TFDQuery;
   private
-    FDataSource: TDataSource;
     FSQL: string;
-    function GetDataSource: TDataSource;
     { Private declarations }
   protected
     procedure FDQueryUpdateRecordOnClient(ASender: TDataSet;
@@ -55,7 +53,6 @@ type
     function SetParamType(const AParamName: String;
       AParamType: TParamType = ptInput; ADataType: TFieldType = ftInteger)
       : TFDParam;
-    property DataSource: TDataSource read GetDataSource;
     { Public declarations }
   end;
 
@@ -128,16 +125,6 @@ procedure TQueryBase.FDQueryUpdateRecordOnClient(ASender: TDataSet;
 begin
   inherited;
   AAction := eaApplied;
-end;
-
-function TQueryBase.GetDataSource: TDataSource;
-begin
-  if FDataSource = nil then
-  begin
-    FDataSource := TDataSource.Create(Self);
-    FDataSource.DataSet := FDQuery;
-  end;
-  Result := FDataSource;
 end;
 
 procedure TQueryBase.Load(const AParamNames: TArray<String>;

@@ -10,7 +10,7 @@ uses
   cxDBLookupComboBox, Vcl.StdCtrls, cxSpinEdit, cxCheckBox, Vcl.Menus,
   cxButtons, CourceGroup, Data.DB, InsertEditMode, FireDAC.Comp.Client,
   cxLabel, DiscNameQry, CourceDiscNameViewModel, DiscNameInt,
-  CourseStudyPlanInterface, FDDumb;
+  CourseStudyPlanInterface, FDDumb, CourceDiscEditInterface;
 
 type
   TfrmCourceDiscEdit = class(TForm, IDiscName, ICourseStudyPlan)
@@ -41,7 +41,7 @@ type
     function GetIDSPECIALITYEDUCATION: Integer; stdcall;
     function GetShortDisciplineName: String; stdcall;
   private
-    FModel: TCourceDiscNameVM;
+    FCourceDiscEditI: ICourceDiscEdit;
     FMode: TMode;
     FqDisciplineNameDumb: TFDDumb;
     function GetExam: Boolean; stdcall;
@@ -61,7 +61,8 @@ type
   protected
     procedure Check;
   public
-    constructor Create(AOwner: TComponent); override;
+    constructor Create(AOwner: TComponent; ACourceDiscEditI: ICourceDiscEdit;
+        AMode: TMode); reintroduce;
     property Exam: Boolean read GetExam write SetExam;
     property IDDisciplineName: Integer read GetIDDisciplineName
       write SetIDDisciplineName;
@@ -80,14 +81,12 @@ uses
 
 {$R *.dfm}
 
-constructor TfrmCourceDiscEdit.Create(AOwner: TComponent);
+constructor TfrmCourceDiscEdit.Create(AOwner: TComponent; ACourceDiscEditI:
+    ICourceDiscEdit; AMode: TMode);
 begin
-  inherited;
-  Assert(AOwner is TCourceDiscNameVM);
+  inherited Create(AOwner);
 
-  FModel := AOwner as TCourceDiscNameVM;
-
-  FMode := InsertMode;
+  FCourceDiscEditI := ACourceDiscEditI;
 
   // **********************************************
   // Наименования дисциплин
@@ -95,7 +94,9 @@ begin
   FqDisciplineNameDumb := TFDDumb.Create(Self);
 
   TDBLCB.Init(cxdblcbDisciplineName, FqDisciplineNameDumb.W.ID,
-    FModel.DiscNameW.DisciplineName, lsEditList);
+    FCourceDiscEditI.DiscNameW.DisciplineName, lsEditList);
+
+  Mode := AMode;
 end;
 
 procedure TfrmCourceDiscEdit.Check;
@@ -122,10 +123,10 @@ begin
   else
   begin
     // Ищем нужную нам дисциплину
-    FModel.DiscNameW.LocateByPK(FqDisciplineNameDumb.W.ID.F.AsInteger, True);
+    FCourceDiscEditI.DiscNameW.LocateByPK(FqDisciplineNameDumb.W.ID.F.AsInteger, True);
 
     // Отображаем её сокращённое наименование
-    cxteShort.Text := FModel.DiscNameW.ShortDisciplineName.F.AsString;
+    cxteShort.Text := FCourceDiscEditI.DiscNameW.ShortDisciplineName.F.AsString;
   end;
 end;
 
@@ -136,7 +137,7 @@ begin
     Exit;
 
   // Пытаемся добавить новое наименование переподготовки (пока с ID = NULL)
-  FModel.DiscNameW.Append(AText, cxteShort.Text, FModel.IDChair, 3);
+  FCourceDiscEditI.DiscNameW.Append(AText, cxteShort.Text, FCourceDiscEditI.IDChair, 3);
 end;
 
 procedure TfrmCourceDiscEdit.cxseLecPropertiesValidate(Sender: TObject;
@@ -156,7 +157,7 @@ begin
   if ModalResult <> mrOK then
   begin
     // НЕ сохраняем сделанные изменения в БД
-    FModel.CancelUpdates; // qDisciplineName.FDQuery.CancelUpdates;
+    FCourceDiscEditI.CancelUpdates;
     Exit;
   end;
 
@@ -169,10 +170,10 @@ begin
 
   // Сохраняем дисциплину и обновляем её код
   FqDisciplineNameDumb.W.UpdateID
-    (FModel.ApplyDisciplines(FqDisciplineNameDumb.W.ID.F.AsInteger, Self));
+    (FCourceDiscEditI.ApplyDisciplines(FqDisciplineNameDumb.W.ID.F.AsInteger, Self));
 
   // Сохраняем запись в учебном плане курсов
-  FModel.ApplyCourseStudyPlan(Self, Mode);
+  FCourceDiscEditI.ApplyCourseStudyPlan(Self, Mode);
 end;
 
 function TfrmCourceDiscEdit.GetDisciplineName: string;
@@ -187,7 +188,7 @@ end;
 
 function TfrmCourceDiscEdit.GetIDChair: Integer;
 begin
-  Result := FModel.IDChair;
+  Result := FCourceDiscEditI.IDChair;
 end;
 
 function TfrmCourceDiscEdit.GetIDDisciplineName: Integer;
@@ -197,7 +198,7 @@ end;
 
 function TfrmCourceDiscEdit.GetIDSPECIALITYEDUCATION: Integer;
 begin
-  Result := FModel.IDSPECIALITYEDUCATION;
+  Result := FCourceDiscEditI.IDSPECIALITYEDUCATION;
 end;
 
 function TfrmCourceDiscEdit.GetLec: Integer;
@@ -260,8 +261,8 @@ begin
   case FMode of
     EditMode:
       begin
-        Assert(FModel.IDSPECIALITYEDUCATION > 0);
-        with FModel do
+        Assert(FCourceDiscEditI.IDSPECIALITYEDUCATION > 0);
+        with FCourceDiscEditI do
         begin
           IDDisciplineName := CourseStudyPlanW.IDDisciplineName.F.AsInteger;
           Lec := CourseStudyPlanW.LecData.F.AsInteger;

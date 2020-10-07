@@ -1,14 +1,16 @@
-
-unit CourseDiscViewModel;
+unit CourseStudyPlanModel;
 
 interface
 
 uses
   System.Classes, FireDAC.Comp.DataSet, DiscNameQry, CourceDiscNameViewModel,
-  CourseStudyPlanQry;
+  CourseStudyPlanQry, CourceDiscViewInterface, CourceDiscEditInterface,
+  CourceStudyPlanViewInterface;
 
 type
-  TCourseDiscViewModel = class(TComponent)
+  TCourseDiscViewModel = class(TComponent, ICourceStudyPlanView)
+  strict private
+    function GetCourceDiscEditI: ICourceDiscEdit;
   private
     FIDChair: Integer;
     FIDSPECIALITYEDUCATION: Integer;
@@ -21,12 +23,12 @@ type
     function GetCourseStudyPlanW: TCourseStudyPlanW;
     procedure SaveToMasterDataSet;
   public
-    constructor Create(AOwner: TComponent; AIDSPECIALITYEDUCATION, AIDChair:
-        Integer; AMasterStudyPlanW: TCourseStudyPlanW; AQryDiscName: TQryDiscName);
-        reintroduce;
+    constructor Create(AOwner: TComponent;
+      AIDSPECIALITYEDUCATION, AIDChair: Integer;
+      AMasterStudyPlanW: TCourseStudyPlanW; AQryDiscName: TQryDiscName);
+      reintroduce;
     procedure ApplyUpdates;
     procedure CancelUpdates;
-    function CreateCourceDiscNameVM(AOwner: TComponent): TCourceDiscNameVM;
     property DiscNameW: TDiscNameW read GetDiscNameW;
     property CourseStudyPlanW: TCourseStudyPlanW read GetCourseStudyPlanW;
     property IDChair: Integer read FIDChair;
@@ -39,8 +41,8 @@ uses
   Data.DB;
 
 constructor TCourseDiscViewModel.Create(AOwner: TComponent;
-    AIDSPECIALITYEDUCATION, AIDChair: Integer; AMasterStudyPlanW:
-    TCourseStudyPlanW; AQryDiscName: TQryDiscName);
+  AIDSPECIALITYEDUCATION, AIDChair: Integer;
+  AMasterStudyPlanW: TCourseStudyPlanW; AQryDiscName: TQryDiscName);
 begin
   inherited Create(AOwner);
   Assert(AIDSPECIALITYEDUCATION > 0);
@@ -54,6 +56,7 @@ begin
   // Создаём курсор главного набора данных
   FMasterW := TCourseStudyPlanW.Create(AMasterStudyPlanW.AddClone(''));
 
+  // Выбираем одну запись из учебного плана курсов
   FqCourseStudyPlan := TQryCourseStudyPlan.Create(Self);
   FqCourseStudyPlan.FDQuery.CachedUpdates := True;
   FqCourseStudyPlan.FDQuery.AfterApplyUpdates := DoAfterDPOSPApplyUpdates;
@@ -81,17 +84,16 @@ begin
   Assert(FqCourseStudyPlan.FDQuery.ChangeCount = 0);
 end;
 
-function TCourseDiscViewModel.CreateCourceDiscNameVM(AOwner: TComponent)
-  : TCourceDiscNameVM;
-begin
-  Result := TCourceDiscNameVM.Create(AOwner, CourseStudyPlanW, FqDiscName, FIDChair,
-    FIDSPECIALITYEDUCATION);
-end;
-
 procedure TCourseDiscViewModel.DoAfterDPOSPApplyUpdates(ADataSet: TFDDataSet;
   AErrorCount: Integer);
 begin
   SaveToMasterDataSet;
+end;
+
+function TCourseDiscViewModel.GetCourceDiscEditI: ICourceDiscEdit;
+begin
+  Result := TCourceDiscNameVM.Create(Self, CourseStudyPlanW, FqDiscName,
+    FIDChair, FIDSPECIALITYEDUCATION);
 end;
 
 function TCourseDiscViewModel.GetDiscNameW: TDiscNameW;
@@ -117,7 +119,8 @@ begin
       usModified:
         begin
           // Ищем эту запись у курсора мастера
-          FMasterW.LocateByPK(FqCourseStudyPlan.W.ID_StudyPlan.F.AsInteger, True);
+          FMasterW.LocateByPK
+            (FqCourseStudyPlan.W.ID_StudyPlan.F.AsInteger, True);
           FMasterW.TryEdit;
         end;
       usInserted:
@@ -126,7 +129,8 @@ begin
     end;
 
     for I := 0 to FqCourseStudyPlan.FDQuery.FieldCount - 1 do
-      FMasterW.DataSet.Fields[I].Value := FqCourseStudyPlan.FDQuery.Fields[I].Value;
+      FMasterW.DataSet.Fields[I].Value :=
+        FqCourseStudyPlan.FDQuery.Fields[I].Value;
 
     FMasterW.TryPost;
 

@@ -18,7 +18,8 @@ uses
   cxDBExtLookupComboBox, ControlNames, cxDBLookupComboBox, IndependentWork,
   DragHelper, cxTextEdit, ThemeQuestions, System.ImageList,
   cxGridCustomPopupMenu, cxGridPopupMenu,
-  cxDataControllerConditionalFormattingRulesManagerDialog, dxBarBuiltInMenu;
+  cxDataControllerConditionalFormattingRulesManagerDialog, dxBarBuiltInMenu,
+  dxDateRanges;
 
 type
   TviewETP = class(TDataSetView2)
@@ -268,9 +269,9 @@ implementation
 
 {$R *.dfm}
 
-uses SPViewDM, dxCore, System.Generics.Collections,
-  OrderEssence, ProgressBarForm, LanguageConstants, GridExtension, System.Math,
-  Vcl.Clipbrd, ClipboardUnit;
+uses SPViewDM, dxCore, System.Generics.Collections, OrderEssence,
+  ProgressBarForm, LanguageConstants, System.Math, Vcl.Clipbrd, ClipboardUnit,
+  GridExtension;
 
 constructor TviewETP.Create(AOwner: TComponent; AParent: TWinControl;
   AAlign: TAlign = alClient);
@@ -821,9 +822,7 @@ begin
   if Length(m) = 0 then
     Exit;
 
-
-  V := GetTableView(1).Controller.FocusedRow.Values
-    [FThemeUnionKeyColumn.Index];
+  V := GetTableView(1).Controller.FocusedRow.Values[FThemeUnionKeyColumn.Index];
   if VarIsNull(V) then
     Exit;
 
@@ -2275,7 +2274,8 @@ begin
   // Удалить раздел или тему
   actDelete.Enabled := (FDocument <> nil) and (AFocusedView <> nil) and
   // на сфокусированном уровне есть записи
-    (AFocusedView.ViewData.RowCount > 0) and (AFocusedView.Level <> cxGridLevel);
+    (AFocusedView.ViewData.RowCount > 0) and
+    (AFocusedView.Level <> cxGridLevel);
 
   if actDelete.Enabled then
   begin
@@ -2303,8 +2303,7 @@ begin
     // Сфокусирован уровень 2
     (AFocusedView.Level = glThemeUnions) and
     // На уровне 2 есть записи
-    (AFocusedView.DataController.RowCount > 0) and
-    (GetTableView(2) <> nil) and
+    (AFocusedView.DataController.RowCount > 0) and (GetTableView(2) <> nil) and
     // У второго уровня активно дочернее представление темы
     (GetTableView(2).Level = glThemeUnionIndependentWork)
     // Или сфокусирован уровень 3
@@ -2316,8 +2315,7 @@ begin
     // Сфокусирован уровень 2
     (AFocusedView.Level = glThemeUnions) and
     // На уровне 2 есть записи
-    (AFocusedView.DataController.RowCount > 0) and
-    (GetTableView(2) <> nil) and
+    (AFocusedView.DataController.RowCount > 0) and (GetTableView(2) <> nil) and
     // У второго уровня активно дочернее представление темы
     (GetTableView(2).Level = glThemeUnionControls)
     // Или сфокусирован уровень 3
@@ -2329,8 +2327,7 @@ begin
     // Сфокусирован уровень 2
     (AFocusedView.Level = glThemeUnions) and
     // На уровне 2 есть записи
-    (AFocusedView.DataController.RowCount > 0) and
-    (GetTableView(2) <> nil) and
+    (AFocusedView.DataController.RowCount > 0) and (GetTableView(2) <> nil) and
     // У второго уровня активно дочернее представление темы
     (GetTableView(2).Level = glThemeUnionEducationalWorks)
     // Или сфокусирован уровень 3
@@ -2342,8 +2339,7 @@ begin
     // Сфокусирован уровень 2
     (AFocusedView.Level = glThemeUnions) and
     // На уровне 2 есть записи
-    (AFocusedView.DataController.RowCount > 0) and
-    (GetTableView(2) <> nil) and
+    (AFocusedView.DataController.RowCount > 0) and (GetTableView(2) <> nil) and
     // У второго уровня активно дочернее представление темы
     (GetTableView(2).Level = glThemeUnionLessonFeature)
     // Или сфокусирован уровень 3
@@ -2355,31 +2351,23 @@ begin
     // Сфокусирован уровень 2
     (AFocusedView.Level = glThemeUnions) and
     // На уровне 2 есть записи
-    (AFocusedView.DataController.RowCount > 0) and
-    (GetTableView(2) <> nil) and
+    (AFocusedView.DataController.RowCount > 0) and (GetTableView(2) <> nil) and
     // У второго уровня активно дочернее представление темы
     (GetTableView(2).Level = glThemeUnionTechnologies)
     // Или сфокусирован уровень 3
     ) or (AFocusedView.Level = glThemeUnionTechnologies));
 
-    // Добавить тему
-    actAddLessonTheme.Enabled :=
-    (FDocument <> nil) and
-    (AFocusedView <> nil) and
-    (
-    (
+  // Добавить тему
+  actAddLessonTheme.Enabled := (FDocument <> nil) and
+    (AFocusedView <> nil) and ((
     // Сфокусирован уровень 2
     (AFocusedView.Level = glThemeUnions) and
     // На уровне 2 есть записи
-    (AFocusedView.DataController.RowCount > 0) and
-    (GetTableView(2) <> nil) and
+    (AFocusedView.DataController.RowCount > 0) and (GetTableView(2) <> nil) and
     // У второго уровня активно дочернее представление темы
     (GetTableView(2).Level = glLessonThemes)
     // Или сфокусирован уровень 3
-    )
-    or
-    (AFocusedView.Level = glLessonThemes)
-    );
+    ) or (AFocusedView.Level = glLessonThemes));
 
   {
     // Добавить тему

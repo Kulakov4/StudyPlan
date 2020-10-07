@@ -124,7 +124,6 @@ uses
   ThemeQuestionTypes in 'ThemeQuestionTypes.pas',
   ThemeQuestions in 'ThemeQuestions.pas',
   StrHelper in 'helpers\StrHelper.pas',
-  GridExtension in 'helpers\GridExtension.pas',
   AbitConnector in 'AbitConnector.pas',
   ClipboardUnit in 'ClipboardUnit.pas',
   DisciplineLit in 'DisciplineLit.pas',
@@ -159,7 +158,7 @@ uses
   StudentGroupsView in 'Views\CourcesView\StudentGroupsView.pas' {ViewStudentGroups: TFrame},
   CreateVirtualStudentQuery in 'Queryes\VirtualStudents\CreateVirtualStudentQuery.pas' {QueryCreateVirtualStudent: TFrame},
   DropVirtualStudentQuery in 'Queryes\VirtualStudents\DropVirtualStudentQuery.pas' {QueryDropVirtualStudent: TFrame},
-  DisciplinesView in 'Views\CourcesView\DisciplinesView.pas' {ViewDisciplines: TFrame},
+  CourceStudyPlanView in 'Views\CourcesView\CourceStudyPlanView.pas' {CourceStudyPlanView2: TFrame},
   CourceEdTypesQuery in 'Queryes\CourceEdTypes\CourceEdTypesQuery.pas' {QueryCourceEdType: TFrame},
   SpecEdQuery in 'Queryes\SpecialityEducations\SpecEdQuery.pas' {QuerySpecEd: TFrame},
   SpecEdView in 'Views\SpecEdView\SpecEdView.pas' {ViewSpecEd: TFrame},
@@ -219,7 +218,7 @@ uses
   LockSPQry in 'Queryes\LockSPQry\LockSPQry.pas' {QryLockSP: TFrame},
   CourceDiscNameViewModel in 'Queryes\CourceDiscNameViewModel.pas',
   CourseStudyPlanInterface in 'Queryes\DPOSP\CourseStudyPlanInterface.pas',
-  CourseDiscViewModel in 'Queryes\DPOSP\CourseDiscViewModel.pas',
+  CourseStudyPlanModel in 'Queryes\DPOSP\CourseStudyPlanModel.pas',
   AdmissionsInterface in 'Queryes\Admissions\AdmissionsInterface.pas',
   MyDir in 'helpers\MyDir.pas',
   GetSpecEdBySP in 'Queryes\SP\GetSpecEdBySP.pas' {QryGetSpecEdBySP: TFrame},
@@ -229,7 +228,12 @@ uses
   SPRetrainingViewInterface in 'Interfaces\SPRetrainingViewInterface.pas',
   SPEditInterface in 'Interfaces\SPEditInterface.pas',
   SpecEditInterface in 'Interfaces\SpecEditInterface.pas',
-  SPRetrainingEditInterface in 'Interfaces\SPRetrainingEditInterface.pas';
+  SPRetrainingEditInterface in 'Interfaces\SPRetrainingEditInterface.pas',
+  GridExtension in 'helpers\GridExtension.pas',
+  CourceViewInterface in 'Interfaces\CourceViewInterface.pas',
+  CourceEditInterface in 'Interfaces\CourceEditInterface.pas',
+  CourceStudyPlanViewInterface in 'Interfaces\CourceStudyPlanViewInterface.pas',
+  CourceDiscEditInterface in 'Interfaces\CourceDiscEditInterface.pas';
 
 {$R *.res}
 
