@@ -4,15 +4,15 @@ interface
 
 type
   ICourseStudyPlan = interface(IInterface)
-    function GetIDChair: Integer; stdcall;
-    function GetIDDisciplineName: Integer; stdcall;
-    function GetIDSPECIALITYEDUCATION: Integer; stdcall;
-    function GetLec: Integer; stdcall;
-    function GetLab: Integer; stdcall;
-    function GetSem: Integer; stdcall;
-    function GetZach: Boolean; stdcall;
-    function GetExam: Boolean; stdcall;
-    function GetID_StudyPlan: Integer; stdcall;
+    function GetIDChair: Integer;
+    function GetIDDisciplineName: Integer;
+    function GetIDSPECIALITYEDUCATION: Integer;
+    function GetLec: Integer;
+    function GetLab: Integer;
+    function GetSem: Integer;
+    function GetZach: Boolean;
+    function GetExam: Boolean;
+    function GetID_StudyPlan: Integer;
     property IDChair: Integer read GetIDChair;
     property IDDisciplineName: Integer read GetIDDisciplineName;
     property IDSPECIALITYEDUCATION: Integer read GetIDSPECIALITYEDUCATION;

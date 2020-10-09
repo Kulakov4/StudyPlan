@@ -177,27 +177,14 @@ var
   AView: TcxGridDBBandedTableView;
 begin
   inherited;
+  AView := FocusedTableView;
+  Assert(AView <> nil);
 
-  BeginUpdate;
-  try
-    // CourceGroup.qAdmissions.W.PK.AsInteger
-    // CourceGroup.qDPOSP.W.PK.AsInteger
-    /// CourceGroup.qAdmissions.W.SaveBookmark;
-    // CourceGroup.qDPOSP.W.SaveBookmark;
+  if AView = MainView then
+    actEditPlan.Execute
+  else
+    actEditDiscipline.Execute;
 
-    AView := FocusedTableView;
-    Assert(AView <> nil);
-
-    if AView = MainView then
-      actEditPlan.Execute
-    else
-      actEditDiscipline.Execute;
-
-    // CourceGroup.qDPOSP.W.RestoreBookmark;
-    // CourceGroup.qAdmissions.W.RestoreBookmark;
-  finally
-    EndUpdate;
-  end;
 end;
 
 procedure TViewCourses.actAddDisciplineExecute(Sender: TObject);
@@ -391,19 +378,19 @@ end;
 function TViewCourses.GetclIDStudyPlan: TcxGridDBBandedColumn;
 begin
   Result := cxGridDBBandedTableView2.GetColumnByFieldName
-    (FCourseViewI.CourseStudyPlanW.ID_StudyPlan.FieldName);
+    (FCourseViewI.AllCourseStudyPlanW.ID_StudyPlan.FieldName);
 end;
 
 function TViewCourses.GetclIDDisciplineName: TcxGridDBBandedColumn;
 begin
   Result := cxGridDBBandedTableView2.GetColumnByFieldName
-    (FCourseViewI.CourseStudyPlanW.IDDisciplineName.FieldName);
+    (FCourseViewI.AllCourseStudyPlanW.IDDisciplineName.FieldName);
 end;
 
 function TViewCourses.GetclLec: TcxGridDBBandedColumn;
 begin
   Result := cxGridDBBandedTableView2.GetColumnByFieldName
-    (FCourseViewI.CourseStudyPlanW.LecData.FieldName);
+    (FCourseViewI.AllCourseStudyPlanW.LecData.FieldName);
 end;
 
 function TViewCourses.GetclIDShortSpeciality: TcxGridDBBandedColumn;
@@ -415,25 +402,25 @@ end;
 function TViewCourses.GetclLab: TcxGridDBBandedColumn;
 begin
   Result := cxGridDBBandedTableView2.GetColumnByFieldName
-    (FCourseViewI.CourseStudyPlanW.LabData.FieldName);
+    (FCourseViewI.AllCourseStudyPlanW.LabData.FieldName);
 end;
 
 function TViewCourses.GetclSem: TcxGridDBBandedColumn;
 begin
   Result := cxGridDBBandedTableView2.GetColumnByFieldName
-    (FCourseViewI.CourseStudyPlanW.SemData.FieldName);
+    (FCourseViewI.AllCourseStudyPlanW.SemData.FieldName);
 end;
 
 function TViewCourses.GetclZach: TcxGridDBBandedColumn;
 begin
   Result := cxGridDBBandedTableView2.GetColumnByFieldName
-    (FCourseViewI.CourseStudyPlanW.ZachData.FieldName);
+    (FCourseViewI.AllCourseStudyPlanW.ZachData.FieldName);
 end;
 
 function TViewCourses.GetclExam: TcxGridDBBandedColumn;
 begin
   Result := cxGridDBBandedTableView2.GetColumnByFieldName
-    (FCourseViewI.CourseStudyPlanW.ExamData.FieldName);
+    (FCourseViewI.AllCourseStudyPlanW.ExamData.FieldName);
 end;
 
 function TViewCourses.GetclGroupCount: TcxGridDBBandedColumn;
@@ -591,14 +578,14 @@ begin
   // **************************************
   with cxGridDBBandedTableView2.DataController do
   begin
-    DetailKeyFieldNames := FCourseViewI.CourseStudyPlanW.
+    DetailKeyFieldNames := FCourseViewI.AllCourseStudyPlanW.
       IDSPECIALITYEDUCATION.FieldName;
 
     MasterKeyFieldNames := FCourseViewI.AdmissionsW.PKFieldName;
   end;
 
   DSWrap := FCourseViewI.AdmissionsW;
-  DSWrap2 := FCourseViewI.CourseStudyPlanW;
+  DSWrap2 := FCourseViewI.AllCourseStudyPlanW;
 
   TNotifyEventWrap.Create(FCourseViewI.AfterLoadData, DoAfterLoadData,
     FEventList);
@@ -630,7 +617,7 @@ begin
   cxGrid.SetFocus;
   MainView.Focused := True;
 
-  A := GetSelectedValues2<Integer>(clIDSpecialityEducation);
+  A := GetSelectedIntValues(clIDSpecialityEducation);
 
   if Length(A) = 0 then
     Exit;
@@ -663,11 +650,12 @@ var
 begin
   inherited;
 
-  A := GetSelectedValues2<Integer>(clIDStudyPlan);
+  A := GetSelectedIntValues(clIDStudyPlan);
   if Length(A) = 0 then
     Exit;
 
-  frm := TfrmCourseStudyPlanEdit.Create(Self, FCourseViewI.GetCourseStudyPlanEditI(A[0]), AMode );
+  frm := TfrmCourseStudyPlanEdit.Create(Self,
+    FCourseViewI.GetCourseStudyPlanEditI(A[0]), AMode);
   try
     frm.ShowModal;
   finally

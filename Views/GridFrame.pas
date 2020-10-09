@@ -1446,6 +1446,7 @@ function TfrmGrid.GetSelectedValues2<T>(AView: TcxGridDBBandedTableView;
 var
   i: Integer;
   L: TList<T>;
+  V: Variant;
   val: TValue;
   x: T;
 begin
@@ -1455,8 +1456,8 @@ begin
   try
     for i := 0 to AView.Controller.SelectedRowCount - 1 do
     begin
-      val := TValue.FromVariant(AView.Controller.SelectedRows[i].Values
-        [AColumnIndex]);
+      V := AView.Controller.SelectedRows[i].Values[AColumnIndex];
+      val := TValue.From<Variant>(V);
 
       x := val.AsType<T>;
 

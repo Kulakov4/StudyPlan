@@ -7,8 +7,8 @@ uses
 
 type
   ICourseStudyPlanView = interface(IInterface)
-    procedure ApplyUpdates;
-    procedure CancelUpdates;
+    procedure ApplyCourseStudyPlan;
+    procedure CancelCourseStudyPlan;
     function GetCourseStudyPlanEditI(AIDStudyPlan: Integer): ICourseStudyPlanEdit;
     function GetCourseStudyPlanW: TCourseStudyPlanW;
     function GetDiscNameW: TDiscNameW;

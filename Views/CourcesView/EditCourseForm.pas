@@ -213,7 +213,6 @@ begin
     // К этому моменту план должет быть уже сохранён
     Assert(FCourseEditI.AdmissionsW.PK.AsInteger > 0);
 
-
     FCourseEditI.SearchStudGroups(FCourseEditI.ID_SpecialityEducation);
 
     FViewStudentGroups := TViewStudentGroups.Create(Self);
@@ -243,7 +242,7 @@ begin
   begin
     // Отменяем изменения в дисциплинах учебного плана курсов
     if FCourceStudyPlanView <> nil then
-      FCourceStudyPlanView.CourseStudyPlanViewI.CancelUpdates;
+      FCourceStudyPlanView.CourseStudyPlanViewI.CancelCourseStudyPlan;
 
     // НЕ сохраняем сделанные изменения в наборе курсов
     FCourseEditI.CancelCourceEdit;
@@ -256,7 +255,7 @@ begin
 
     // Сохраняем изменения в дисциплинах учебного плана курсов
     if FCourceStudyPlanView <> nil then
-      FCourceStudyPlanView.CourseStudyPlanViewI.ApplyUpdates;
+      FCourceStudyPlanView.CourseStudyPlanViewI.ApplyCourseStudyPlan;
 
     // Сохраняем созданные группы в базе данных
     FCourseEditI.ApplyStudGroups;
@@ -283,7 +282,7 @@ end;
 
 function TfrmEditCourse.GetID_Speciality: Integer;
 begin
- Result := FqSpecialityDumb.W.ID.F.AsInteger;
+  Result := FqSpecialityDumb.W.ID.F.AsInteger;
 end;
 
 function TfrmEditCourse.GetID_SpecialityEducation: Integer;
@@ -316,7 +315,8 @@ begin
   // Сохраняем информацию о наборе курсов
   FCourseEditI.AdmissionsW.Save(Self, FMode);
   // Сохраняем код набора
-  FCourseEditI.ID_SpecialityEducation := FCourseEditI.AdmissionsW.ID_SpecialityEducation.F.AsInteger;
+  FCourseEditI.ID_SpecialityEducation :=
+    FCourseEditI.AdmissionsW.ID_SpecialityEducation.F.AsInteger;
 
   // Теперь план будет только редактироваться!
   FMode := EditMode;
@@ -344,8 +344,9 @@ begin
   case FMode of
     EditMode:
       begin
-        Assert(FCourseEditI.AdmissionsW.ID_SpecialityEducation.F.AsInteger = FCourseEditI.ID_SpecialityEducation);
-
+        Assert(FCourseEditI.ID_SpecialityEducation > 0);
+        FCourseEditI.AdmissionsW.ID_SpecialityEducation.Locate
+          (FCourseEditI.ID_SpecialityEducation, [], True);
         with FCourseEditI do
         begin
           IDChair := AdmissionsW.IDChair.F.AsInteger;

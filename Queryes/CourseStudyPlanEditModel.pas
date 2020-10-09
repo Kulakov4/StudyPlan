@@ -26,8 +26,7 @@ type
     constructor Create(AOwner: TComponent; AIDStudyPlan: Integer;
         ACourseStudyPlanW: TCourseStudyPlanW; AQryDiscName: TQryDiscName; AIDChair,
         AIDSPECIALITYEDUCATION: Integer); reintroduce;
-    function ApplyDisciplines(AIDDisciplineName: Integer;
-      ADiscNameInt: IDiscName): Integer;
+    function ApplyDisciplines(ADiscNameI: IDiscName): Integer;
     procedure CancelDisciplines;
   end;
 
@@ -45,12 +44,11 @@ begin
   FIDSPECIALITYEDUCATION := AIDSPECIALITYEDUCATION;
 end;
 
-function TCourseStudyPlanEditModel.ApplyDisciplines(AIDDisciplineName: Integer;
-  ADiscNameInt: IDiscName): Integer;
+function TCourseStudyPlanEditModel.ApplyDisciplines(ADiscNameI: IDiscName):
+    Integer;
 begin
   // Тут у нас пока может ID = NULL
-  DiscNameW.LocateByPK(AIDDisciplineName, True);
-  DiscNameW.UpdateShortCaption(ADiscNameInt.ShortDisciplineName);
+  FqDiscName.W.Save(ADiscNameI, EditMode);
 
   // Наконец-то сохраняем сделанные изменения в БД
   FqDiscName.FDQuery.ApplyUpdates(0);

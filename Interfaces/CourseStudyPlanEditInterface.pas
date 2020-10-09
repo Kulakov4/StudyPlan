@@ -8,8 +8,7 @@ uses
 
 type
   ICourseStudyPlanEdit = interface(IInterface)
-    function ApplyDisciplines(AIDDisciplineName: Integer; ADiscNameInt: IDiscName):
-        Integer;
+    function ApplyDisciplines(ADiscNameI: IDiscName): Integer;
     function GetCourseStudyPlanW: TCourseStudyPlanW;
     function GetDiscNameW: TDiscNameW;
     function GetIDChair: Integer;

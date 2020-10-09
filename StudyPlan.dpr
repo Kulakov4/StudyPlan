@@ -234,7 +234,8 @@ uses
   CourseStudyPlanEditInterface in 'Interfaces\CourseStudyPlanEditInterface.pas',
   CoursesView in 'Views\CourcesView\CoursesView.pas' {ViewCourses: TFrame},
   CourseViewInterface in 'Interfaces\CourseViewInterface.pas',
-  CourseNameInterface in 'Interfaces\CourseNameInterface.pas';
+  CourseNameInterface in 'Interfaces\CourseNameInterface.pas',
+  DiscNameViewInterface in 'Interfaces\DiscNameViewInterface.pas';
 
 {$R *.res}
 

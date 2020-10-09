@@ -36,21 +36,23 @@ type
     procedure cxseLecPropertiesValidate(Sender: TObject;
       var DisplayValue: Variant; var ErrorText: TCaption; var Error: Boolean);
   strict private
-    function GetDisciplineName: string; stdcall;
-    function GetIDChair: Integer; stdcall;
-    function GetIDSPECIALITYEDUCATION: Integer; stdcall;
-    function GetID_StudyPlan: Integer; stdcall;
-    function GetShortDisciplineName: String; stdcall;
+    function GetDisciplineName: string;
+    function GetIDChair: Integer;
+    function GetIDSPECIALITYEDUCATION: Integer;
+    function GetID_DisciplineName: Integer;
+    function GetID_StudyPlan: Integer;
+    function GetShortDisciplineName: String;
+    function GetType_Discipline: Integer;
   private
     FCourseStudyPlanEditI: ICourseStudyPlanEdit;
     FMode: TMode;
     FqDisciplineNameDumb: TFDDumb;
-    function GetExam: Boolean; stdcall;
-    function GetIDDisciplineName: Integer; stdcall;
-    function GetLec: Integer; stdcall;
-    function GetLab: Integer; stdcall;
-    function GetSem: Integer; stdcall;
-    function GetZach: Boolean; stdcall;
+    function GetExam: Boolean;
+    function GetIDDisciplineName: Integer;
+    function GetLec: Integer;
+    function GetLab: Integer;
+    function GetSem: Integer;
+    function GetZach: Boolean;
     procedure SetExam(const Value: Boolean);
     procedure SetIDDisciplineName(const Value: Integer);
     procedure SetLec(const Value: Integer);
@@ -142,8 +144,7 @@ begin
     Exit;
 
   // Пытаемся добавить новое наименование переподготовки (пока с ID = NULL)
-  FCourseStudyPlanEditI.DiscNameW.Append(AText, cxteShort.Text,
-    FCourseStudyPlanEditI.IDChair, 3);
+  FCourseStudyPlanEditI.DiscNameW.Save(Self, InsertMode);
 end;
 
 procedure TfrmCourseStudyPlanEdit.cxseLecPropertiesValidate(Sender: TObject;
@@ -174,8 +175,7 @@ begin
   end;
 
   // Сохраняем дисциплину и обновляем её код
-  FqDisciplineNameDumb.W.UpdateID(FCourseStudyPlanEditI.ApplyDisciplines
-    (FqDisciplineNameDumb.W.ID.F.AsInteger, Self));
+  FqDisciplineNameDumb.W.UpdateID(FCourseStudyPlanEditI.ApplyDisciplines(Self));
 
   // Сохраняем запись в учебном плане курсов
   FCourseStudyPlanEditI.CourseStudyPlanW.Save(Self, Mode);
@@ -206,6 +206,11 @@ begin
   Result := FCourseStudyPlanEditI.IDSPECIALITYEDUCATION;
 end;
 
+function TfrmCourseStudyPlanEdit.GetID_DisciplineName: Integer;
+begin
+  Result := FqDisciplineNameDumb.W.ID.F.AsInteger;
+end;
+
 function TfrmCourseStudyPlanEdit.GetID_StudyPlan: Integer;
 begin
   Result := FCourseStudyPlanEditI.ID_StudyPlan;
@@ -229,6 +234,12 @@ end;
 function TfrmCourseStudyPlanEdit.GetShortDisciplineName: String;
 begin
   Result := cxteShort.Text;
+end;
+
+function TfrmCourseStudyPlanEdit.GetType_Discipline: Integer;
+begin
+  // Дисциплины курсов имеют тип 3
+  Result := 3;
 end;
 
 function TfrmCourseStudyPlanEdit.GetZach: Boolean;

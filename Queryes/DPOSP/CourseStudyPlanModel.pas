@@ -26,8 +26,8 @@ type
       AIDSPECIALITYEDUCATION, AIDChair: Integer;
       AMasterStudyPlanW: TCourseStudyPlanW; AQryDiscName: TQryDiscName);
       reintroduce;
-    procedure ApplyUpdates;
-    procedure CancelUpdates;
+    procedure ApplyCourseStudyPlan;
+    procedure CancelCourseStudyPlan;
     property DiscNameW: TDiscNameW read GetDiscNameW;
     property CourseStudyPlanW: TCourseStudyPlanW read GetCourseStudyPlanW;
     property IDChair: Integer read FIDChair;
@@ -62,7 +62,7 @@ begin
   FqCourseStudyPlan.Search(AIDSPECIALITYEDUCATION);
 end;
 
-procedure TCourseDiscViewModel.ApplyUpdates;
+procedure TCourseDiscViewModel.ApplyCourseStudyPlan;
 begin
   FqCourseStudyPlan.W.TryPost;
 
@@ -74,7 +74,7 @@ begin
   Assert(FqCourseStudyPlan.FDQuery.ChangeCount = 0);
 end;
 
-procedure TCourseDiscViewModel.CancelUpdates;
+procedure TCourseDiscViewModel.CancelCourseStudyPlan;
 begin
   if FqCourseStudyPlan.FDQuery.ChangeCount = 0 then
     Exit;

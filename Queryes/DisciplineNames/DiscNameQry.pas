@@ -19,12 +19,11 @@ type
     FShortDisciplineName: TFieldWrap;
     FIDChair: TFieldWrap;
     FType_Discipline: TFieldWrap;
-  public
-    constructor Create(AOwner: TComponent); override;
     procedure Append(const ADisciplineName, AShortDisciplineName: String; AIDChair,
         AIDType: Integer);
-    procedure Save(ADiscNameInt: IDiscName; AMode: TMode);
-    procedure UpdateShortCaption(const AShortDisciplineName: String);
+  public
+    constructor Create(AOwner: TComponent); override;
+    procedure Save(ADiscNameI: IDiscName; AMode: TMode);
     property ID_DisciplineName: TFieldWrap read FID_DisciplineName;
     property DisciplineName: TFieldWrap read FDisciplineName;
     property ShortDisciplineName: TFieldWrap read FShortDisciplineName;
@@ -77,26 +76,24 @@ begin
   TryPost;
 end;
 
-procedure TDiscNameW.UpdateShortCaption(const AShortDisciplineName: String);
+procedure TDiscNameW.Save(ADiscNameI: IDiscName; AMode: TMode);
 begin
-  TryEdit;
-  ShortDisciplineName.F.AsString := AShortDisciplineName;
-  TryPost;
-end;
-
-procedure TDiscNameW.Save(ADiscNameInt: IDiscName; AMode: TMode);
-begin
-  Assert(ADiscNameInt <> nil);
+  Assert(ADiscNameI <> nil);
 
   if AMode = EditMode then
-    TryEdit
+  begin
+    if ID_DisciplineName.F.AsInteger <> ADiscNameI.ID_DisciplineName then
+      ID_DisciplineName.Locate(ADiscNameI.ID_DisciplineName, [], True);
+    TryEdit;
+  end
   else
     TryAppend;
+
   try
-    DisciplineName.F.AsString := ADiscNameInt.DisciplineName;
-    ShortDisciplineName.F.AsString := ADiscNameInt.ShortDisciplineName;
-    IDChair.F.AsInteger := ADiscNameInt.IDChair;
-    // Type_Discipline.F.Value := Type_Discipline.DefaultValue;
+    DisciplineName.F.AsString := ADiscNameI.DisciplineName;
+    ShortDisciplineName.F.AsString := ADiscNameI.ShortDisciplineName;
+    IDChair.F.AsInteger := ADiscNameI.IDChair;
+    Type_Discipline.F.Value := ADiscNameI.Type_Discipline;
     TryPost;
   except
     TryCancel;

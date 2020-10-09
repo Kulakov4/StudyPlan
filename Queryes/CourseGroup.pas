@@ -8,29 +8,37 @@ uses
   CourseEdTypesQuery, YearsQry, EdLvlQry, Data.DB, FireDAC.Comp.DataSet,
   DiscNameQry, CourseStudyPlanQry, FDDumb, CourseViewInterface,
   CourseEditInterface, CourseStudyPlanViewInterface, CourseNameInterface,
-  InsertEditMode, CourseStudyPlanEditInterface;
+  InsertEditMode, CourseStudyPlanEditInterface, DiscNameInt;
 
 type
-  TCourseGroup = class(TComponent, ICourseView, ICourseEdit)
+  TCourseGroup = class(TComponent, ICourseView, ICourseEdit,
+    ICourseStudyPlanView, ICourseStudyPlanEdit)
   strict private
     procedure AdmissionMove(AIDArr: TArray<Integer>;
       AIDEducationLevel: Integer);
     procedure ApplyStudGroups;
     procedure CancelCourceEdit;
     function ApplyCourseName(ACourseNameI: ICourseName): Integer;
+    procedure ApplyCourseStudyPlan;
+    function ApplyDisciplines(ADiscNameI: IDiscName): Integer;
+    procedure CancelCourseStudyPlan;
     function GetAdmissionsW: TAdmissionsW;
     function GetAfterLoadData: TNotifyEventsEx;
     function GetAllCourseStudyPlanW: TCourseStudyPlanW;
     function GetChairsW: TChairsW;
     function GetCourseEditI(AIDSpecialityEducation: Integer): ICourseEdit;
     function GetCourseNameW: TCourseNameW;
-    function GetCourseStudyPlanEditI(AIDStudyPlan: Integer): ICourseStudyPlanEdit;
+    function GetCourseStudyPlanEditI(AIDStudyPlan: Integer)
+      : ICourseStudyPlanEdit;
     function GetCourseStudyPlanViewI: ICourseStudyPlanView;
     function GetCourseStudyPlanW: TCourseStudyPlanW;
     function GetDiscNameW: TDiscNameW;
     function GetEdLvlW: TEdLvlW;
+    function GetIDChair: Integer;
+    function GetIDSpecialityEducation: Integer;
     function GetIDYearW: TDumbW;
     function GetID_SpecialityEducation: Integer; stdcall;
+    function GetID_StudyPlan: Integer; stdcall;
     function GetStudentGroupsW: TStudentGroupsW;
     function GetYearsW: TYearsW;
     procedure SearchStudGroups(AIDSpecialityEducation: Integer);
@@ -40,6 +48,7 @@ type
     FEventList: TObjectList;
     FIDEducationLevel: Integer;
     FID_SpecialityEducation: Integer;
+    FID_StudyPlan: Integer;
     FOnYearChange: TNotifyEventsEx;
     FqAllCourseStudyPlan: TQryCourseStudyPlan;
     FqAdmissions: TQueryAdmissions;
@@ -51,8 +60,8 @@ type
     FqStudentGroups: TQueryStudentGroups;
     FqYears: TQryYears;
     FYearDumb: TFDDumb;
-    procedure DoAfterDisciplinesApplyUpdates(ADataSet: TFDDataSet; AErrorCount:
-        Integer);
+    procedure DoAfterDisciplinesApplyUpdates(ADataSet: TFDDataSet;
+      AErrorCount: Integer);
     function GetqCourseStudyPlan: TQryCourseStudyPlan;
     function GetqDiscName: TQryDiscName;
     function GetqEdLvl: TQryEdLvl;
@@ -162,7 +171,8 @@ begin
   Assert(qStudentGroups.FDQuery.ChangeCount = 0);
 
   // Обновляем кол-во групп учебного плана
-  qAdmissions.W.ID_SpecialityEducation.Locate( FID_SpecialityEducation, [], True );
+  qAdmissions.W.ID_SpecialityEducation.Locate(FID_SpecialityEducation,
+    [], True);
   qAdmissions.SetGroupCount(qStudentGroups.FDQuery.RecordCount);
 end;
 
@@ -190,11 +200,53 @@ begin
   Result := qCourseName.ApplyUpdates;
 end;
 
+procedure TCourseGroup.ApplyCourseStudyPlan;
+begin
+  FqCourseStudyPlan.W.TryPost;
+
+  if FqCourseStudyPlan.FDQuery.ChangeCount = 0 then
+    Exit;
+
+  FqCourseStudyPlan.FDQuery.ApplyUpdates(0);
+  FqCourseStudyPlan.FDQuery.CommitUpdates;
+  Assert(FqCourseStudyPlan.FDQuery.ChangeCount = 0);
+end;
+
+function TCourseGroup.ApplyDisciplines(ADiscNameI: IDiscName): Integer;
+begin
+  // Тут у нас пока может ID = NULL
+  qDiscName.W.Save(ADiscNameI, EditMode);
+
+  // Наконец-то сохраняем сделанные изменения в БД
+  qDiscName.FDQuery.ApplyUpdates(0);
+  qDiscName.FDQuery.CommitUpdates;
+
+  // Тут должен появиться положительный ID
+  Assert(qDiscName.W.PK.AsInteger > 0);
+  Result := qDiscName.W.PK.AsInteger;
+end;
+
+procedure TCourseGroup.CancelCourseStudyPlan;
+begin
+  FqCourseStudyPlan.W.TryCancel;
+  if FqCourseStudyPlan.FDQuery.ChangeCount = 0 then
+    Exit;
+
+  FqCourseStudyPlan.FDQuery.CancelUpdates;
+  Assert(FqCourseStudyPlan.FDQuery.ChangeCount = 0);
+end;
+
 procedure TCourseGroup.DoAfterDisciplinesApplyUpdates(ADataSet: TFDDataSet;
-    AErrorCount: Integer);
+  AErrorCount: Integer);
 var
+  AW: TCourseStudyPlanW;
   I: Integer;
 begin
+  // Создаём курсор дисциплин учебного плана курсов
+  // Всё, что запишем в этот курсор, отобразится и в qCourseStudyPlan
+  // даже если qCourseStudyPlan использует CahedUpdates
+  AW := TCourseStudyPlanW.Create(qCourseStudyPlan.W.AddClone(''));
+
   FqCourseStudyPlan.FDQuery.FilterChanges := [FireDAC.Comp.DataSet.rtModified,
     FireDAC.Comp.DataSet.rtInserted];
   FqCourseStudyPlan.FDQuery.First;
@@ -204,20 +256,18 @@ begin
       usModified:
         begin
           // Ищем эту запись у курсора мастера
-          FMasterW.LocateByPK
-            (FqCourseStudyPlan.W.ID_StudyPlan.F.AsInteger, True);
-          FMasterW.TryEdit;
+          AW.LocateByPK(FqCourseStudyPlan.W.ID_StudyPlan.F.AsInteger, True);
+          AW.TryEdit;
         end;
       usInserted:
         // Добавляем эту запись в курсор мастера
-        FMasterW.TryAppend;
+        AW.TryAppend;
     end;
 
     for I := 0 to FqCourseStudyPlan.FDQuery.FieldCount - 1 do
-      FMasterW.DataSet.Fields[I].Value :=
-        FqCourseStudyPlan.FDQuery.Fields[I].Value;
+      AW.DataSet.Fields[I].Value := FqCourseStudyPlan.FDQuery.Fields[I].Value;
 
-    FMasterW.TryPost;
+    AW.TryPost;
 
     FqCourseStudyPlan.FDQuery.Next;
   end;
@@ -227,8 +277,8 @@ begin
   while not FqCourseStudyPlan.FDQuery.Eof do
   begin
     // Ищем эту запись у курсора мастера
-    FMasterW.LocateByPK(FqCourseStudyPlan.W.ID_StudyPlan.F.AsInteger, True);
-    FMasterW.DataSet.Delete;
+    AW.LocateByPK(FqCourseStudyPlan.W.ID_StudyPlan.F.AsInteger, True);
+    AW.DataSet.Delete;
 
     FqCourseStudyPlan.FDQuery.Next;
   end;
@@ -248,7 +298,9 @@ begin
   // Сами наборы на курсы
   FqAdmissions.Search(FIDEducationLevel, Year);
 
-  FAfterLoadData.CallEventHandlers(Self);
+  if FAfterLoadData <> nil then
+    FAfterLoadData.CallEventHandlers(Self);
+
   FOnYearChange.CallEventHandlers(Self);
 end;
 
@@ -275,8 +327,8 @@ begin
   Result := qChairs.W;
 end;
 
-function TCourseGroup.GetCourseEditI(AIDSpecialityEducation: Integer):
-    ICourseEdit;
+function TCourseGroup.GetCourseEditI(AIDSpecialityEducation: Integer)
+  : ICourseEdit;
 begin
   // Запоминаем код записи набора курсов, которую мы редактируем
   FID_SpecialityEducation := AIDSpecialityEducation;
@@ -288,9 +340,14 @@ begin
   Result := qCourseName.W;
 end;
 
-function TCourseGroup.GetCourseStudyPlanEditI(AIDStudyPlan: Integer):
-    ICourseStudyPlanEdit;
+function TCourseGroup.GetCourseStudyPlanEditI(AIDStudyPlan: Integer)
+  : ICourseStudyPlanEdit;
 begin
+  Assert(AIDStudyPlan > 0);
+  // Запоминаем, какую запись учебного плана мы будем редактировать
+  FID_StudyPlan := AIDStudyPlan;
+
+  Result := Self;
   // Создаём модель для представления
   (*
     AModel := TCourceDiscNameVM.Create(Self, CourceGroup.qAllCourseStudyPlan.W,
@@ -305,11 +362,16 @@ begin
   qCourseStudyPlan.Search(FID_SpecialityEducation);
   qCourseStudyPlan.FDQuery.CachedUpdates := True;
   qCourseStudyPlan.FDQuery.AfterApplyUpdates := DoAfterDisciplinesApplyUpdates;
+
+  Result := Self;
 end;
 
 function TCourseGroup.GetCourseStudyPlanW: TCourseStudyPlanW;
 begin
-  Result := qAllCourseStudyPlan.W;
+  // Реализация ICourseStudyPlanView
+  // Возвращаем список дисциплин одного набора на курсы
+
+  Result := qCourseStudyPlan.W;
 end;
 
 function TCourseGroup.GetDiscNameW: TDiscNameW;
@@ -322,6 +384,24 @@ begin
   Result := qEdLvl.W;
 end;
 
+function TCourseGroup.GetIDChair: Integer;
+begin
+  // Код кафедры - используется при редактировании дисциплины
+  // ICourseStudyPlanEdit
+
+  // Мы должны знать, какой набор на курсы мы редактируем
+  Assert(FID_SpecialityEducation > 0);
+  qAdmissions.W.ID_SpecialityEducation.Locate(FID_SpecialityEducation, [], True);
+  Result := qAdmissions.W.IDChair.F.AsInteger;
+end;
+
+function TCourseGroup.GetIDSpecialityEducation: Integer;
+begin
+  // Реализация ICourseStudyPlanEdit
+  Assert(FID_SpecialityEducation > 0);
+  Result := FID_SpecialityEducation;
+end;
+
 function TCourseGroup.GetIDYearW: TDumbW;
 begin
   Result := YearDumb.W;
@@ -330,6 +410,13 @@ end;
 function TCourseGroup.GetID_SpecialityEducation: Integer;
 begin
   Result := FID_SpecialityEducation;
+end;
+
+function TCourseGroup.GetID_StudyPlan: Integer;
+begin
+  // Реализация ICourseStudyPlanEdit
+  Assert(FID_StudyPlan > 0);
+  Result := FID_StudyPlan;
 end;
 
 function TCourseGroup.GetqCourseStudyPlan: TQryCourseStudyPlan;
@@ -401,6 +488,9 @@ end;
 
 procedure TCourseGroup.SetID_SpecialityEducation(const Value: Integer);
 begin
+  if FID_SpecialityEducation = Value then
+    Exit;
+
   Assert(FID_SpecialityEducation = 0);
   Assert(Value > 0);
   FID_SpecialityEducation := Value;

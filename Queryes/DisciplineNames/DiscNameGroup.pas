@@ -3,18 +3,22 @@ unit DiscNameGroup;
 interface
 
 uses
-  System.Classes, DiscNameQry, ChairsQuery, DiscNameInt, InsertEditMode;
+  System.Classes, DiscNameQry, ChairsQuery, DiscNameInt, InsertEditMode,
+  DiscNameViewInterface;
 
 type
-  TDiscNameGroup = class(TComponent)
+  TDiscNameGroup = class(TComponent, IDiscNameEdit, IDiscNameView)
+  strict private
+    function GetChairsW: TChairsW;
+    function GetDiscNameEditI(AID_DisciplineName: Integer): IDiscNameEdit;
+    function GetDiscNameW: TDiscNameW;
+    function GetID_DisciplineName: Integer;
   private
+    FID_DisciplineName: Integer;
     FqChairs: TQueryChairs;
     FqDiscName: TQryDiscName;
   public
     constructor Create(AOwner: TComponent); override;
-    procedure Save(ADiscNameInt: IDiscName; AMode: TMode);
-    property qChairs: TQueryChairs read FqChairs;
-    property qDiscName: TQryDiscName read FqDiscName;
   end;
 
 implementation
@@ -29,11 +33,26 @@ begin
   FqDiscName.SearchByType([1, 2]);
 end;
 
-procedure TDiscNameGroup.Save(ADiscNameInt: IDiscName; AMode: TMode);
+function TDiscNameGroup.GetChairsW: TChairsW;
 begin
-  Assert(ADiscNameInt <> nil);
+  Result := FqChairs.W;
+end;
 
-  qDiscName.W.Save(ADiscNameInt, AMode);
+function TDiscNameGroup.GetDiscNameEditI(AID_DisciplineName: Integer):
+    IDiscNameEdit;
+begin
+  FID_DisciplineName := AID_DisciplineName;
+  Result := Self;
+end;
+
+function TDiscNameGroup.GetDiscNameW: TDiscNameW;
+begin
+  Result := FqDiscName.W;
+end;
+
+function TDiscNameGroup.GetID_DisciplineName: Integer;
+begin
+  Result := FID_DisciplineName;
 end;
 
 end.

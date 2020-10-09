@@ -12,9 +12,9 @@ uses
   dxBarBuiltInMenu, cxGridCustomPopupMenu, cxGridPopupMenu, Vcl.Menus,
   System.Actions, Vcl.ActnList, cxClasses, dxBar, Vcl.ComCtrls, cxGridLevel,
   cxGridCustomView, cxGridCustomTableView, cxGridTableView,
-  cxGridBandedTableView, cxGridDBBandedTableView, cxGrid, DiscNameGroup,
+  cxGridBandedTableView, cxGridDBBandedTableView, cxGrid,
   System.ImageList, Vcl.ImgList, cxImageList, FireDAC.Phys.OracleWrapper,
-  dxDateRanges;
+  dxDateRanges, DiscNameViewInterface;
 
 type
   TViewDiscName = class(TfrmGrid)
@@ -26,11 +26,13 @@ type
     dxBarButton3: TdxBarButton;
     procedure actAddExecute(Sender: TObject);
     procedure actEditExecute(Sender: TObject);
+  strict private
   private
-    FDiscNameGroup: TDiscNameGroup;
+    FDiscNameViewI: IDiscNameView;
     function GetclIDChair: TcxGridDBBandedColumn;
     function GetclDisciplineName: TcxGridDBBandedColumn;
-    procedure SetDiscNameGroup(const Value: TDiscNameGroup);
+    function GetclID_DisciplineName: TcxGridDBBandedColumn;
+    procedure SetDiscNameViewI(const Value: IDiscNameView);
     { Private declarations }
   protected
     procedure InitColumns(AView: TcxGridDBBandedTableView); override;
@@ -39,8 +41,10 @@ type
     procedure UpdateView; override;
     property clIDChair: TcxGridDBBandedColumn read GetclIDChair;
     property clDisciplineName: TcxGridDBBandedColumn read GetclDisciplineName;
-    property DiscNameGroup: TDiscNameGroup read FDiscNameGroup
-      write SetDiscNameGroup;
+    property clID_DisciplineName: TcxGridDBBandedColumn
+      read GetclID_DisciplineName;
+    property DiscNameViewI: IDiscNameView read FDiscNameViewI
+      write SetDiscNameViewI;
     { Public declarations }
   end;
 
@@ -54,12 +58,17 @@ uses
 
 procedure TViewDiscName.actAddExecute(Sender: TObject);
 var
+  A: TArray<Integer>;
   F: TfrmEditDisciplineName;
 begin
   inherited;
-  F := TfrmEditDisciplineName.Create(DiscNameGroup);
+  A := GetSelectedIntValues(clID_DisciplineName);
+  if Length(A) = 0 then
+    Exit;
+
+  F := TfrmEditDisciplineName.Create(Self, DiscNameViewI.GetDiscNameEditI(A[0]),
+    InsertMode);
   try
-    F.Mode := InsertMode;
     F.ShowModal;
   finally
     FreeAndNil(F);
@@ -68,12 +77,17 @@ end;
 
 procedure TViewDiscName.actEditExecute(Sender: TObject);
 var
+  A: TArray<Integer>;
   F: TfrmEditDisciplineName;
 begin
   inherited;
-  F := TfrmEditDisciplineName.Create(DiscNameGroup);
+  A := GetSelectedIntValues(clID_DisciplineName);
+  if Length(A) = 0 then
+    Exit;
+
+  F := TfrmEditDisciplineName.Create(Self, DiscNameViewI.GetDiscNameEditI(A[0]),
+    EditMode);
   try
-    F.Mode := EditMode;
     F.ShowModal;
   finally
     FreeAndNil(F);
@@ -83,13 +97,19 @@ end;
 function TViewDiscName.GetclIDChair: TcxGridDBBandedColumn;
 begin
   Result := MainView.GetColumnByFieldName
-    (FDiscNameGroup.qDiscName.W.IDChair.FieldName);
+    (FDiscNameViewI.DiscNameW.IDChair.FieldName);
 end;
 
 function TViewDiscName.GetclDisciplineName: TcxGridDBBandedColumn;
 begin
   Result := MainView.GetColumnByFieldName
-    (FDiscNameGroup.qDiscName.W.DisciplineName.FieldName);
+    (FDiscNameViewI.DiscNameW.DisciplineName.FieldName);
+end;
+
+function TViewDiscName.GetclID_DisciplineName: TcxGridDBBandedColumn;
+begin
+  Result := MainView.GetColumnByFieldName
+    (FDiscNameViewI.DiscNameW.ID_DisciplineName.FieldName);
 end;
 
 procedure TViewDiscName.InitColumns(AView: TcxGridDBBandedTableView);
@@ -98,7 +118,7 @@ begin
   clDisciplineName.BestFitMaxWidth := 600;
 
   // Настраиваем подстановочную колонку кафедра
-  TDBLCB.InitColumn(clIDChair, FDiscNameGroup.qChairs.W.Shortening);
+  TDBLCB.InitColumn(clIDChair, FDiscNameViewI.ChairsW.Shortening);
 
   clIDChair.Options.SortByDisplayText := isbtOn;
   GridSort.Add(TSortVariant.Create(clIDChair, [clIDChair, clDisciplineName]));
@@ -122,17 +142,17 @@ begin
   MainView.OptionsData.Deleting := False;
 end;
 
-procedure TViewDiscName.SetDiscNameGroup(const Value: TDiscNameGroup);
+procedure TViewDiscName.SetDiscNameViewI(const Value: IDiscNameView);
 begin
-  if FDiscNameGroup = Value then
+  if FDiscNameViewI = Value then
     Exit;
 
-  FDiscNameGroup := Value;
+  FDiscNameViewI := Value;
 
-  if FDiscNameGroup = nil then
+  if FDiscNameViewI = nil then
     DSWrap := nil
   else
-    DSWrap := FDiscNameGroup.qDiscName.W;
+    DSWrap := FDiscNameViewI.DiscNameW;
 
   UpdateView;
 end;
@@ -144,7 +164,7 @@ var
 begin
   inherited;
   AView := FocusedTableView;
-  OK := (FDiscNameGroup <> nil) and (FDiscNameGroup.qDiscName.FDQuery.Active);
+  OK := (FDiscNameViewI <> nil) and (FDiscNameViewI.DiscNameW.DataSet.Active);
 
   actAdd.Enabled := OK;
 

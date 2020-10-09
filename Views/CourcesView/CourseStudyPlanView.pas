@@ -203,7 +203,7 @@ var
 begin
   inherited;
 
-  a := GetSelectedValues2<Integer>(clIDStudyPlan);
+  a := GetSelectedIntValues(clIDStudyPlan);
   if Length(a) = 0 then
     Exit;
 

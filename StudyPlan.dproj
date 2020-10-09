@@ -729,6 +729,7 @@
         </DCCReference>
         <DCCReference Include="Interfaces\CourseViewInterface.pas"/>
         <DCCReference Include="Interfaces\CourseNameInterface.pas"/>
+        <DCCReference Include="Interfaces\DiscNameViewInterface.pas"/>
         <None Include="StudyPlan.todo"/>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>

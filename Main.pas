@@ -177,7 +177,7 @@ begin
     TMyDir.AppDataDirFile('DisciplineNameForm.ini'), [mbOk]);
   try
     F.GridViewClass := TViewDiscName;
-    (F.GridView as TViewDiscName).DiscNameGroup := ADiscNameGroup;
+    (F.GridView as TViewDiscName).DiscNameViewI := ADiscNameGroup;
     F.ShowModal;
   finally
     FreeAndNil(F);
