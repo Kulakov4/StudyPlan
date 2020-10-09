@@ -384,12 +384,7 @@
             <FormType>dfm</FormType>
             <DesignClass>TFrame</DesignClass>
         </DCCReference>
-        <DCCReference Include="Views\CourcesView\CourcesView.pas">
-            <Form>ViewCources</Form>
-            <FormType>dfm</FormType>
-            <DesignClass>TFrame</DesignClass>
-        </DCCReference>
-        <DCCReference Include="Queryes\CourceGroup.pas"/>
+        <DCCReference Include="Queryes\CourseGroup.pas"/>
         <DCCReference Include="helpers\DragHelper.pas"/>
         <DCCReference Include="helpers\TextRectHelper.pas"/>
         <DCCReference Include="helpers\DialogUnit.pas"/>
@@ -419,8 +414,8 @@
             <FormType>dfm</FormType>
             <DesignClass>TFrame</DesignClass>
         </DCCReference>
-        <DCCReference Include="Queryes\CourceName\CourceNameQuery.pas">
-            <Form>QueryCourceName</Form>
+        <DCCReference Include="Queryes\CourseName\CourseNameQuery.pas">
+            <Form>QueryCourseName</Form>
             <FormType>dfm</FormType>
             <DesignClass>TFrame</DesignClass>
         </DCCReference>
@@ -428,8 +423,8 @@
             <Form>frmEditCourse</Form>
             <FormType>dfm</FormType>
         </DCCReference>
-        <DCCReference Include="Views\CourcesView\CourceDiscEditForm.pas">
-            <Form>frmCourceDiscEdit</Form>
+        <DCCReference Include="Views\CourcesView\CourseStudyPlanEditForm.pas">
+            <Form>frmCourseStudyPlanEdit</Form>
             <FormType>dfm</FormType>
         </DCCReference>
         <DCCReference Include="helpers\InsertEditMode.pas"/>
@@ -479,13 +474,13 @@
             <FormType>dfm</FormType>
             <DesignClass>TFrame</DesignClass>
         </DCCReference>
-        <DCCReference Include="Views\CourcesView\CourceStudyPlanView.pas">
+        <DCCReference Include="Views\CourcesView\CourseStudyPlanView.pas">
             <Form>CourceStudyPlanView2</Form>
             <FormType>dfm</FormType>
             <DesignClass>TFrame</DesignClass>
         </DCCReference>
-        <DCCReference Include="Queryes\CourceEdTypes\CourceEdTypesQuery.pas">
-            <Form>QueryCourceEdType</Form>
+        <DCCReference Include="Queryes\CourseEdTypes\CourseEdTypesQuery.pas">
+            <Form>QueryCourseEdType</Form>
             <FormType>dfm</FormType>
             <DesignClass>TFrame</DesignClass>
         </DCCReference>
@@ -706,7 +701,7 @@
             <FormType>dfm</FormType>
             <DesignClass>TFrame</DesignClass>
         </DCCReference>
-        <DCCReference Include="Queryes\CourceDiscNameViewModel.pas"/>
+        <DCCReference Include="Queryes\CourseStudyPlanEditModel.pas"/>
         <DCCReference Include="Queryes\DPOSP\CourseStudyPlanInterface.pas"/>
         <DCCReference Include="Queryes\DPOSP\CourseStudyPlanModel.pas"/>
         <DCCReference Include="Queryes\Admissions\AdmissionsInterface.pas"/>
@@ -724,10 +719,16 @@
         <DCCReference Include="Interfaces\SpecEditInterface.pas"/>
         <DCCReference Include="Interfaces\SPRetrainingEditInterface.pas"/>
         <DCCReference Include="helpers\GridExtension.pas"/>
-        <DCCReference Include="Interfaces\CourceViewInterface.pas"/>
-        <DCCReference Include="Interfaces\CourceEditInterface.pas"/>
-        <DCCReference Include="Interfaces\CourceStudyPlanViewInterface.pas"/>
-        <DCCReference Include="Interfaces\CourceDiscEditInterface.pas"/>
+        <DCCReference Include="Interfaces\CourseEditInterface.pas"/>
+        <DCCReference Include="Interfaces\CourseStudyPlanViewInterface.pas"/>
+        <DCCReference Include="Interfaces\CourseStudyPlanEditInterface.pas"/>
+        <DCCReference Include="Views\CourcesView\CoursesView.pas">
+            <Form>ViewCourses</Form>
+            <FormType>dfm</FormType>
+            <DesignClass>TFrame</DesignClass>
+        </DCCReference>
+        <DCCReference Include="Interfaces\CourseViewInterface.pas"/>
+        <DCCReference Include="Interfaces\CourseNameInterface.pas"/>
         <None Include="StudyPlan.todo"/>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>

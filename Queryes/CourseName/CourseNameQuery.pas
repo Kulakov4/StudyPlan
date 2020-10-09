@@ -1,31 +1,33 @@
-unit CourceNameQuery;
+unit CourseNameQuery;
 
 interface
 
 uses
-  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants,
+  System.Classes, Vcl.Graphics,
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, BaseQuery, FireDAC.Stan.Intf,
   FireDAC.Stan.Option, FireDAC.Stan.Param, FireDAC.Stan.Error, FireDAC.DatS,
   FireDAC.Phys.Intf, FireDAC.DApt.Intf, FireDAC.Stan.Async, FireDAC.DApt,
-  Data.DB, FireDAC.Comp.DataSet, FireDAC.Comp.Client, DSWrap;
+  Data.DB, FireDAC.Comp.DataSet, FireDAC.Comp.Client, DSWrap,
+  CourseNameInterface, InsertEditMode;
 
 type
-  TCourceNameW = class;
+  TCourseNameW = class;
 
-  TQueryCourceName = class(TQueryBase)
+  TQueryCourseName = class(TQueryBase)
   private
-    FW: TCourceNameW;
+    FW: TCourseNameW;
     { Private declarations }
   public
     constructor Create(AOwner: TComponent); override;
-    function ApplyUpdates(AID: Integer; AShortCaption: string): Integer;
+    function ApplyUpdates: Integer;
     function Search(AEnabled: Boolean = True): Integer;
     function SearchCourceName(AEnabled: Boolean = True): Integer;
-    property W: TCourceNameW read FW;
+    property W: TCourseNameW read FW;
     { Public declarations }
   end;
 
-  TCourceNameW = class(TDSWrap)
+  TCourseNameW = class(TDSWrap)
   private
     FChiper_Speciality: TFieldWrap;
     FID_Speciality: TFieldWrap;
@@ -37,10 +39,8 @@ type
     procedure DoAfterOpen(Sender: TObject);
   public
     constructor Create(AOwner: TComponent); override;
-    procedure Append(const ASpeciality, AShortSpeciality: String; AIDChair:
-        Integer);
     procedure FilterByChair(const AIDChair: Integer);
-    procedure UpdateShortCaption(const AShortSpeciality: string);
+    procedure Save(ACourseNameI: ICourseName; AMode: TMode);
     property Chiper_Speciality: TFieldWrap read FChiper_Speciality;
     property ID_Speciality: TFieldWrap read FID_Speciality;
     property SHORT_SPECIALITY: TFieldWrap read FSHORT_SPECIALITY;
@@ -55,23 +55,18 @@ implementation
 uses
   System.Math, NotifyEvents;
 
-constructor TQueryCourceName.Create(AOwner: TComponent);
+constructor TQueryCourseName.Create(AOwner: TComponent);
 begin
   inherited;
-  FW := TCourceNameW.Create(FDQuery);
+  FW := TCourseNameW.Create(FDQuery);
   FDQuery.CachedUpdates := True;
   FDQuery.UpdateOptions.AutoIncFields := W.PKFieldName;
   FDQuery.UpdateOptions.RefreshMode := rmOnDemand;
 end;
 
-function TQueryCourceName.ApplyUpdates(AID: Integer; AShortCaption: string):
-    Integer;
+function TQueryCourseName.ApplyUpdates: Integer;
 begin
   Assert(FDQuery.CachedUpdates);
-
-  // Тут у нас пока может ID = 0 (NULL)
-  W.LocateByPK(AID);
-  W.UpdateShortCaption(AShortCaption);
 
   // Наконец-то сохраняем сделанные изменения в БД
   FDQuery.ApplyUpdates(0);
@@ -83,7 +78,7 @@ begin
   Result := W.PK.AsInteger;
 end;
 
-function TQueryCourceName.Search(AEnabled: Boolean = True): Integer;
+function TQueryCourseName.Search(AEnabled: Boolean = True): Integer;
 begin
 
   FDQuery.SQL.Text := SQL; // Восстанавливаем первоначальный SQL
@@ -91,64 +86,54 @@ begin
     Format('%s is not null', [W.Chiper_Speciality.FieldName]));
 
   FDQuery.SQL.Text := FDQuery.SQL.Text.Replace('1=1',
-    Format('%s = :%s', [W.Enable_Speciality.FieldName, W.Enable_Speciality.FieldName]));
-
-  SetParamType(W.Enable_Speciality.FieldName);
-
-  Result := W.Load([W.Enable_Speciality.FieldName], [ IfThen(AEnabled, 1, 0) ]);
-end;
-
-function TQueryCourceName.SearchCourceName(AEnabled: Boolean = True): Integer;
-begin
-  FDQuery.SQL.Text := SQL; // Восстанавливаем первоначальный SQL
-  FDQuery.SQL.Text := FDQuery.SQL.Text.Replace('0=0',
-    Format('%s is null', [W.Chiper_Speciality.FieldName]));
-
-  FDQuery.SQL.Text := FDQuery.SQL.Text.Replace('1=1',
-    Format('%s = :%s', [W.Enable_Speciality.FieldName, W.Enable_Speciality.FieldName]));
+    Format('%s = :%s', [W.Enable_Speciality.FieldName,
+    W.Enable_Speciality.FieldName]));
 
   SetParamType(W.Enable_Speciality.FieldName);
 
   Result := W.Load([W.Enable_Speciality.FieldName], [IfThen(AEnabled, 1, 0)]);
 end;
 
-constructor TCourceNameW.Create(AOwner: TComponent);
+function TQueryCourseName.SearchCourceName(AEnabled: Boolean = True): Integer;
+begin
+  FDQuery.SQL.Text := SQL; // Восстанавливаем первоначальный SQL
+  FDQuery.SQL.Text := FDQuery.SQL.Text.Replace('0=0',
+    Format('%s is null', [W.Chiper_Speciality.FieldName]));
+
+  FDQuery.SQL.Text := FDQuery.SQL.Text.Replace('1=1',
+    Format('%s = :%s', [W.Enable_Speciality.FieldName,
+    W.Enable_Speciality.FieldName]));
+
+  SetParamType(W.Enable_Speciality.FieldName);
+
+  Result := W.Load([W.Enable_Speciality.FieldName], [IfThen(AEnabled, 1, 0)]);
+end;
+
+constructor TCourseNameW.Create(AOwner: TComponent);
 begin
   inherited;
   FID_Speciality := TFieldWrap.Create(Self, 'ID_Speciality');
   PKFieldName := FID_Speciality.FieldName;
 
   FSpeciality := TFieldWrap.Create(Self, 'Speciality', 'Наименование');
-  FSHORT_SPECIALITY := TFieldWrap.Create(Self, 'SHORT_SPECIALITY', 'Сокращение');
+  FSHORT_SPECIALITY := TFieldWrap.Create(Self, 'SHORT_SPECIALITY',
+    'Сокращение');
   FSPECIALITY_ACCESS := TFieldWrap.Create(Self, 'SPECIALITY_ACCESS');
   FChiper_Speciality := TFieldWrap.Create(Self, 'Chiper_Speciality', 'Код');
   FEnable_Speciality := TFieldWrap.Create(Self, 'Enable_Speciality');
-  FCalcSpeciality := TFieldWrap.Create(Self, 'CalcSpeciality', 'Наименование и код');
+  FCalcSpeciality := TFieldWrap.Create(Self, 'CalcSpeciality',
+    'Наименование и код');
 
   TNotifyEventWrap.Create(AfterOpen, DoAfterOpen, EventList);
 end;
 
-procedure TCourceNameW.Append(const ASpeciality, AShortSpeciality: String;
-    AIDChair: Integer);
-begin
-  Assert(not ASpeciality.IsEmpty);
-
-  TryAppend;
-  Speciality.F.Value := ASpeciality;
-  SHORT_SPECIALITY.F.Value := AShortSpeciality;
-  SPECIALITY_ACCESS.F.Value := AIDChair;
-  TryPost;
-
-//  Assert(ID_Speciality.F.AsInteger <> 0);
-end;
-
-procedure TCourceNameW.DoAfterOpen(Sender: TObject);
+procedure TCourseNameW.DoAfterOpen(Sender: TObject);
 begin
   // Это вычисляемое в запросе поле
   CalcSpeciality.F.ProviderFlags := [];
 end;
 
-procedure TCourceNameW.FilterByChair(const AIDChair: Integer);
+procedure TCourseNameW.FilterByChair(const AIDChair: Integer);
 begin
   Assert(AIDChair > 0);
 
@@ -156,16 +141,28 @@ begin
   DataSet.Filtered := True;
 end;
 
-procedure TCourceNameW.UpdateShortCaption(const AShortSpeciality: string);
+procedure TCourseNameW.Save(ACourseNameI: ICourseName; AMode: TMode);
 begin
-  Assert(not AShortSpeciality.IsEmpty);
+  Assert(ACourseNameI <> nil);
 
-  if SHORT_SPECIALITY.F.AsString = AShortSpeciality then
-    Exit;
+  if AMode = EditMode then
+  begin
+    Assert(ACourseNameI.ID_Speciality > 0);
+    if ID_Speciality.F.AsInteger <> ACourseNameI.ID_Speciality then
+      ID_Speciality.Locate(ACourseNameI.ID_Speciality, [], True);
+    TryEdit;
+  end
+  else
+    TryAppend;
 
-  TryEdit;
-  SHORT_SPECIALITY.F.AsString := AShortSpeciality;
-  TryPost;
+  try
+    Speciality.F.AsString := ACourseNameI.Speciality;
+    SHORT_SPECIALITY.F.Value := ACourseNameI.ShortSpeciality;
+    SPECIALITY_ACCESS.F.Value := ACourseNameI.IDChair;
+  except
+    TryCancel;
+    raise;
+  end;
 end;
 
 {$R *.dfm}

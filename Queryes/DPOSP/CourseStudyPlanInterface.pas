@@ -12,6 +12,7 @@ type
     function GetSem: Integer; stdcall;
     function GetZach: Boolean; stdcall;
     function GetExam: Boolean; stdcall;
+    function GetID_StudyPlan: Integer; stdcall;
     property IDChair: Integer read GetIDChair;
     property IDDisciplineName: Integer read GetIDDisciplineName;
     property IDSPECIALITYEDUCATION: Integer read GetIDSPECIALITYEDUCATION;
@@ -20,6 +21,7 @@ type
     property Sem: Integer read GetSem;
     property Zach: Boolean read GetZach;
     property Exam: Boolean read GetExam;
+    property ID_StudyPlan: Integer read GetID_StudyPlan;
   end;
 
 implementation

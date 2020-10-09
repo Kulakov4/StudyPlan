@@ -1,25 +1,25 @@
-unit CourcesView;
+unit CoursesView;
 
 interface
 
 uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants,
-  System.Classes, Vcl.Graphics,
-  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, GridFrame, cxGraphics, cxControls,
-  cxLookAndFeels, cxLookAndFeelPainters, cxStyles, cxCustomData, cxFilter,
-  cxData, cxDataStorage, cxEdit, cxNavigator,
+  System.Classes, Vcl.Graphics, Vcl.Controls, Vcl.Forms, Vcl.Dialogs,
+  GridFrame, cxGraphics, cxControls, cxLookAndFeels, cxLookAndFeelPainters,
+  cxStyles, cxCustomData, cxFilter, cxData, cxDataStorage, cxEdit, cxNavigator,
   cxDataControllerConditionalFormattingRulesManagerDialog, Data.DB, cxDBData,
   dxBarBuiltInMenu, cxGridCustomPopupMenu, cxGridPopupMenu, Vcl.Menus,
   System.Actions, Vcl.ActnList, cxClasses, dxBar, Vcl.ComCtrls, cxGridLevel,
   cxGridCustomView, cxGridCustomTableView, cxGridTableView,
-  cxGridBandedTableView, cxGridDBBandedTableView, cxGrid, CourceGroup,
+  cxGridBandedTableView, cxGridDBBandedTableView, cxGrid,
   System.ImageList, Vcl.ImgList, cxImageList, cxDBLookupComboBox, cxCheckBox,
   TB2Item, TB2Dock, TB2Toolbar, Vcl.StdCtrls, NotifyEvents, Vcl.Samples.Spin,
   cxContainer, cxTextEdit, cxMaskEdit, cxDropDownEdit, cxLookupEdit,
-  cxDBLookupEdit, OptionsHelper, dxDateRanges, InsertEditMode, DSWrap;
+  cxDBLookupEdit, OptionsHelper, dxDateRanges, InsertEditMode, DSWrap,
+  CourseViewInterface;
 
 type
-  TViewCources = class(TfrmGrid)
+  TViewCourses = class(TfrmGrid)
     cxImageList: TcxImageList;
     actAddPlan: TAction;
     dxBarButton1: TdxBarButton;
@@ -96,11 +96,12 @@ type
   private
     FAccessLevel: TAccessLevel;
     FCanFocusRecord: Boolean;
-    FCourceGroup: TCourceGroup;
+    FCourseViewI: ICourseView;
     FDetailViewWrap: TGridViewWrap;
     function GetclIDChair: TcxGridDBBandedColumn;
     function GetclIDSpeciality: TcxGridDBBandedColumn;
     function GetclData: TcxGridDBBandedColumn;
+    function GetclIDStudyPlan: TcxGridDBBandedColumn;
     function GetclIDDisciplineName: TcxGridDBBandedColumn;
     function GetclLec: TcxGridDBBandedColumn;
     function GetclIDShortSpeciality: TcxGridDBBandedColumn;
@@ -112,7 +113,7 @@ type
     function GetclIDSpecialityEducation: TcxGridDBBandedColumn;
     function GetDSWrap2: TDSWrap;
     procedure SetAccessLevel(const Value: TAccessLevel);
-    procedure SetCourceGroup(const Value: TCourceGroup);
+    procedure SetCourseViewI(const Value: ICourseView);
     procedure SetDSWrap2(const Value: TDSWrap);
     procedure ShowEditCourceForm(AMode: TMode);
     procedure ShowEditDisciplineForm(AMode: TMode);
@@ -132,6 +133,7 @@ type
     property clIDChair: TcxGridDBBandedColumn read GetclIDChair;
     property clIDSpeciality: TcxGridDBBandedColumn read GetclIDSpeciality;
     property clData: TcxGridDBBandedColumn read GetclData;
+    property clIDStudyPlan: TcxGridDBBandedColumn read GetclIDStudyPlan;
     property clIDDisciplineName: TcxGridDBBandedColumn
       read GetclIDDisciplineName;
     property clLec: TcxGridDBBandedColumn read GetclLec;
@@ -144,7 +146,7 @@ type
     property clGroupCount: TcxGridDBBandedColumn read GetclGroupCount;
     property clIDSpecialityEducation: TcxGridDBBandedColumn
       read GetclIDSpecialityEducation;
-    property CourceGroup: TCourceGroup read FCourceGroup write SetCourceGroup;
+    property CourseViewI: ICourseView read FCourseViewI write SetCourseViewI;
     { Public declarations }
   end;
 
@@ -152,11 +154,11 @@ implementation
 
 uses
   GridSort, EditCourseForm, GridComboBox, DialogUnit, DBLookupComboBoxHelper,
-  CourceDiscEditForm, CourceDiscNameViewModel;
+  CourseStudyPlanEditForm;
 
 {$R *.dfm}
 
-constructor TViewCources.Create(AOwner: TComponent);
+constructor TViewCourses.Create(AOwner: TComponent);
 begin
   inherited;
   InitView(cxGridDBBandedTableView2);
@@ -164,13 +166,13 @@ begin
   FCanFocusRecord := True;
 end;
 
-procedure TViewCources.actAddPlanExecute(Sender: TObject);
+procedure TViewCourses.actAddPlanExecute(Sender: TObject);
 begin
   inherited;
   ShowEditCourceForm(InsertMode);
 end;
 
-procedure TViewCources.actEditExecute(Sender: TObject);
+procedure TViewCourses.actEditExecute(Sender: TObject);
 var
   AView: TcxGridDBBandedTableView;
 begin
@@ -198,13 +200,13 @@ begin
   end;
 end;
 
-procedure TViewCources.actAddDisciplineExecute(Sender: TObject);
+procedure TViewCourses.actAddDisciplineExecute(Sender: TObject);
 begin
   inherited;
   ShowEditDisciplineForm(InsertMode);
 end;
 
-procedure TViewCources.actCopyExecute(Sender: TObject);
+procedure TViewCourses.actCopyExecute(Sender: TObject);
 var
   A: TArray<Integer>;
 begin
@@ -216,64 +218,64 @@ begin
   if not TDialog.Create.CopyPlanDialog(Length(A), seYears.Value) then
     Exit;
 
-  FCourceGroup.Copy(A, seYears.Value);
+  FCourseViewI.Copy(A, seYears.Value);
 end;
 
-procedure TViewCources.actEditDisciplineExecute(Sender: TObject);
+procedure TViewCourses.actEditDisciplineExecute(Sender: TObject);
 begin
   inherited;
   ShowEditDisciplineForm(EditMode);
 end;
 
-procedure TViewCources.actEditPlanExecute(Sender: TObject);
+procedure TViewCourses.actEditPlanExecute(Sender: TObject);
 begin
   inherited;
   ShowEditCourceForm(EditMode);
 end;
 
-procedure TViewCources.actMoveExecute(Sender: TObject);
+procedure TViewCourses.actMoveExecute(Sender: TObject);
 var
   A: TArray<Integer>;
 begin
   inherited;
-  Assert(CourceGroup.qEdLvl.FDQuery.RecordCount > 0);
+  Assert(FCourseViewI.EdLvlW.RecordCount > 0);
   A := GetSelectedIntValues(clIDSpecialityEducation);
 
   BeginUpdate;
   try
-    CourceGroup.qAdmissions.Move(A,
-      CourceGroup.qEdLvl.W.ID_Education_Level.F.AsInteger);
+    FCourseViewI.AdmissionMove(A,
+      FCourseViewI.EdLvlW.ID_Education_Level.F.AsInteger);
   finally
     EndUpdate;
   end;
 end;
 
-procedure TViewCources.actRefreshExecute(Sender: TObject);
+procedure TViewCourses.actRefreshExecute(Sender: TObject);
 begin
   inherited;
   BeginUpdate;
   try
-    FCourceGroup.Refresh;
+    FCourseViewI.Refresh;
   finally
     EndUpdate;
   end;
 end;
 
-procedure TViewCources.BeginUpdate;
+procedure TViewCourses.BeginUpdate;
 begin
   // FCanFocusRecord := False;
   // MainView.DataController.DataModeController.SyncMode := False;
   // cxGridDBBandedTableView2.DataController.DataModeController.SyncMode := False;
 end;
 
-procedure TViewCources.cxdblcbYearsPropertiesChange(Sender: TObject);
+procedure TViewCourses.cxdblcbYearsPropertiesChange(Sender: TObject);
 begin
   inherited;
   (Sender as TcxDBLookupComboBox).PostEditValue;
-  FCourceGroup.YearDumb.W.TryPost;
+  FCourseViewI.IDYearW.TryPost;
 end;
 
-procedure TViewCources.cxGridDBBandedTableView2CanFocusRecord
+procedure TViewCourses.cxGridDBBandedTableView2CanFocusRecord
   (Sender: TcxCustomGridTableView; ARecord: TcxCustomGridRecord;
   var AAllow: Boolean);
 begin
@@ -281,7 +283,7 @@ begin
   AAllow := FCanFocusRecord;
 end;
 
-procedure TViewCources.cxGridDBBandedTableView2CanSelectRecord
+procedure TViewCourses.cxGridDBBandedTableView2CanSelectRecord
   (Sender: TcxCustomGridTableView; ARecord: TcxCustomGridRecord;
   var AAllow: Boolean);
 begin
@@ -289,13 +291,13 @@ begin
   AAllow := FCanFocusRecord;
 end;
 
-procedure TViewCources.cxGridDBBandedTableView2DblClick(Sender: TObject);
+procedure TViewCourses.cxGridDBBandedTableView2DblClick(Sender: TObject);
 begin
   inherited;
   actEdit.Execute;
 end;
 
-procedure TViewCources.cxGridDBBandedTableView2EditKeyDown
+procedure TViewCourses.cxGridDBBandedTableView2EditKeyDown
   (Sender: TcxCustomGridTableView; AItem: TcxCustomGridTableItem;
   AEdit: TcxCustomEdit; var Key: Word; Shift: TShiftState);
 begin
@@ -303,21 +305,21 @@ begin
   DoOnEditKeyDown(Sender, AItem, AEdit, Key, Shift);
 end;
 
-procedure TViewCources.cxGridDBBandedTableView2KeyDown(Sender: TObject;
+procedure TViewCourses.cxGridDBBandedTableView2KeyDown(Sender: TObject;
   var Key: Word; Shift: TShiftState);
 begin
   inherited;
   DoOnKeyOrMouseDown;
 end;
 
-procedure TViewCources.cxGridDBBandedTableView2MouseDown(Sender: TObject;
+procedure TViewCourses.cxGridDBBandedTableView2MouseDown(Sender: TObject;
   Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
 begin
   inherited;
   DoOnKeyOrMouseDown;
 end;
 
-procedure TViewCources.cxGridDBBandedTableViewCanFocusRecord
+procedure TViewCourses.cxGridDBBandedTableViewCanFocusRecord
   (Sender: TcxCustomGridTableView; ARecord: TcxCustomGridRecord;
   var AAllow: Boolean);
 begin
@@ -325,7 +327,7 @@ begin
   AAllow := FCanFocusRecord;
 end;
 
-procedure TViewCources.cxGridDBBandedTableViewCanSelectRecord
+procedure TViewCourses.cxGridDBBandedTableViewCanSelectRecord
   (Sender: TcxCustomGridTableView; ARecord: TcxCustomGridRecord;
   var AAllow: Boolean);
 begin
@@ -333,14 +335,14 @@ begin
   AAllow := FCanFocusRecord;
 end;
 
-procedure TViewCources.cxGridDBBandedTableViewColumnHeaderClick
+procedure TViewCourses.cxGridDBBandedTableViewColumnHeaderClick
   (Sender: TcxGridTableView; AColumn: TcxGridColumn);
 begin
   inherited;
   ApplySort(Sender, AColumn);
 end;
 
-procedure TViewCources.cxGridDBBandedTableViewDataControllerDetailExpanding
+procedure TViewCourses.cxGridDBBandedTableViewDataControllerDetailExpanding
   (ADataController: TcxCustomDataController; ARecordIndex: Integer;
   var AAllow: Boolean);
 begin
@@ -348,99 +350,104 @@ begin
   AAllow := FCanFocusRecord;
 end;
 
-procedure TViewCources.cxGridDBBandedTableViewDblClick(Sender: TObject);
+procedure TViewCourses.cxGridDBBandedTableViewDblClick(Sender: TObject);
 begin
   inherited;
   actEdit.Execute;
 end;
 
-procedure TViewCources.DoAfterLoadData(Sender: TObject);
+procedure TViewCourses.DoAfterLoadData(Sender: TObject);
 begin
   MyApplyBestFitForView(MainView);
   MainView.ViewData.Collapse(True);
   UpdateView;
 end;
 
-procedure TViewCources.EndUpdate;
+procedure TViewCourses.EndUpdate;
 begin
   // MainView.DataController.DataModeController.SyncMode := True;
   // cxGridDBBandedTableView2.DataController.DataModeController.SyncMode := True;
   // FCanFocusRecord := True;
 end;
 
-function TViewCources.GetclIDChair: TcxGridDBBandedColumn;
+function TViewCourses.GetclIDChair: TcxGridDBBandedColumn;
 begin
   Result := MainView.GetColumnByFieldName
-    (FCourceGroup.qAdmissions.W.IDChair.FieldName);
+    (FCourseViewI.AdmissionsW.IDChair.FieldName);
 end;
 
-function TViewCources.GetclIDSpeciality: TcxGridDBBandedColumn;
+function TViewCourses.GetclIDSpeciality: TcxGridDBBandedColumn;
 begin
   Result := MainView.GetColumnByFieldName
-    (FCourceGroup.qAdmissions.W.IDSpeciality.FieldName);
+    (FCourseViewI.AdmissionsW.IDSpeciality.FieldName);
 end;
 
-function TViewCources.GetclData: TcxGridDBBandedColumn;
+function TViewCourses.GetclData: TcxGridDBBandedColumn;
 begin
   Result := MainView.GetColumnByFieldName
-    (FCourceGroup.qAdmissions.W.Data.FieldName);
+    (FCourseViewI.AdmissionsW.Data.FieldName);
 end;
 
-function TViewCources.GetclIDDisciplineName: TcxGridDBBandedColumn;
+function TViewCourses.GetclIDStudyPlan: TcxGridDBBandedColumn;
 begin
   Result := cxGridDBBandedTableView2.GetColumnByFieldName
-    (FCourceGroup.qCourseStudyPlan.W.IDDisciplineName.FieldName);
+    (FCourseViewI.CourseStudyPlanW.ID_StudyPlan.FieldName);
 end;
 
-function TViewCources.GetclLec: TcxGridDBBandedColumn;
+function TViewCourses.GetclIDDisciplineName: TcxGridDBBandedColumn;
 begin
   Result := cxGridDBBandedTableView2.GetColumnByFieldName
-    (FCourceGroup.qCourseStudyPlan.W.LecData.FieldName);
+    (FCourseViewI.CourseStudyPlanW.IDDisciplineName.FieldName);
 end;
 
-function TViewCources.GetclIDShortSpeciality: TcxGridDBBandedColumn;
+function TViewCourses.GetclLec: TcxGridDBBandedColumn;
+begin
+  Result := cxGridDBBandedTableView2.GetColumnByFieldName
+    (FCourseViewI.CourseStudyPlanW.LecData.FieldName);
+end;
+
+function TViewCourses.GetclIDShortSpeciality: TcxGridDBBandedColumn;
 begin
   Result := MainView.GetColumnByFieldName
-    (FCourceGroup.qAdmissions.W.IDShortSpeciality.FieldName);
+    (FCourseViewI.AdmissionsW.IDShortSpeciality.FieldName);
 end;
 
-function TViewCources.GetclLab: TcxGridDBBandedColumn;
+function TViewCourses.GetclLab: TcxGridDBBandedColumn;
 begin
   Result := cxGridDBBandedTableView2.GetColumnByFieldName
-    (FCourceGroup.qCourseStudyPlan.W.LabData.FieldName);
+    (FCourseViewI.CourseStudyPlanW.LabData.FieldName);
 end;
 
-function TViewCources.GetclSem: TcxGridDBBandedColumn;
+function TViewCourses.GetclSem: TcxGridDBBandedColumn;
 begin
   Result := cxGridDBBandedTableView2.GetColumnByFieldName
-    (FCourceGroup.qCourseStudyPlan.W.SemData.FieldName);
+    (FCourseViewI.CourseStudyPlanW.SemData.FieldName);
 end;
 
-function TViewCources.GetclZach: TcxGridDBBandedColumn;
+function TViewCourses.GetclZach: TcxGridDBBandedColumn;
 begin
   Result := cxGridDBBandedTableView2.GetColumnByFieldName
-    (FCourceGroup.qCourseStudyPlan.W.ZachData.FieldName);
+    (FCourseViewI.CourseStudyPlanW.ZachData.FieldName);
 end;
 
-function TViewCources.GetclExam: TcxGridDBBandedColumn;
+function TViewCourses.GetclExam: TcxGridDBBandedColumn;
 begin
   Result := cxGridDBBandedTableView2.GetColumnByFieldName
-    (FCourceGroup.qCourseStudyPlan.W.ExamData.FieldName);
+    (FCourseViewI.CourseStudyPlanW.ExamData.FieldName);
 end;
 
-function TViewCources.GetclGroupCount: TcxGridDBBandedColumn;
+function TViewCourses.GetclGroupCount: TcxGridDBBandedColumn;
 begin
   Result := MainView.GetColumnByFieldName
-    (FCourceGroup.qAdmissions.W.GroupCount.FieldName);
+    (FCourseViewI.AdmissionsW.GroupCount.FieldName);
 end;
 
-function TViewCources.GetclIDSpecialityEducation: TcxGridDBBandedColumn;
+function TViewCourses.GetclIDSpecialityEducation: TcxGridDBBandedColumn;
 begin
-  Result := MainView.GetColumnByFieldName
-    (FCourceGroup.qAdmissions.W.PKFieldName);
+  Result := MainView.GetColumnByFieldName(FCourseViewI.AdmissionsW.PKFieldName);
 end;
 
-function TViewCources.GetDSWrap2: TDSWrap;
+function TViewCourses.GetDSWrap2: TDSWrap;
 begin
   Result := nil;
 
@@ -448,7 +455,7 @@ begin
     Result := FDetailViewWrap.DSWrap;
 end;
 
-function TViewCources.GetFocusedTableView: TcxGridDBBandedTableView;
+function TViewCourses.GetFocusedTableView: TcxGridDBBandedTableView;
 begin
   Result := inherited;
 
@@ -462,27 +469,23 @@ begin
 
 end;
 
-procedure TViewCources.InitColumns(AView: TcxGridDBBandedTableView);
+procedure TViewCourses.InitColumns(AView: TcxGridDBBandedTableView);
 begin
   inherited;
 
   if AView = MainView then
   begin
     // Настраиваем подстановочную Наименование
-    InitializeLookupColumn(clIDSpeciality, FCourceGroup.qCourceName.DataSource,
-      lsEditList, FCourceGroup.qCourceName.W.Speciality.FieldName,
-      FCourceGroup.qCourceName.W.ID_Speciality.FieldName);
+    TDBLCB.InitColumn(clIDSpeciality, FCourseViewI.CourseNameW.Speciality,
+      lsEditList);
 
     // Настраиваем подстановочную сокращённое наименование
-    InitializeLookupColumn(clIDShortSpeciality,
-      FCourceGroup.qCourceName.DataSource, lsEditList,
-      FCourceGroup.qCourceName.W.SHORT_SPECIALITY.FieldName,
-      FCourceGroup.qCourceName.W.ID_Speciality.FieldName);
+    TDBLCB.InitColumn(clIDShortSpeciality,
+      FCourseViewI.CourseNameW.SHORT_SPECIALITY, lsEditList);
 
     // Настраиваем подстановочную колонку Кафедра
-    InitializeLookupColumn(clIDChair, FCourceGroup.qChairs.DataSource,
-      lsFixedList, FCourceGroup.qChairs.W.Short_Name.FieldName,
-      FCourceGroup.qChairs.W.ID_CHAIR.FieldName);
+    TDBLCB.InitColumn(clIDChair, FCourseViewI.ChairsW.Short_Name, lsFixedList);
+
     clIDChair.Options.SortByDisplayText := isbtOn;
 
     clIDSpeciality.BestFitMaxWidth := 900;
@@ -503,10 +506,8 @@ begin
   else
   begin
     // Настраиваем подстановочную колонку Наименование дисциплины
-    InitializeLookupColumn(clIDDisciplineName,
-      FCourceGroup.qDiscName.DataSource, lsEditList,
-      FCourceGroup.qDiscName.W.DisciplineName.FieldName,
-      FCourceGroup.qDiscName.W.PKFieldName);
+    TDBLCB.InitColumn(clIDDisciplineName, FCourseViewI.DiscNameW.DisciplineName,
+      lsEditList);
 
     clIDDisciplineName.Options.SortByDisplayText := isbtOn;
 
@@ -533,9 +534,12 @@ begin
   end;
 end;
 
-procedure TViewCources.InitView(AView: TcxGridDBBandedTableView);
+procedure TViewCourses.InitView(AView: TcxGridDBBandedTableView);
 begin
   inherited;
+  // Сетка не синхронизирована с набором данных
+  AView.DataController.DataModeController.SyncMode := False;
+
   MainView.OptionsData.Deleting := False;
   MainView.OptionsData.Appending := False;
   MainView.OptionsData.Inserting := False;
@@ -557,62 +561,51 @@ begin
   DeleteMessages.Add(cxGridLevel2, 'Удалить выделенные дисциплины?');
 end;
 
-procedure TViewCources.SetAccessLevel(const Value: TAccessLevel);
+procedure TViewCourses.SetAccessLevel(const Value: TAccessLevel);
 begin
   FAccessLevel := Value;
   UpdateView;
 end;
 
-procedure TViewCources.SetCourceGroup(const Value: TCourceGroup);
+procedure TViewCourses.SetCourseViewI(const Value: ICourseView);
 begin
-  if FCourceGroup = Value then
-    Exit;
-
   // Отписываемся от событий
   FEventList.Clear;
 
-  FCourceGroup := Value;
+  FCourseViewI := Value;
 
-  if FCourceGroup = nil then
+  if FCourseViewI = nil then
   begin
     DSWrap := nil;
+    DSWrap2 := nil;
     UpdateView;
     Exit;
   end;
 
   // Года
-  TDBLCB.Init(cxdblcbYears, FCourceGroup.YearDumb.W.ID,
-    FCourceGroup.qYears.W.Year, lsFixedList);
+  TDBLCB.Init(cxdblcbYears, FCourseViewI.IDYearW.ID, FCourseViewI.YearsW.Year,
+    lsFixedList);
 
   // **************************************
   // Связываем подчинённый набор с главным
   // **************************************
   with cxGridDBBandedTableView2.DataController do
   begin
-    DetailKeyFieldNames := FCourceGroup.qCourseStudyPlan.W.
+    DetailKeyFieldNames := FCourseViewI.CourseStudyPlanW.
       IDSPECIALITYEDUCATION.FieldName;
 
-    MasterKeyFieldNames := FCourceGroup.qAdmissions.W.PKFieldName;
+    MasterKeyFieldNames := FCourseViewI.AdmissionsW.PKFieldName;
   end;
 
-  DSWrap := FCourceGroup.qAdmissions.W;
-  DSWrap2 := FCourceGroup.qCourseStudyPlan.W;
+  DSWrap := FCourseViewI.AdmissionsW;
+  DSWrap2 := FCourseViewI.CourseStudyPlanW;
 
-  BeginUpdate;
-  try
-
-
-    // ApplyBestFitForDetail := True;
-
-    TNotifyEventWrap.Create(FCourceGroup.AfterLoadData, DoAfterLoadData,
-      FEventList);
-  finally
-    EndUpdate;
-  end;
+  TNotifyEventWrap.Create(FCourseViewI.AfterLoadData, DoAfterLoadData,
+    FEventList);
   DoAfterLoadData(nil);
 end;
 
-procedure TViewCources.SetDSWrap2(const Value: TDSWrap);
+procedure TViewCourses.SetDSWrap2(const Value: TDSWrap);
 begin
   if DSWrap2 = Value then
     Exit;
@@ -628,15 +621,21 @@ begin
   end;
 end;
 
-procedure TViewCources.ShowEditCourceForm(AMode: TMode);
+procedure TViewCourses.ShowEditCourceForm(AMode: TMode);
 var
+  A: TArray<Integer>;
   frm: TfrmEditCourse;
 begin
   inherited;
   cxGrid.SetFocus;
   MainView.Focused := True;
 
-  frm := TfrmEditCourse.Create(FCourceGroup);
+  A := GetSelectedValues2<Integer>(clIDSpecialityEducation);
+
+  if Length(A) = 0 then
+    Exit;
+
+  frm := TfrmEditCourse.Create(Self, FCourseViewI.GetCourseEditI(A[0]), AMode);
   try
     BeginUpdate;
     try
@@ -657,43 +656,36 @@ begin
   UpdateView;
 end;
 
-procedure TViewCources.ShowEditDisciplineForm(AMode: TMode);
+procedure TViewCourses.ShowEditDisciplineForm(AMode: TMode);
 var
-  AModel: TCourceDiscNameVM;
-  frm: TfrmCourceDiscEdit;
+  A: TArray<Integer>;
+  frm: TfrmCourseStudyPlanEdit;
 begin
   inherited;
-  Assert(FCourceGroup.qAdmissions.W.DataSet.RecordCount > 0);
 
-  // Создаём модель для представления
-  AModel := TCourceDiscNameVM.Create(Self, CourceGroup.qCourseStudyPlan.W,
-    CourceGroup.qDiscName, CourceGroup.qAdmissions.W.IDChair.F.AsInteger,
-    CourceGroup.qAdmissions.W.ID_SpecialityEducation.F.AsInteger);
+  A := GetSelectedValues2<Integer>(clIDStudyPlan);
+  if Length(A) = 0 then
+    Exit;
 
-  BeginUpdate;
+  frm := TfrmCourseStudyPlanEdit.Create(Self, FCourseViewI.GetCourseStudyPlanEditI(A[0]), AMode );
   try
-    frm := TfrmCourceDiscEdit.Create(AModel);
-    try
-      frm.Mode := AMode;
-      frm.ShowModal;
-    finally
-      FreeAndNil(AModel);
-    end;
+    frm.ShowModal;
   finally
-    EndUpdate;
+    FreeAndNil(frm);
   end;
 
   UpdateView;
 end;
 
-procedure TViewCources.UpdateView;
+procedure TViewCourses.UpdateView;
 var
   AView: TcxGridDBBandedTableView;
   OK: Boolean;
 begin
   inherited;
   AView := FocusedTableView;
-  OK := (FCourceGroup <> nil) and (FCourceGroup.qAdmissions.FDQuery.Active) and
+
+  OK := (FCourseViewI <> nil) and (FCourseViewI.AdmissionsW.DataSet.Active) and
     (AccessLevel >= alManager);
 
   actAddPlan.Enabled := OK;
@@ -712,12 +704,12 @@ begin
 
   actMove.Enabled := OK and (AView <> nil) and (AView = MainView) and
     (AView.Controller.SelectedRowCount > 0) and
-    (FCourceGroup.qEdLvl.FDQuery.RecordCount > 0);
+    (FCourseViewI.EdLvlW.RecordCount > 0);
 
   if OK and (actMove.Hint = '') then
   begin
     actMove.Caption := Format('Перенести на вкладку %s',
-      [FCourceGroup.qEdLvl.W.Short_Education_Level.F.AsString]);
+      [FCourseViewI.EdLvlW.Short_Education_Level.F.AsString]);
     actMove.Hint := actMove.Caption;
   end;
 

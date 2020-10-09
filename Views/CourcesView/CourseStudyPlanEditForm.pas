@@ -1,4 +1,4 @@
-unit CourceDiscEditForm;
+unit CourseStudyPlanEditForm;
 
 interface
 
@@ -8,12 +8,12 @@ uses
   cxGraphics, cxControls, cxLookAndFeels, cxLookAndFeelPainters, cxContainer,
   cxEdit, cxTextEdit, cxMaskEdit, cxDropDownEdit, cxLookupEdit, cxDBLookupEdit,
   cxDBLookupComboBox, Vcl.StdCtrls, cxSpinEdit, cxCheckBox, Vcl.Menus,
-  cxButtons, CourceGroup, Data.DB, InsertEditMode, FireDAC.Comp.Client,
-  cxLabel, DiscNameQry, CourceDiscNameViewModel, DiscNameInt,
-  CourseStudyPlanInterface, FDDumb, CourceDiscEditInterface;
+  cxButtons, CourseGroup, Data.DB, InsertEditMode, FireDAC.Comp.Client,
+  cxLabel, DiscNameQry, DiscNameInt, CourseStudyPlanInterface, FDDumb,
+  CourseStudyPlanEditInterface;
 
 type
-  TfrmCourceDiscEdit = class(TForm, IDiscName, ICourseStudyPlan)
+  TfrmCourseStudyPlanEdit = class(TForm, IDiscName, ICourseStudyPlan)
     Label11: TLabel;
     cxdblcbDisciplineName: TcxDBLookupComboBox;
     Label12: TLabel;
@@ -39,9 +39,10 @@ type
     function GetDisciplineName: string; stdcall;
     function GetIDChair: Integer; stdcall;
     function GetIDSPECIALITYEDUCATION: Integer; stdcall;
+    function GetID_StudyPlan: Integer; stdcall;
     function GetShortDisciplineName: String; stdcall;
   private
-    FCourceDiscEditI: ICourceDiscEdit;
+    FCourseStudyPlanEditI: ICourseStudyPlanEdit;
     FMode: TMode;
     FqDisciplineNameDumb: TFDDumb;
     function GetExam: Boolean; stdcall;
@@ -61,8 +62,8 @@ type
   protected
     procedure Check;
   public
-    constructor Create(AOwner: TComponent; ACourceDiscEditI: ICourceDiscEdit;
-        AMode: TMode); reintroduce;
+    constructor Create(AOwner: TComponent;
+      ACourseStudyPlanEditI: ICourseStudyPlanEdit; AMode: TMode); reintroduce;
     property Exam: Boolean read GetExam write SetExam;
     property IDDisciplineName: Integer read GetIDDisciplineName
       write SetIDDisciplineName;
@@ -81,12 +82,13 @@ uses
 
 {$R *.dfm}
 
-constructor TfrmCourceDiscEdit.Create(AOwner: TComponent; ACourceDiscEditI:
-    ICourceDiscEdit; AMode: TMode);
+constructor TfrmCourseStudyPlanEdit.Create(AOwner: TComponent;
+  ACourseStudyPlanEditI: ICourseStudyPlanEdit; AMode: TMode);
 begin
   inherited Create(AOwner);
+  Assert(ACourseStudyPlanEditI <> nil);
 
-  FCourceDiscEditI := ACourceDiscEditI;
+  FCourseStudyPlanEditI := ACourseStudyPlanEditI;
 
   // **********************************************
   // Наименования дисциплин
@@ -94,12 +96,12 @@ begin
   FqDisciplineNameDumb := TFDDumb.Create(Self);
 
   TDBLCB.Init(cxdblcbDisciplineName, FqDisciplineNameDumb.W.ID,
-    FCourceDiscEditI.DiscNameW.DisciplineName, lsEditList);
+    FCourseStudyPlanEditI.DiscNameW.DisciplineName, lsEditList);
 
   Mode := AMode;
 end;
 
-procedure TfrmCourceDiscEdit.Check;
+procedure TfrmCourseStudyPlanEdit.Check;
 begin
   if cxdblcbDisciplineName.Text = '' then
     raise Exception.Create('Не задано наименование дисциплины');
@@ -109,8 +111,8 @@ begin
 
 end;
 
-procedure TfrmCourceDiscEdit.cxdblcbDisciplineNamePropertiesEditValueChanged
-  (Sender: TObject);
+procedure TfrmCourseStudyPlanEdit.
+  cxdblcbDisciplineNamePropertiesEditValueChanged(Sender: TObject);
 var
   AcxDBLookupComboBox: TcxDBLookupComboBox;
 begin
@@ -123,24 +125,28 @@ begin
   else
   begin
     // Ищем нужную нам дисциплину
-    FCourceDiscEditI.DiscNameW.LocateByPK(FqDisciplineNameDumb.W.ID.F.AsInteger, True);
+    FCourseStudyPlanEditI.DiscNameW.LocateByPK
+      (FqDisciplineNameDumb.W.ID.F.AsInteger, True);
 
     // Отображаем её сокращённое наименование
-    cxteShort.Text := FCourceDiscEditI.DiscNameW.ShortDisciplineName.F.AsString;
+    cxteShort.Text := FCourseStudyPlanEditI.DiscNameW.ShortDisciplineName.
+      F.AsString;
   end;
 end;
 
-procedure TfrmCourceDiscEdit.cxdblcbDisciplineNamePropertiesNewLookupDisplayText
-  (Sender: TObject; const AText: TCaption);
+procedure TfrmCourseStudyPlanEdit.
+  cxdblcbDisciplineNamePropertiesNewLookupDisplayText(Sender: TObject;
+  const AText: TCaption);
 begin
   if AText = '' then
     Exit;
 
   // Пытаемся добавить новое наименование переподготовки (пока с ID = NULL)
-  FCourceDiscEditI.DiscNameW.Append(AText, cxteShort.Text, FCourceDiscEditI.IDChair, 3);
+  FCourseStudyPlanEditI.DiscNameW.Append(AText, cxteShort.Text,
+    FCourseStudyPlanEditI.IDChair, 3);
 end;
 
-procedure TfrmCourceDiscEdit.cxseLecPropertiesValidate(Sender: TObject;
+procedure TfrmCourseStudyPlanEdit.cxseLecPropertiesValidate(Sender: TObject;
   var DisplayValue: Variant; var ErrorText: TCaption; var Error: Boolean);
 var
   x: Integer;
@@ -151,13 +157,12 @@ begin
     ErrorText := 'Отрицательное значение не допускается';
 end;
 
-procedure TfrmCourceDiscEdit.FormClose(Sender: TObject;
+procedure TfrmCourseStudyPlanEdit.FormClose(Sender: TObject;
   var Action: TCloseAction);
 begin
   if ModalResult <> mrOK then
   begin
     // НЕ сохраняем сделанные изменения в БД
-    FCourceDiscEditI.CancelUpdates;
     Exit;
   end;
 
@@ -169,89 +174,94 @@ begin
   end;
 
   // Сохраняем дисциплину и обновляем её код
-  FqDisciplineNameDumb.W.UpdateID
-    (FCourceDiscEditI.ApplyDisciplines(FqDisciplineNameDumb.W.ID.F.AsInteger, Self));
+  FqDisciplineNameDumb.W.UpdateID(FCourseStudyPlanEditI.ApplyDisciplines
+    (FqDisciplineNameDumb.W.ID.F.AsInteger, Self));
 
   // Сохраняем запись в учебном плане курсов
-  FCourceDiscEditI.ApplyCourseStudyPlan(Self, Mode);
+  FCourseStudyPlanEditI.CourseStudyPlanW.Save(Self, Mode);
 end;
 
-function TfrmCourceDiscEdit.GetDisciplineName: string;
+function TfrmCourseStudyPlanEdit.GetDisciplineName: string;
 begin
   cxdblcbDisciplineName.Text;
 end;
 
-function TfrmCourceDiscEdit.GetExam: Boolean;
+function TfrmCourseStudyPlanEdit.GetExam: Boolean;
 begin
   Result := cxcbExam.Checked;
 end;
 
-function TfrmCourceDiscEdit.GetIDChair: Integer;
+function TfrmCourseStudyPlanEdit.GetIDChair: Integer;
 begin
-  Result := FCourceDiscEditI.IDChair;
+  Result := FCourseStudyPlanEditI.IDChair;
 end;
 
-function TfrmCourceDiscEdit.GetIDDisciplineName: Integer;
+function TfrmCourseStudyPlanEdit.GetIDDisciplineName: Integer;
 begin
   Result := FqDisciplineNameDumb.W.ID.F.AsInteger;
 end;
 
-function TfrmCourceDiscEdit.GetIDSPECIALITYEDUCATION: Integer;
+function TfrmCourseStudyPlanEdit.GetIDSPECIALITYEDUCATION: Integer;
 begin
-  Result := FCourceDiscEditI.IDSPECIALITYEDUCATION;
+  Result := FCourseStudyPlanEditI.IDSPECIALITYEDUCATION;
 end;
 
-function TfrmCourceDiscEdit.GetLec: Integer;
+function TfrmCourseStudyPlanEdit.GetID_StudyPlan: Integer;
+begin
+  Result := FCourseStudyPlanEditI.ID_StudyPlan;
+end;
+
+function TfrmCourseStudyPlanEdit.GetLec: Integer;
 begin
   Result := cxseLec.Value;
 end;
 
-function TfrmCourceDiscEdit.GetLab: Integer;
+function TfrmCourseStudyPlanEdit.GetLab: Integer;
 begin
   Result := cxseLab.Value;
 end;
 
-function TfrmCourceDiscEdit.GetSem: Integer;
+function TfrmCourseStudyPlanEdit.GetSem: Integer;
 begin
   Result := cxseSem.Value;
 end;
 
-function TfrmCourceDiscEdit.GetShortDisciplineName: String;
+function TfrmCourseStudyPlanEdit.GetShortDisciplineName: String;
 begin
   Result := cxteShort.Text;
 end;
 
-function TfrmCourceDiscEdit.GetZach: Boolean;
+function TfrmCourseStudyPlanEdit.GetZach: Boolean;
 begin
   Result := cxcbZach.Checked;
 end;
 
-procedure TfrmCourceDiscEdit.SetExam(const Value: Boolean);
+procedure TfrmCourseStudyPlanEdit.SetExam(const Value: Boolean);
 begin
   cxcbExam.Checked := Value;
 end;
 
-procedure TfrmCourceDiscEdit.SetIDDisciplineName(const Value: Integer);
+procedure TfrmCourseStudyPlanEdit.SetIDDisciplineName(const Value: Integer);
 begin
   FqDisciplineNameDumb.W.UpdateID(Value);
 end;
 
-procedure TfrmCourceDiscEdit.SetLec(const Value: Integer);
+procedure TfrmCourseStudyPlanEdit.SetLec(const Value: Integer);
 begin
   cxseLec.Value := Value;
 end;
 
-procedure TfrmCourceDiscEdit.SetLab(const Value: Integer);
+procedure TfrmCourseStudyPlanEdit.SetLab(const Value: Integer);
 begin
   cxseLab.Value := Value;
 end;
 
-procedure TfrmCourceDiscEdit.SetSem(const Value: Integer);
+procedure TfrmCourseStudyPlanEdit.SetSem(const Value: Integer);
 begin
   cxseSem.Value := Value;
 end;
 
-procedure TfrmCourceDiscEdit.SetMode(const Value: TMode);
+procedure TfrmCourseStudyPlanEdit.SetMode(const Value: TMode);
 begin
   // if FMode = Value then
   // Exit;
@@ -261,8 +271,9 @@ begin
   case FMode of
     EditMode:
       begin
-        Assert(FCourceDiscEditI.IDSPECIALITYEDUCATION > 0);
-        with FCourceDiscEditI do
+        Assert(FCourseStudyPlanEditI.ID_StudyPlan > 0);
+        FCourseStudyPlanEditI.CourseStudyPlanW.ID_StudyPlan.Locate(FCourseStudyPlanEditI.ID_StudyPlan, [], True);
+        with FCourseStudyPlanEditI do
         begin
           IDDisciplineName := CourseStudyPlanW.IDDisciplineName.F.AsInteger;
           Lec := CourseStudyPlanW.LecData.F.AsInteger;
@@ -284,7 +295,7 @@ begin
   end;
 end;
 
-procedure TfrmCourceDiscEdit.SetZach(const Value: Boolean);
+procedure TfrmCourseStudyPlanEdit.SetZach(const Value: Boolean);
 begin
   cxcbZach.Checked := Value;
 end;

@@ -8,13 +8,13 @@ uses
   cxGraphics, cxControls, cxLookAndFeels, cxLookAndFeelPainters, cxContainer,
   cxEdit, Vcl.Menus, Vcl.StdCtrls, cxButtons, cxTextEdit, cxMaskEdit,
   cxDropDownEdit, cxLookupEdit, cxDBLookupEdit, cxDBLookupComboBox,
-  Data.DB, CourceNameQuery, FireDAC.Comp.Client, InsertEditMode, Vcl.ExtCtrls,
+  Data.DB, CourseNameQuery, FireDAC.Comp.Client, InsertEditMode, Vcl.ExtCtrls,
   StudentGroupsView, dxNavBarCollns, cxClasses, dxNavBarBase, dxNavBar,
-  dxBarBuiltInMenu, cxPC, DisciplinesView, AdmissionsInterface, FDDumb,
-  CourceEditInterface;
+  dxBarBuiltInMenu, cxPC, AdmissionsInterface, FDDumb, CourseEditInterface,
+  CourseStudyPlanView, CourseNameInterface;
 
 type
-  TfrmEditCourse = class(TForm, IAdmission)
+  TfrmEditCourse = class(TForm, IAdmission, ICourseName)
     btnClose: TcxButton;
     cxPageControl: TcxPageControl;
     cxtshPlan: TcxTabSheet;
@@ -36,20 +36,23 @@ type
     procedure cxPageControlChange(Sender: TObject);
     procedure cxPageControlPageChanging(Sender: TObject; NewPage: TcxTabSheet;
       var AllowChange: Boolean);
+  strict private
+    function GetID_Speciality: Integer;
+    function GetID_SpecialityEducation: Integer; stdcall;
+    function GetShortSpeciality: string;
+    function GetSpeciality: string;
   private
-    FCourceEditI: ICourceEdit;
-    FCourceNameW: TCourceNameW;
-    FID: Integer;
+    FCourseEditI: ICourseEdit;
+    FCourseNameW: TCourseNameW;
     FMode: TMode;
     FqChairDumb: TFDDumb;
     FqSpecialityDumb: TFDDumb;
-    FViewDisciplines: TViewDisciplines;
+    FCourceStudyPlanView: TCourceStudyPlanView2;
     FViewStudentGroups: TViewStudentGroups;
-    function GetData: Integer; stdcall;
-    function GetIDChair: Integer; stdcall;
-    function GetIDSpeciality: Integer; stdcall;
+    function GetData: Integer;
+    function GetIDChair: Integer;
+    function GetIDSpeciality: Integer;
     procedure SavePlan;
-    procedure SaveGroups;
     procedure SetData(const Value: Integer);
     procedure SetIDChair(const Value: Integer);
     procedure SetIDSpeciality(const Value: Integer);
@@ -58,8 +61,8 @@ type
   protected
     procedure CheckPlan;
   public
-    constructor Create(AOwner: TComponent; ACourceEditI: ICourceEdit; AMode:
-        TMode); reintroduce;
+    constructor Create(AOwner: TComponent; ACourseEditI: ICourseEdit;
+      AMode: TMode); reintroduce;
     destructor Destroy; override;
     property Data: Integer read GetData write SetData;
     property IDChair: Integer read GetIDChair write SetIDChair;
@@ -71,17 +74,16 @@ type
 implementation
 
 uses
-  CommissionOptions, DBLookupComboBoxHelper, CourseDiscViewModel;
+  CommissionOptions, DBLookupComboBoxHelper;
 
 {$R *.dfm}
 
-constructor TfrmEditCourse.Create(AOwner: TComponent; ACourceEditI:
-    ICourceEdit; AMode: TMode);
+constructor TfrmEditCourse.Create(AOwner: TComponent; ACourseEditI: ICourseEdit;
+  AMode: TMode);
 begin
   inherited Create(AOwner);
-  FCourceEditI := ACourceEditI;
-
-  FID := FCourceEditI.AdmissionsW.PK.AsInteger;
+  Assert(ACourseEditI <> nil);
+  FCourseEditI := ACourseEditI;
 
   cxPageControl.ActivePage := cxtshPlan;
 
@@ -90,11 +92,11 @@ begin
   // ********************************************
 
   // Создаём обёртку вокруг нового курсора названий курсов
-  FCourceNameW := TCourceNameW.Create(FCourceEditI.CourceNameW.AddClone(''));
+  FCourseNameW := TCourseNameW.Create(FCourseEditI.CourseNameW.AddClone(''));
 
   FqSpecialityDumb := TFDDumb.Create(Self);
 
-  TDBLCB.Init(cxdblcbSpeciality, FqSpecialityDumb.W.ID, FCourceNameW.Speciality,
+  TDBLCB.Init(cxdblcbSpeciality, FqSpecialityDumb.W.ID, FCourseNameW.Speciality,
     lsEditList);
 
   // *************
@@ -108,8 +110,8 @@ begin
     cxdblcbChair.Enabled := False;
   end;
 
-  TDBLCB.Init(cxdblcbChair, FqChairDumb.W.ID,
-    FCourceEditI.ChairsW.Наименование, lsFixedList);
+  TDBLCB.Init(cxdblcbChair, FqChairDumb.W.ID, FCourseEditI.ChairsW.Наименование,
+    lsFixedList);
 
   Mode := AMode;
 end;
@@ -118,7 +120,7 @@ destructor TfrmEditCourse.Destroy;
 begin
   inherited;
   // Удаляем клон
-  FCourceEditI.CourceNameW.DropClone(FCourceNameW.DataSet as TFDMemTable);
+  FCourseEditI.CourseNameW.DropClone(FCourseNameW.DataSet as TFDMemTable);
 end;
 
 procedure TfrmEditCourse.CheckPlan;
@@ -153,7 +155,7 @@ begin
   Assert(FqChairDumb.W.ID.F.AsInteger > 0);
 
   // Фильтруем выпадающий список названий курсов (специальностей) по кафедре
-  FCourceNameW.FilterByChair(FqChairDumb.W.ID.F.AsInteger);
+  FCourseNameW.FilterByChair(FqChairDumb.W.ID.F.AsInteger);
 
   cxdblcbSpeciality.Enabled := True;
   cxteShort.Enabled := True;
@@ -172,8 +174,8 @@ begin
   end
   else
   begin
-    FCourceNameW.LocateByPK(FqSpecialityDumb.W.ID.F.AsInteger, True);
-    cxteShort.Text := FCourceNameW.SHORT_SPECIALITY.F.AsString;
+    FCourseNameW.LocateByPK(FqSpecialityDumb.W.ID.F.AsInteger, True);
+    cxteShort.Text := FCourseNameW.SHORT_SPECIALITY.F.AsString;
   end;
 
 end;
@@ -185,29 +187,23 @@ begin
     Exit;
 
   // Пытаемся добавить новое наименование переподготовки (пока с ID = NULL)
-  FCourceNameW.Append(AText, cxteShort.Text, FqChairDumb.W.ID.F.AsInteger);
-
+  FCourseNameW.Save(Self, InsertMode);
 end;
 
 procedure TfrmEditCourse.cxPageControlChange(Sender: TObject);
 begin
   // Переход на вкладку дисциплины
-  if (cxPageControl.ActivePage = cxtshDisciplines) and (FViewDisciplines = nil)
-  then
+  if (cxPageControl.ActivePage = cxtshDisciplines) and
+    (FCourceStudyPlanView = nil) then
   begin
     // К этому моменту план должет быть уже сохранён
-    Assert(FCourceEditI.AdmissionsW.PK.AsInteger > 0);
+    Assert(FCourseEditI.AdmissionsW.PK.AsInteger > 0);
 
     // Создаём представление
-    FViewDisciplines := TViewDisciplines.Create(Self);
-    FViewDisciplines.Place(cxtshDisciplines);
-    FViewDisciplines.CourceDiscViewI := FCourceEditI.GetCourceDiscViewI;
-{
-    TCourseDiscViewModel.Create(Self,
-      FCourceGroup.qAdmissions.W.ID_SpecialityEducation.F.AsInteger,
-      FCourceGroup.qAdmissions.W.IDChair.F.AsInteger,
-      FCourceGroup.qCourseStudyPlan.W, FCourceGroup.qDiscName);
-}
+    FCourceStudyPlanView := TCourceStudyPlanView2.Create(Self);
+    FCourceStudyPlanView.Place(cxtshDisciplines);
+    FCourceStudyPlanView.CourseStudyPlanViewI :=
+      FCourseEditI.GetCourseStudyPlanViewI;
   end;
 
   // Переход на вкладку группы
@@ -215,17 +211,14 @@ begin
   then
   begin
     // К этому моменту план должет быть уже сохранён
-    Assert(FCourceEditI.AdmissionsW.PK.AsInteger > 0);
+    Assert(FCourseEditI.AdmissionsW.PK.AsInteger > 0);
 
-    // Идентификатор плана должен быть такой же как в момент создания формы!!!
-    if FID > 0 then
-      Assert(FCourceEditI.AdmissionsW.PK.AsInteger = FID);
 
-    FCourceEditI.SearchStudGroups;
+    FCourseEditI.SearchStudGroups(FCourseEditI.ID_SpecialityEducation);
 
     FViewStudentGroups := TViewStudentGroups.Create(Self);
     FViewStudentGroups.Place(cxtshGroups);
-    FViewStudentGroups.SGW := FCourceEditI.StudentGroupsW;
+    FViewStudentGroups.SGW := FCourseEditI.StudentGroupsW;
   end;
 end;
 
@@ -248,45 +241,25 @@ procedure TfrmEditCourse.FormClose(Sender: TObject; var Action: TCloseAction);
 begin
   if ModalResult <> mrOK then
   begin
-    // Отменяем изменения в дисциплинах
-    if FViewDisciplines <> nil then
-      FViewDisciplines.CourceDiscViewI.CancelUpdates;
+    // Отменяем изменения в дисциплинах учебного плана курсов
+    if FCourceStudyPlanView <> nil then
+      FCourceStudyPlanView.CourseStudyPlanViewI.CancelUpdates;
 
-
-    // НЕ сохраняем сделанные изменения в БД
-    FCourceEditI.CancelCourceEdit;
+    // НЕ сохраняем сделанные изменения в наборе курсов
+    FCourseEditI.CancelCourceEdit;
 
     Exit;
   end;
 
   try
-    if FMode = EditMode then
-    begin
-      Assert(FID > 0);
-      // Возвращаемся к той записи, которую начали редактировать
-      FCourceGroup.qAdmissions.W.LocateByPK(FID, True);
-    end;
-
     SavePlan;
-    if FID = 0 then
-      FID := FCourceGroup.qAdmissions.W.PK.AsInteger;
 
     // Сохраняем изменения в дисциплинах учебного плана курсов
-    if FViewDisciplines <> nil then
-      FViewDisciplines.CourceDiscViewI.ApplyUpdates;
+    if FCourceStudyPlanView <> nil then
+      FCourceStudyPlanView.CourseStudyPlanViewI.ApplyUpdates;
 
-    SaveGroups;
-
-    FCourceGroup.qAdmissions.W.LocateByPK(FID, True);
-
-    // Обновляем кол-во групп учебного плана
-    if FCourceGroup.qStudentGroups.FDQuery.Active then
-    begin
-      FCourceGroup.qAdmissions.SetGroupCount
-        (FCourceGroup.qStudentGroups.FDQuery.RecordCount);
-    end;
-
-    FCourceGroup.qAdmissions.W.LocateByPK(FID, True);
+    // Сохраняем созданные группы в базе данных
+    FCourseEditI.ApplyStudGroups;
   except
     Action := caNone;
     raise;
@@ -308,28 +281,45 @@ begin
   Result := FqSpecialityDumb.W.ID.F.AsInteger;
 end;
 
+function TfrmEditCourse.GetID_Speciality: Integer;
+begin
+ Result := FqSpecialityDumb.W.ID.F.AsInteger;
+end;
+
+function TfrmEditCourse.GetID_SpecialityEducation: Integer;
+begin
+  Result := FCourseEditI.ID_SpecialityEducation;
+end;
+
+function TfrmEditCourse.GetShortSpeciality: string;
+begin
+  Result := cxteShort.Text;
+end;
+
+function TfrmEditCourse.GetSpeciality: string;
+begin
+  Result := cxdblcbSpeciality.Text;
+end;
+
 procedure TfrmEditCourse.SavePlan;
+var
+  AIDSpeciality: Integer;
 begin
   CheckPlan;
 
-  FqSpecialityDumb.W.UpdateID(FCourceGroup.qCourceName.ApplyUpdates
-    (FqSpecialityDumb.W.ID.F.AsInteger, cxteShort.Text));
+  // Сохраняем наименование курсов (специальность)
+  AIDSpeciality := FCourseEditI.ApplyCourseName(Self);
 
-  FCourceGroup.qAdmissions.W.Save(Self, FMode);
+  // Выбираем этот код специальности
+  FqSpecialityDumb.W.UpdateID(AIDSpeciality);
+
+  // Сохраняем информацию о наборе курсов
+  FCourseEditI.AdmissionsW.Save(Self, FMode);
+  // Сохраняем код набора
+  FCourseEditI.ID_SpecialityEducation := FCourseEditI.AdmissionsW.ID_SpecialityEducation.F.AsInteger;
 
   // Теперь план будет только редактироваться!
   FMode := EditMode;
-end;
-
-procedure TfrmEditCourse.SaveGroups;
-begin
-  if FCourceGroup.qStudentGroups.FDQuery.Active then
-  begin
-    // Наконец-то сохраняем сделанные изменения в БД
-    FCourceGroup.qStudentGroups.FDQuery.ApplyUpdates(0);
-    FCourceGroup.qStudentGroups.FDQuery.CommitUpdates;
-    Assert(FCourceGroup.qStudentGroups.FDQuery.ChangeCount = 0);
-  end;
 end;
 
 procedure TfrmEditCourse.SetData(const Value: Integer);
@@ -354,12 +344,13 @@ begin
   case FMode of
     EditMode:
       begin
-        Assert(FCourceGroup.qAdmissions.W.DataSet.RecordCount > 0);
-        with FCourceGroup.qAdmissions do
+        Assert(FCourseEditI.AdmissionsW.ID_SpecialityEducation.F.AsInteger = FCourseEditI.ID_SpecialityEducation);
+
+        with FCourseEditI do
         begin
-          IDChair := W.IDChair.F.AsInteger;
-          IDSpeciality := W.IDSpeciality.F.AsInteger;
-          Data := W.Data.F.AsInteger;
+          IDChair := AdmissionsW.IDChair.F.AsInteger;
+          IDSpeciality := AdmissionsW.IDSpeciality.F.AsInteger;
+          Data := AdmissionsW.Data.F.AsInteger;
         end;
 
         Caption := 'Редактирование плана';

@@ -1,4 +1,4 @@
-unit DisciplinesView;
+unit CourseStudyPlanView;
 
 interface
 
@@ -13,10 +13,10 @@ uses
   cxGridCustomView, cxGridCustomTableView, cxGridTableView,
   cxGridBandedTableView, cxGridDBBandedTableView, cxGrid,
   System.ImageList, Vcl.ImgList, cxImageList, TB2Dock, TB2Toolbar, TB2Item,
-  dxDateRanges, DiscNameQry, InsertEditMode, CourceStudyPlanViewInterface;
+  dxDateRanges, DiscNameQry, InsertEditMode, CourseStudyPlanViewInterface;
 
 type
-  TViewDisciplines = class(TfrmGrid)
+  TCourceStudyPlanView2 = class(TfrmGrid)
     TBDock1: TTBDock;
     TBToolbar1: TTBToolbar;
     actAdd: TAction;
@@ -28,16 +28,17 @@ type
     procedure actAddExecute(Sender: TObject);
     procedure actEditExecute(Sender: TObject);
   private
-    FCourceStudyPlanViewI: ICourceStudyPlanView;
+    FCourceStudyPlanViewI: ICourseStudyPlanView;
     procedure DoOnExamChange(Sender: TObject);
     procedure DoOnIDDisciplineNameChanged(Sender: TObject);
     function GetclExam: TcxGridDBBandedColumn;
     function GetclIDDisciplineName: TcxGridDBBandedColumn;
     function GetclLab: TcxGridDBBandedColumn;
+    function GetclIDStudyPlan: TcxGridDBBandedColumn;
     function GetclLec: TcxGridDBBandedColumn;
     function GetclSem: TcxGridDBBandedColumn;
     function GetclZach: TcxGridDBBandedColumn;
-    procedure SetCourceStudyPlanViewI(const Value: ICourceStudyPlanView);
+    procedure SetCourseStudyPlanViewI(const Value: ICourseStudyPlanView);
     procedure ShowDisciplineEditForm(AMode: TMode);
     { Private declarations }
   protected
@@ -49,11 +50,12 @@ type
     property clIDDisciplineName: TcxGridDBBandedColumn
       read GetclIDDisciplineName;
     property clLab: TcxGridDBBandedColumn read GetclLab;
+    property clIDStudyPlan: TcxGridDBBandedColumn read GetclIDStudyPlan;
     property clLec: TcxGridDBBandedColumn read GetclLec;
     property clSem: TcxGridDBBandedColumn read GetclSem;
     property clZach: TcxGridDBBandedColumn read GetclZach;
-    property CourceStudyPlanViewI: ICourceStudyPlanView read FCourceStudyPlanViewI
-        write SetCourceStudyPlanViewI;
+    property CourseStudyPlanViewI: ICourseStudyPlanView read FCourceStudyPlanViewI
+        write SetCourseStudyPlanViewI;
     { Public declarations }
   end;
 
@@ -61,78 +63,83 @@ implementation
 
 uses
   cxDropDownEdit, cxCheckBox, FireDAC.Comp.Client, cxDBLookupComboBox,
-  NotifyEvents, CourceDiscEditForm,
-  DBLookupComboBoxHelper;
+  NotifyEvents, DBLookupComboBoxHelper, CourseStudyPlanEditForm;
 
 {$R *.dfm}
 
-procedure TViewDisciplines.actAddExecute(Sender: TObject);
+procedure TCourceStudyPlanView2.actAddExecute(Sender: TObject);
 begin
   inherited;
   ShowDisciplineEditForm(InsertMode);
 end;
 
-procedure TViewDisciplines.actEditExecute(Sender: TObject);
+procedure TCourceStudyPlanView2.actEditExecute(Sender: TObject);
 begin
   inherited;
   ShowDisciplineEditForm(EditMode);
 end;
 
-procedure TViewDisciplines.DoOnExamChange(Sender: TObject);
+procedure TCourceStudyPlanView2.DoOnExamChange(Sender: TObject);
 begin
   (Sender as TcxCheckBox).PostEditValue;
   UpdateView;
 end;
 
-procedure TViewDisciplines.DoOnIDDisciplineNameChanged(Sender: TObject);
+procedure TCourceStudyPlanView2.DoOnIDDisciplineNameChanged(Sender: TObject);
 begin
   (Sender as TcxLookupComboBox).PostEditValue;
   clIDDisciplineName.ApplyBestFit();
   UpdateView;
 end;
 
-function TViewDisciplines.GetclExam: TcxGridDBBandedColumn;
+function TCourceStudyPlanView2.GetclExam: TcxGridDBBandedColumn;
 begin
   Result := MainView.GetColumnByFieldName
-    (CourceStudyPlanViewI.CourseStudyPlanW.ExamData.FieldName);
+    (CourseStudyPlanViewI.CourseStudyPlanW.ExamData.FieldName);
 end;
 
-function TViewDisciplines.GetclIDDisciplineName: TcxGridDBBandedColumn;
+function TCourceStudyPlanView2.GetclIDDisciplineName: TcxGridDBBandedColumn;
 begin
   Result := MainView.GetColumnByFieldName
-    (CourceStudyPlanViewI.CourseStudyPlanW.IDDisciplineName.FieldName);
+    (CourseStudyPlanViewI.CourseStudyPlanW.IDDisciplineName.FieldName);
 end;
 
-function TViewDisciplines.GetclLab: TcxGridDBBandedColumn;
+function TCourceStudyPlanView2.GetclLab: TcxGridDBBandedColumn;
 begin
   Result := MainView.GetColumnByFieldName
-    (CourceStudyPlanViewI.CourseStudyPlanW.LabData.FieldName);
+    (CourseStudyPlanViewI.CourseStudyPlanW.LabData.FieldName);
 end;
 
-function TViewDisciplines.GetclLec: TcxGridDBBandedColumn;
+function TCourceStudyPlanView2.GetclIDStudyPlan: TcxGridDBBandedColumn;
 begin
   Result := MainView.GetColumnByFieldName
-    (CourceStudyPlanViewI.CourseStudyPlanW.LecData.FieldName);
+    (CourseStudyPlanViewI.CourseStudyPlanW.ID_StudyPlan.FieldName);
 end;
 
-function TViewDisciplines.GetclSem: TcxGridDBBandedColumn;
+function TCourceStudyPlanView2.GetclLec: TcxGridDBBandedColumn;
 begin
   Result := MainView.GetColumnByFieldName
-    (CourceStudyPlanViewI.CourseStudyPlanW.SemData.FieldName);
+    (CourseStudyPlanViewI.CourseStudyPlanW.LecData.FieldName);
 end;
 
-function TViewDisciplines.GetclZach: TcxGridDBBandedColumn;
+function TCourceStudyPlanView2.GetclSem: TcxGridDBBandedColumn;
 begin
   Result := MainView.GetColumnByFieldName
-    (CourceStudyPlanViewI.CourseStudyPlanW.ZachData.FieldName);
+    (CourseStudyPlanViewI.CourseStudyPlanW.SemData.FieldName);
 end;
 
-procedure TViewDisciplines.InitColumns(AView: TcxGridDBBandedTableView);
+function TCourceStudyPlanView2.GetclZach: TcxGridDBBandedColumn;
+begin
+  Result := MainView.GetColumnByFieldName
+    (CourseStudyPlanViewI.CourseStudyPlanW.ZachData.FieldName);
+end;
+
+procedure TCourceStudyPlanView2.InitColumns(AView: TcxGridDBBandedTableView);
 begin
   inherited;
   // Настраиваем подстановочную колонку Наименование дисциплины
   TDBLCB.InitColumn(clIDDisciplineName,
-    CourceStudyPlanViewI.DiscNameW.DisciplineName, lsEditList).OnEditValueChanged :=
+    CourseStudyPlanViewI.DiscNameW.DisciplineName, lsEditList).OnEditValueChanged :=
     DoOnIDDisciplineNameChanged;
 
   clIDDisciplineName.Options.SortByDisplayText := isbtOn;
@@ -166,15 +173,15 @@ begin
   MyApplyBestFitForView(MainView);
 end;
 
-procedure TViewDisciplines.InitView(AView: TcxGridDBBandedTableView);
+procedure TCourceStudyPlanView2.InitView(AView: TcxGridDBBandedTableView);
 begin
   inherited;
   AView.OptionsBehavior.CellHints := True;
   DeleteMessages.Add(cxGridLevel, 'Удалить выбранные дисциплины?');
 end;
 
-procedure TViewDisciplines.SetCourceStudyPlanViewI(const Value:
-    ICourceStudyPlanView);
+procedure TCourceStudyPlanView2.SetCourseStudyPlanViewI(const Value:
+    ICourseStudyPlanView);
 begin
   FCourceStudyPlanViewI := Value;
 
@@ -189,14 +196,19 @@ begin
   UpdateView;
 end;
 
-procedure TViewDisciplines.ShowDisciplineEditForm(AMode: TMode);
+procedure TCourceStudyPlanView2.ShowDisciplineEditForm(AMode: TMode);
 var
-  frm: TfrmCourceDiscEdit;
+  a: TArray<Integer>;
+  frm: TfrmCourseStudyPlanEdit;
 begin
   inherited;
 
-  frm := TfrmCourceDiscEdit.Create(Self,
-    FCourceStudyPlanViewI.GetCourceDiscEditI, AMode);
+  a := GetSelectedValues2<Integer>(clIDStudyPlan);
+  if Length(a) = 0 then
+    Exit;
+
+  frm := TfrmCourseStudyPlanEdit.Create(Self,
+    FCourceStudyPlanViewI.GetCourseStudyPlanEditI(a[0]), AMode);
   try
     frm.ShowModal;
   finally
@@ -207,7 +219,7 @@ begin
   UpdateView;
 end;
 
-procedure TViewDisciplines.UpdateView;
+procedure TCourceStudyPlanView2.UpdateView;
 var
   AView: TcxGridDBBandedTableView;
   OK: Boolean;

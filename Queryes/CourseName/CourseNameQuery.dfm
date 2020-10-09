@@ -1,4 +1,4 @@
-inherited QueryCourceName: TQueryCourceName
+inherited QueryCourseName: TQueryCourseName
   inherited FDQuery: TFDQuery
     UpdateOptions.AssignedValues = [uvRefreshMode, uvCheckRequired]
     UpdateOptions.RefreshMode = rmAll

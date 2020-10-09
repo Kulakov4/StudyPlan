@@ -293,7 +293,7 @@ begin
   // Сокращение специальности
   cxdblcbShortSpeciality.Enabled := False;
   TDBLCB.Init(cxdblcbShortSpeciality, FSPViewI.SpecEdSimpleW.IDSpeciality,
-    FSPViewI.CourceNameW.SHORT_SPECIALITY, lsEditFixedList);
+    FSPViewI.CourseNameW.SHORT_SPECIALITY, lsEditFixedList);
 
   // Кафедра
   cxdblcbChair.Enabled := False;

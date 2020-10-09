@@ -3,14 +3,13 @@ unit CourseStudyPlanModel;
 interface
 
 uses
-  System.Classes, FireDAC.Comp.DataSet, DiscNameQry, CourceDiscNameViewModel,
-  CourseStudyPlanQry, CourceDiscViewInterface, CourceDiscEditInterface,
-  CourceStudyPlanViewInterface;
+  System.Classes, FireDAC.Comp.DataSet, DiscNameQry, CourseStudyPlanQry,
+  CourseStudyPlanViewInterface, CourseStudyPlanEditInterface;
 
 type
-  TCourseDiscViewModel = class(TComponent, ICourceStudyPlanView)
+  TCourseDiscViewModel = class(TComponent, ICourseStudyPlanView)
   strict private
-    function GetCourceDiscEditI: ICourceDiscEdit;
+    function GetCourseStudyPlanEditI(AIDStudyPlan: Integer): ICourseStudyPlanEdit;
   private
     FIDChair: Integer;
     FIDSPECIALITYEDUCATION: Integer;
@@ -90,10 +89,13 @@ begin
   SaveToMasterDataSet;
 end;
 
-function TCourseDiscViewModel.GetCourceDiscEditI: ICourceDiscEdit;
+function TCourseDiscViewModel.GetCourseStudyPlanEditI(AIDStudyPlan: Integer):
+    ICourseStudyPlanEdit;
 begin
+ {
   Result := TCourceDiscNameVM.Create(Self, CourseStudyPlanW, FqDiscName,
     FIDChair, FIDSPECIALITYEDUCATION);
+ }
 end;
 
 function TCourseDiscViewModel.GetDiscNameW: TDiscNameW;

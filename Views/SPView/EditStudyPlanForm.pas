@@ -8,7 +8,7 @@ uses
   Vcl.StdCtrls, Vcl.DBCtrls, cxGraphics, cxControls, cxLookAndFeels,
   cxLookAndFeelPainters, cxContainer, cxEdit, cxTextEdit, cxMaskEdit,
   cxDropDownEdit, cxLookupEdit, cxDBLookupEdit, cxDBLookupComboBox,
-  InsertEditMode, Vcl.Menus, cxButtons, Data.DB, CourceNameQuery, SpecPopupView,
+  InsertEditMode, Vcl.Menus, cxButtons, Data.DB, CourseNameQuery, SpecPopupView,
   cxDBExtLookupComboBox, SpecEdSimpleQuery, cxCheckBox, cxDBEdit,
   SpecEdSimpleInt, System.Generics.Collections, EditSpecFrm, FDDumb,
   SPEditInterface;

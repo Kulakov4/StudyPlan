@@ -14,10 +14,10 @@ uses
   SpecEducationGridComboBoxView, Cromis.Comm.IPC, Cromis.Comm.Custom,
   dxBarBuiltInMenu, System.Actions, cxClasses, cxLocalization,
   System.ImageList, cxMaskEdit, cxDropDownEdit, cxLookupEdit, cxDBLookupEdit,
-  cxDBLookupComboBox, DisciplineLit, KDBClient, CourceGroup,
+  cxDBLookupComboBox, DisciplineLit, KDBClient, CourseGroup,
   SpecEdGroup, SpecEdView, SPGroup, SPMainView, System.Contnrs, SPOView, VOView,
   RetrainingView, SpecEdSimpleQuery, SpecEdSimpleQuery2, CommissionOptions,
-  Vcl.Menus;
+  Vcl.Menus, CoursesView;
 
 const
   WM_SelectStudyPlan = WM_USER + 123;
@@ -60,8 +60,8 @@ type
     procedure cxpcStudyPlanChange(Sender: TObject);
     procedure cxpgcntrlMainChange(Sender: TObject);
   private
-    FCourceGrpDO: TCourceGroup;
-    FCourceGrpDPO: TCourceGroup;
+    FCourseGrpDO: TCourseGroup;
+    FCourseGrpDPO: TCourseGroup;
     FDisciplineListIDs: String;
     FEvents: TObjectList;
     FIPCServer: TIPCServer;
@@ -70,8 +70,8 @@ type
     FSPGrpSPO: TSPGroup;
     FSPGrpRetraining: TSPGroup;
     // FStudyPlanFactors: TStudyPlanFactors;
-    FViewCourcesDO: TViewCources;
-    FViewCourcesDPO: TViewCources;
+    FViewCoursesDO: TViewCourses;
+    FViewCoursesDPO: TViewCourses;
     FViewRetraining: TViewRetraining;
     // FViewSpecEd: TViewSpecEd;
     FViewSPO: TViewSPO;
@@ -623,24 +623,25 @@ begin
   // *************************************************
   if cxpgcntrlMain.ActivePage = cxtshDO then
   begin
-    if FViewCourcesDO = nil then
+    if FViewCoursesDO = nil then
     begin
-      FCourceGrpDO := TCourceGroup.Create(Self, TOptions.SP.AcademicYear, 4);
+      FCourseGrpDO := TCourseGroup.Create(Self, TOptions.SP.AcademicYear, 4);
 
-      TNotifyEventWrap.Create(FCourceGrpDO.OnYearChange,
+      TNotifyEventWrap.Create(FCourseGrpDO.OnYearChange,
         DoOnDOYearChange, FEvents);
 
-      FViewCourcesDO := TViewCources.Create(Self);
-      with FViewCourcesDO do
+      FViewCoursesDO := TViewCourses.Create(Self);
+      with FViewCoursesDO do
       begin
         Name := 'ViewCourcesDO';
         AccessLevel := TOptions.AccessLevel;
         Place(cxtshDO);
-        CourceGroup := FCourceGrpDO;
+
+        CourseViewI := FCourseGrpDO;
       end;
     end
     else
-      FCourceGrpDO.Year := TOptions.SP.AcademicYear;
+      FCourseGrpDO.Year := TOptions.SP.AcademicYear;
 
     TOptions.SP.IDEducationLevel := 4;
   end;
@@ -650,24 +651,24 @@ begin
   // *************************************************
   if cxpgcntrlMain.ActivePage = cxtshNewDPO then
   begin
-    if FViewCourcesDPO = nil then
+    if FViewCoursesDPO = nil then
     begin
-      FCourceGrpDPO := TCourceGroup.Create(Self, TOptions.SP.AcademicYear, 6);
+      FCourseGrpDPO := TCourseGroup.Create(Self, TOptions.SP.AcademicYear, 6);
 
-      TNotifyEventWrap.Create(FCourceGrpDPO.OnYearChange,
+      TNotifyEventWrap.Create(FCourseGrpDPO.OnYearChange,
         DoOnDPOYearChange, FEvents);
 
-      FViewCourcesDPO := TViewCources.Create(Self);
-      with FViewCourcesDPO do
+      FViewCoursesDPO := TViewCourses.Create(Self);
+      with FViewCoursesDPO do
       begin
         Name := 'ViewCourcesDPO';
         AccessLevel := TOptions.AccessLevel;
         Place(cxtshNewDPO);
-        CourceGroup := FCourceGrpDPO;
+        CourseViewI := FCourseGrpDPO;
       end;
     end
     else
-      FCourceGrpDPO.Year := TOptions.SP.AcademicYear;
+      FCourseGrpDPO.Year := TOptions.SP.AcademicYear;
 
     TOptions.SP.IDEducationLevel := 6;
   end;
@@ -734,11 +735,11 @@ end;
 
 procedure TfrmMain.DoOnDOYearChange(Sender: TObject);
 begin
-  if TOptions.SP.AcademicYear = FCourceGrpDO.Year then
+  if TOptions.SP.AcademicYear = FCourseGrpDO.Year then
     Exit;
 
   // Произошёл переход на новый год!
-  TOptions.SP.AcademicYear := FCourceGrpDO.Year;
+  TOptions.SP.AcademicYear := FCourseGrpDO.Year;
   TOptions.SP.IDSpecEdVO := 0;
   TOptions.SP.IDSpecEdSPO := 0;
   TOptions.SP.IDSpecEdRetraining := 0;
@@ -746,11 +747,11 @@ end;
 
 procedure TfrmMain.DoOnDPOYearChange(Sender: TObject);
 begin
-  if TOptions.SP.AcademicYear = FCourceGrpDPO.Year then
+  if TOptions.SP.AcademicYear = FCourseGrpDPO.Year then
     Exit;
 
   // Произошёл переход на новый год!
-  TOptions.SP.AcademicYear := FCourceGrpDPO.Year;
+  TOptions.SP.AcademicYear := FCourseGrpDPO.Year;
   TOptions.SP.IDSpecEdVO := 0;
   TOptions.SP.IDSpecEdSPO := 0;
   TOptions.SP.IDSpecEdRetraining := 0;

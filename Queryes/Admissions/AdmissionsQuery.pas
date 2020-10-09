@@ -64,7 +64,7 @@ type
     procedure DoAfterOpen(Sender: TObject);
   public
     constructor Create(AOwner: TComponent); override;
-    procedure Save(AdmissionInt: IAdmission; AMode: TMode);
+    procedure Save(AdmissionI: IAdmission; AMode: TMode);
     property Data: TFieldWrap read FData;
     property GroupCount: TFieldWrap read FGroupCount;
     property IDChair: TFieldWrap read FIDChair;
@@ -88,7 +88,7 @@ constructor TQueryAdmissions.Create(AOwner: TComponent);
 begin
   inherited;
   FW := TAdmissionsW.Create(FDQuery);
-//  TNotifyEventWrap.Create(FW.BeforeScrollM, DoBeforeScroll, FW.EventList);
+  // TNotifyEventWrap.Create(FW.BeforeScrollM, DoBeforeScroll, FW.EventList);
 end;
 
 procedure TQueryAdmissions.FDQueryUpdateRecord(ASender: TDataSet;
@@ -150,13 +150,13 @@ end;
 
 procedure TAdmissionsW.DoAfterInsert(Sender: TObject);
 begin
-  if not VarIsNull(FIDEducationLevel.DefaultValue ) then
+  if not VarIsNull(FIDEducationLevel.DefaultValue) then
     IDEducationLevel.F.AsInteger := FIDEducationLevel.DefaultValue;
 
-  if not VarIsNull( Year.DefaultValue ) then
+  if not VarIsNull(Year.DefaultValue) then
     Year.F.AsInteger := Year.DefaultValue;
 
-  IDEDUCATION2.F.AsInteger := 1;  // Очная форма обучения
+  IDEDUCATION2.F.AsInteger := 1; // Очная форма обучения
 
   Mount_of_year.F.AsInteger := 1;
 
@@ -184,18 +184,25 @@ begin
   IDShortSpeciality.F.AsInteger := IDSpeciality.F.AsInteger;
 end;
 
-procedure TAdmissionsW.Save(AdmissionInt: IAdmission; AMode: TMode);
+procedure TAdmissionsW.Save(AdmissionI: IAdmission; AMode: TMode);
 begin
-  Assert(AdmissionInt <> nil);
+  Assert(AdmissionI <> nil);
 
   if AMode = EditMode then
-    TryEdit
+  begin
+    if ID_SpecialityEducation.F.AsInteger <> AdmissionI.ID_SpecialityEducation
+    then
+      ID_SpecialityEducation.Locate(AdmissionI.ID_SpecialityEducation,
+        [], True);
+
+    TryEdit;
+  end
   else
     TryAppend;
   try
-    IDSpeciality.F.AsInteger := AdmissionInt.IDSpeciality;
-    IDChair.F.AsInteger := AdmissionInt.IDChair;
-    Data.F.AsInteger := AdmissionInt.Data;
+    IDSpeciality.F.AsInteger := AdmissionI.IDSpeciality;
+    IDChair.F.AsInteger := AdmissionI.IDChair;
+    Data.F.AsInteger := AdmissionI.Data;
     TryPost;
   except
     TryCancel;
@@ -290,8 +297,8 @@ begin
   Result := FqSS;
 end;
 
-procedure TQueryAdmissions.Move(AIDArr: TArray<Integer>; AIDEducationLevel:
-    Integer);
+procedure TQueryAdmissions.Move(AIDArr: TArray<Integer>;
+  AIDEducationLevel: Integer);
 var
   AID: Integer;
 begin

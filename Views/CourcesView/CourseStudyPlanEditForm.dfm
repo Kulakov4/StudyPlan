@@ -1,4 +1,4 @@
-object frmCourceDiscEdit: TfrmCourceDiscEdit
+object frmCourseStudyPlanEdit: TfrmCourseStudyPlanEdit
   Left = 0
   Top = 0
   BorderStyle = bsDialog

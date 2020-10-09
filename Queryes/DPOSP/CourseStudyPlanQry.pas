@@ -82,7 +82,7 @@ type
     FSemID: TFieldWrap;
   public
     constructor Create(AOwner: TComponent); override;
-    procedure Save(ACourseStudyPlanInt: ICourseStudyPlan; AMode: TMode);
+    procedure Save(ACourseStudyPlanI: ICourseStudyPlan; AMode: TMode);
     property IDSPECIALITYEDUCATION: TFieldWrap read FIDSPECIALITYEDUCATION;
     property IDDisciplineName: TFieldWrap read FIDDisciplineName;
     property ID_StudyPlan: TFieldWrap read FID_StudyPlan;
@@ -172,23 +172,29 @@ end;
 
 {$R *.dfm}
 
-procedure TCourseStudyPlanW.Save(ACourseStudyPlanInt: ICourseStudyPlan;
-  AMode: TMode);
+procedure TCourseStudyPlanW.Save(ACourseStudyPlanI: ICourseStudyPlan; AMode:
+    TMode);
 begin
   if AMode = EditMode then
-    TryEdit
+  begin
+    Assert(ACourseStudyPlanI.ID_StudyPlan > 0);
+    if ID_StudyPlan.F.AsInteger <> ACourseStudyPlanI.ID_StudyPlan then
+      ID_StudyPlan.Locate(ACourseStudyPlanI.ID_StudyPlan, [], True);
+    TryEdit;
+  end
   else
     TryAppend;
+
   try
     IDSPECIALITYEDUCATION.F.AsInteger :=
-      ACourseStudyPlanInt.IDSPECIALITYEDUCATION;
-    IDChair.F.AsInteger := ACourseStudyPlanInt.IDChair;
-    IDDisciplineName.F.AsInteger := ACourseStudyPlanInt.IDDisciplineName;
-    LecData.F.AsInteger := ACourseStudyPlanInt.Lec;
-    LabData.F.AsInteger := ACourseStudyPlanInt.Lab;
-    SemData.F.AsInteger := ACourseStudyPlanInt.Sem;
-    ZachData.F.AsInteger := IfThen(ACourseStudyPlanInt.Zach, 2, 0);
-    ExamData.F.AsInteger := IfThen(ACourseStudyPlanInt.Exam, 2, 0);
+      ACourseStudyPlanI.IDSPECIALITYEDUCATION;
+    IDChair.F.AsInteger := ACourseStudyPlanI.IDChair;
+    IDDisciplineName.F.AsInteger := ACourseStudyPlanI.IDDisciplineName;
+    LecData.F.AsInteger := ACourseStudyPlanI.Lec;
+    LabData.F.AsInteger := ACourseStudyPlanI.Lab;
+    SemData.F.AsInteger := ACourseStudyPlanI.Sem;
+    ZachData.F.AsInteger := IfThen(ACourseStudyPlanI.Zach, 2, 0);
+    ExamData.F.AsInteger := IfThen(ACourseStudyPlanI.Exam, 2, 0);
     TryPost;
   except
     TryCancel;

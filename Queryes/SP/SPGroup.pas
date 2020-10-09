@@ -3,7 +3,7 @@ unit SPGroup;
 interface
 
 uses
-  System.Classes, ChairsQuery, CourceNameQuery, SpecEdQuery, SpecEdSimpleQuery,
+  System.Classes, ChairsQuery, CourseNameQuery, SpecEdQuery, SpecEdSimpleQuery,
   SPQry, SpecialitySessionsQuery, SPUnit, YearsQry, SpecEdBaseFormQry,
   NotifyEvents, System.Contnrs, EdQuery, SpecByChairQry, QualificationQuery,
   AreasQry, SPStandartQuery, SpecEdSimpleInt, InsertEditMode, SpecQry,
@@ -19,7 +19,7 @@ type
   strict private
     function GetAllChairsW: TChairsW;
     function GetAreasW: TAreasW; stdcall;
-    function GetCourceNameW: TCourceNameW;
+    function GetCourseNameW: TCourseNameW;
     function GetEdW: TEdW; stdcall;
     function GetEnabledChairsW: TChairsW; stdcall;
     function GetIDSpecEdW: TDumbW;
@@ -49,7 +49,7 @@ type
     FqAreas: TQryAreas;
     FqEnabledChairs: TQueryChairs;
     FqAllChairs: TQueryChairs;
-    FqCourceName: TQueryCourceName;
+    FqCourseName: TQueryCourseName;
     FqEd: TQueryEd;
     FqQualifications: TQryQualifications;
     FqSP: TQrySP;
@@ -105,7 +105,7 @@ type
     property qAreas: TQryAreas read GetqAreas;
     property qEnabledChairs: TQueryChairs read FqEnabledChairs;
     property qAllChairs: TQueryChairs read FqAllChairs;
-    property qCourceName: TQueryCourceName read FqCourceName;
+    property qCourseName: TQueryCourseName read FqCourseName;
     property qQualifications: TQryQualifications read GetqQualifications;
     property qSP: TQrySP read FqSP;
     property qSpec: TQrySpec read GetqSpec;
@@ -170,8 +170,8 @@ begin
   FqAllChairs.W.TryOpen;
 
   // Названия специальностей все!!
-  FqCourceName := TQueryCourceName.Create(Self);
-  FqCourceName.W.TryOpen;
+  FqCourseName := TQueryCourseName.Create(Self);
+  FqCourseName.W.TryOpen;
 
   // Учебный план
   FqSP := TQrySP.Create(Self);
@@ -323,9 +323,9 @@ begin
   Result := qAreas.W;
 end;
 
-function TSPGroup.GetCourceNameW: TCourceNameW;
+function TSPGroup.GetCourseNameW: TCourseNameW;
 begin
-  Result := qCourceName.W;
+  Result := qCourseName.W;
 end;
 
 function TSPGroup.GetEdW: TEdW;

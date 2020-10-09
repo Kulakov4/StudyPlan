@@ -3,18 +3,18 @@ unit SpecEdGroup;
 interface
 
 uses
-  System.Classes, SpecEdQuery, ChairsQuery, CourceNameQuery;
+  System.Classes, SpecEdQuery, ChairsQuery, CourseNameQuery;
 
 type
   TSpecEdGroup = class(TComponent)
   private
     FqChairs: TQueryChairs;
-    FqCourceName: TQueryCourceName;
+    FqCourseName: TQueryCourseName;
     FqSpecEd: TQuerySpecEd;
   public
     constructor Create(AOwner: TComponent); override;
     property qChairs: TQueryChairs read FqChairs;
-    property qCourceName: TQueryCourceName read FqCourceName;
+    property qCourseName: TQueryCourseName read FqCourseName;
     property qSpecEd: TQuerySpecEd read FqSpecEd;
   end;
 
@@ -32,8 +32,8 @@ begin
   FqChairs.W.RefreshQuery;
 
   // Названия специальностей
-  FqCourceName := TQueryCourceName.Create(Self);
-  FqCourceName.Search();
+  FqCourseName := TQueryCourseName.Create(Self);
+  FqCourseName.Search();
 
 end;
 

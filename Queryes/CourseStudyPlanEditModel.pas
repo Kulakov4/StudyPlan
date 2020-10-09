@@ -1,51 +1,51 @@
-unit CourceDiscNameViewModel;
+unit CourseStudyPlanEditModel;
 
 interface
 
 uses
   System.Classes, DiscNameQry, DiscNameInt, InsertEditMode, CourseStudyPlanQry,
-  CourseStudyPlanInterface, CourceDiscEditInterface;
+  CourseStudyPlanInterface, CourseStudyPlanEditInterface;
 
 type
-  TCourceDiscNameVM = class(TComponent, ICourceDiscEdit)
+  TCourseStudyPlanEditModel = class(TComponent, ICourseStudyPlanEdit)
   strict private
     function GetCourseStudyPlanW: TCourseStudyPlanW;
     function GetIDChair: Integer;
     function GetIDSpecialityEducation: Integer;
+    function GetID_StudyPlan: Integer; stdcall;
   private
     FCourseStudyPlanW: TCourseStudyPlanW;
     FIDChair: Integer;
     FIDSPECIALITYEDUCATION: Integer;
+    FIDStudyPlan: Integer;
     FqDiscName: TQryDiscName;
     function GetDiscNameW: TDiscNameW;
   protected
     property DiscNameW: TDiscNameW read GetDiscNameW;
   public
-    constructor Create(AOwner: TComponent; ACourseStudyPlanW: TCourseStudyPlanW;
-      AQryDiscName: TQryDiscName; AIDChair, AIDSPECIALITYEDUCATION: Integer);
-      reintroduce;
+    constructor Create(AOwner: TComponent; AIDStudyPlan: Integer;
+        ACourseStudyPlanW: TCourseStudyPlanW; AQryDiscName: TQryDiscName; AIDChair,
+        AIDSPECIALITYEDUCATION: Integer); reintroduce;
     function ApplyDisciplines(AIDDisciplineName: Integer;
       ADiscNameInt: IDiscName): Integer;
-    procedure ApplyCourseStudyPlan(ACourseStudyPlanInt: ICourseStudyPlan;
-      AMode: TMode);
-    procedure CancelUpdates;
+    procedure CancelDisciplines;
   end;
 
 implementation
 
-constructor TCourceDiscNameVM.Create(AOwner: TComponent;
-  ACourseStudyPlanW: TCourseStudyPlanW; AQryDiscName: TQryDiscName;
-  AIDChair, AIDSPECIALITYEDUCATION: Integer);
+constructor TCourseStudyPlanEditModel.Create(AOwner: TComponent; AIDStudyPlan:
+    Integer; ACourseStudyPlanW: TCourseStudyPlanW; AQryDiscName: TQryDiscName;
+    AIDChair, AIDSPECIALITYEDUCATION: Integer);
 begin
   inherited Create(AOwner);
+  FIDStudyPlan := AIDStudyPlan;
   FCourseStudyPlanW := ACourseStudyPlanW;
   FqDiscName := AQryDiscName;
   FIDChair := AIDChair;
   FIDSPECIALITYEDUCATION := AIDSPECIALITYEDUCATION;
-  ACourseStudyPlanW.SaveBookmark;
 end;
 
-function TCourceDiscNameVM.ApplyDisciplines(AIDDisciplineName: Integer;
+function TCourseStudyPlanEditModel.ApplyDisciplines(AIDDisciplineName: Integer;
   ADiscNameInt: IDiscName): Integer;
 begin
   // Тут у нас пока может ID = NULL
@@ -61,44 +61,34 @@ begin
   Result := FqDiscName.W.PK.AsInteger;
 end;
 
-procedure TCourceDiscNameVM.ApplyCourseStudyPlan(ACourseStudyPlanInt
-  : ICourseStudyPlan; AMode: TMode);
-var
-  OK: Boolean;
-begin
-  OK := FCourseStudyPlanW.RestoreBookmark;
-
-  // если мы редактировали дисциплину,
-  // то обязательно должны вернуться к редактируемой записи, перед сохранением
-  if AMode = EditMode then
-    Assert(OK);
-
-  FCourseStudyPlanW.Save(ACourseStudyPlanInt, AMode);
-end;
-
-procedure TCourceDiscNameVM.CancelUpdates;
+procedure TCourseStudyPlanEditModel.CancelDisciplines;
 begin
   FqDiscName.FDQuery.CancelUpdates;
 end;
 
-function TCourceDiscNameVM.GetCourseStudyPlanW: TCourseStudyPlanW;
+function TCourseStudyPlanEditModel.GetCourseStudyPlanW: TCourseStudyPlanW;
 begin
   Result := FCourseStudyPlanW;
 end;
 
-function TCourceDiscNameVM.GetDiscNameW: TDiscNameW;
+function TCourseStudyPlanEditModel.GetDiscNameW: TDiscNameW;
 begin
   Result := FqDiscName.W;
 end;
 
-function TCourceDiscNameVM.GetIDChair: Integer;
+function TCourseStudyPlanEditModel.GetIDChair: Integer;
 begin
   Result := FIDChair;
 end;
 
-function TCourceDiscNameVM.GetIDSpecialityEducation: Integer;
+function TCourseStudyPlanEditModel.GetIDSpecialityEducation: Integer;
 begin
   Result := FIDSPECIALITYEDUCATION;
+end;
+
+function TCourseStudyPlanEditModel.GetID_StudyPlan: Integer;
+begin
+  Result := FIDStudyPlan;
 end;
 
 end.

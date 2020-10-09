@@ -1,4 +1,4 @@
-inherited QueryCourceEdType: TQueryCourceEdType
+inherited QueryCourseEdType: TQueryCourseEdType
   inherited FDQuery: TFDQuery
     SQL.Strings = (
       'select '

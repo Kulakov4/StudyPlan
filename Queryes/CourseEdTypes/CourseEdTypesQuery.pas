@@ -1,4 +1,4 @@
-unit CourceEdTypesQuery;
+unit CourseEdTypesQuery;
 
 interface
 
@@ -10,20 +10,20 @@ uses
   Data.DB, FireDAC.Comp.DataSet, FireDAC.Comp.Client, DSWrap;
 
 type
-  TCourceEdTypeW = class;
+  TCourseEdTypeW = class;
 
-  TQueryCourceEdType = class(TQueryBase)
+  TQueryCourseEdType = class(TQueryBase)
   private
-    FW: TCourceEdTypeW;
+    FW: TCourseEdTypeW;
     { Private declarations }
   public
     constructor Create(AOwner: TComponent); override;
     function Search(AIDEducation: Integer): Integer;
-    property W: TCourceEdTypeW read FW;
+    property W: TCourseEdTypeW read FW;
     { Public declarations }
   end;
 
-  TCourceEdTypeW = class(TDSWrap)
+  TCourseEdTypeW = class(TDSWrap)
   private
     FID_Education: TFieldWrap;
     FID_EducationType: TFieldWrap;
@@ -37,7 +37,7 @@ type
 
 implementation
 
-constructor TCourceEdTypeW.Create(AOwner: TComponent);
+constructor TCourseEdTypeW.Create(AOwner: TComponent);
 begin
   inherited;
   FID_EducationType := TFieldWrap.Create(Self, 'ID_EducationType');
@@ -46,13 +46,13 @@ begin
   FID_Education := TFieldWrap.Create(Self, 'ID_Education');
 end;
 
-constructor TQueryCourceEdType.Create(AOwner: TComponent);
+constructor TQueryCourseEdType.Create(AOwner: TComponent);
 begin
   inherited;
-  FW := TCourceEdTypeW.Create(FDQuery);
+  FW := TCourseEdTypeW.Create(FDQuery);
 end;
 
-function TQueryCourceEdType.Search(AIDEducation: Integer): Integer;
+function TQueryCourseEdType.Search(AIDEducation: Integer): Integer;
 begin
   Assert(AIDEducation > 0);
 

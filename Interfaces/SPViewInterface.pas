@@ -3,7 +3,7 @@ unit SPViewInterface;
 interface
 
 uses
-  FDDumb, YearsQry, SpecEdSimpleWrap, CourceNameQuery, SpecEdQuery,
+  FDDumb, YearsQry, SpecEdSimpleWrap, CourseNameQuery, SpecEdQuery,
   ChairsQuery, SPUnit, EdQuery, SPEditInterface;
 
 type
@@ -13,7 +13,7 @@ type
     procedure DoOnReportPlanGraphBySpecExec;
     function GetActivePlansOnly: Boolean;
     function GetAllChairsW: TChairsW;
-    function GetCourceNameW: TCourceNameW;
+    function GetCourseNameW: TCourseNameW;
     function GetIDSpecEdW: TDumbW;
     function GetIDYearW: TDumbW;
     function GetSP: TStudyPlan;
@@ -26,7 +26,7 @@ type
     property ActivePlansOnly: Boolean read GetActivePlansOnly
       write SetActivePlansOnly;
     property AllChairsW: TChairsW read GetAllChairsW;
-    property CourceNameW: TCourceNameW read GetCourceNameW;
+    property CourseNameW: TCourseNameW read GetCourseNameW;
     property IDSpecEdW: TDumbW read GetIDSpecEdW;
     property IDYearW: TDumbW read GetIDYearW;
     property SP: TStudyPlan read GetSP;
