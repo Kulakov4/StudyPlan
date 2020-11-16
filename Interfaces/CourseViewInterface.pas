@@ -17,6 +17,7 @@ type
     function GetEdLvlW: TEdLvlW;
     procedure AdmissionMove(AIDArr: TArray<Integer>;
       AIDEducationLevel: Integer);
+    procedure DeleteCourse(AIDSpecialityEducationArr: TArray<Integer>);
     function GetChairsW: TChairsW;
     function GetCourseNameW: TCourseNameW;
     function GetCourseStudyPlanEditI(AIDStudyPlan: Integer)

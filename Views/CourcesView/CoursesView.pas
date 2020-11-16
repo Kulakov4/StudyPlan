@@ -62,6 +62,7 @@ type
     procedure actEditExecute(Sender: TObject);
     procedure actAddDisciplineExecute(Sender: TObject);
     procedure actCopyExecute(Sender: TObject);
+    procedure actDeleteExExecute(Sender: TObject);
     procedure actEditDisciplineExecute(Sender: TObject);
     procedure actEditPlanExecute(Sender: TObject);
     procedure actMoveExecute(Sender: TObject);
@@ -206,6 +207,16 @@ begin
     Exit;
 
   FCourseViewI.Copy(A, seYears.Value);
+end;
+
+procedure TViewCourses.actDeleteExExecute(Sender: TObject);
+var
+  A: TArray<Integer>;
+begin
+  inherited;
+  Assert(FCourseViewI.EdLvlW.RecordCount > 0);
+  A := GetSelectedIntValues(clIDSpecialityEducation);
+  FCourseViewI.DeleteCourse(A);
 end;
 
 procedure TViewCourses.actEditDisciplineExecute(Sender: TObject);
@@ -611,18 +622,22 @@ end;
 procedure TViewCourses.ShowEditCourceForm(AMode: TMode);
 var
   A: TArray<Integer>;
+  AIDSpecialityEducation: Integer;
   frm: TfrmEditCourse;
 begin
   inherited;
   cxGrid.SetFocus;
   MainView.Focused := True;
+  AIDSpecialityEducation := 0;
 
   A := GetSelectedIntValues(clIDSpecialityEducation);
+  Assert((Length(A) > 0) or ((AMode = InsertMode)));
 
-  if Length(A) = 0 then
-    Exit;
+  if AMode = EditMode then
+    AIDSpecialityEducation := A[0];
 
-  frm := TfrmEditCourse.Create(Self, FCourseViewI.GetCourseEditI(A[0]), AMode);
+  frm := TfrmEditCourse.Create(Self,
+    FCourseViewI.GetCourseEditI(AIDSpecialityEducation), AMode);
   try
     BeginUpdate;
     try
@@ -646,6 +661,7 @@ end;
 procedure TViewCourses.ShowEditDisciplineForm(AMode: TMode);
 var
   A: TArray<Integer>;
+  AIDStudyPlan: Integer;
   frm: TfrmCourseStudyPlanEdit;
 begin
   inherited;
@@ -654,8 +670,10 @@ begin
   if Length(A) = 0 then
     Exit;
 
+  AIDStudyPlan := A[0];
+
   frm := TfrmCourseStudyPlanEdit.Create(Self,
-    FCourseViewI.GetCourseStudyPlanEditI(A[0]), AMode);
+    FCourseViewI.GetCourseStudyPlanEditI(AIDStudyPlan), AMode);
   try
     frm.ShowModal;
   finally

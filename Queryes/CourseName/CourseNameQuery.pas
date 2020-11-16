@@ -147,7 +147,7 @@ begin
 
   if AMode = EditMode then
   begin
-    Assert(ACourseNameI.ID_Speciality > 0);
+//    Assert(ACourseNameI.ID_Speciality > 0);
     if ID_Speciality.F.AsInteger <> ACourseNameI.ID_Speciality then
       ID_Speciality.Locate(ACourseNameI.ID_Speciality, [], True);
     TryEdit;
@@ -159,6 +159,8 @@ begin
     Speciality.F.AsString := ACourseNameI.Speciality;
     SHORT_SPECIALITY.F.Value := ACourseNameI.ShortSpeciality;
     SPECIALITY_ACCESS.F.Value := ACourseNameI.IDChair;
+
+    TryPost;
   except
     TryCancel;
     raise;

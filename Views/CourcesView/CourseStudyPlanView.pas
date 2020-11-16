@@ -54,8 +54,8 @@ type
     property clLec: TcxGridDBBandedColumn read GetclLec;
     property clSem: TcxGridDBBandedColumn read GetclSem;
     property clZach: TcxGridDBBandedColumn read GetclZach;
-    property CourseStudyPlanViewI: ICourseStudyPlanView read FCourceStudyPlanViewI
-        write SetCourseStudyPlanViewI;
+    property CourseStudyPlanViewI: ICourseStudyPlanView
+      read FCourceStudyPlanViewI write SetCourseStudyPlanViewI;
     { Public declarations }
   end;
 
@@ -139,8 +139,8 @@ begin
   inherited;
   // Настраиваем подстановочную колонку Наименование дисциплины
   TDBLCB.InitColumn(clIDDisciplineName,
-    CourseStudyPlanViewI.DiscNameW.DisciplineName, lsEditList).OnEditValueChanged :=
-    DoOnIDDisciplineNameChanged;
+    CourseStudyPlanViewI.DiscNameW.DisciplineName, lsEditList)
+    .OnEditValueChanged := DoOnIDDisciplineNameChanged;
 
   clIDDisciplineName.Options.SortByDisplayText := isbtOn;
   clLec.Options.AutoWidthSizable := False;
@@ -180,8 +180,8 @@ begin
   DeleteMessages.Add(cxGridLevel, 'Удалить выбранные дисциплины?');
 end;
 
-procedure TCourceStudyPlanView2.SetCourseStudyPlanViewI(const Value:
-    ICourseStudyPlanView);
+procedure TCourceStudyPlanView2.SetCourseStudyPlanViewI
+  (const Value: ICourseStudyPlanView);
 begin
   FCourceStudyPlanViewI := Value;
 
@@ -198,17 +198,21 @@ end;
 
 procedure TCourceStudyPlanView2.ShowDisciplineEditForm(AMode: TMode);
 var
-  a: TArray<Integer>;
+  A: TArray<Integer>;
+  AIDStudyPlan: Integer;
   frm: TfrmCourseStudyPlanEdit;
 begin
   inherited;
+  AIDStudyPlan := 0;
+  A := GetSelectedIntValues(clIDStudyPlan);
 
-  a := GetSelectedIntValues(clIDStudyPlan);
-  if Length(a) = 0 then
-    Exit;
+  Assert((Length(A) > 0) or ((AMode = InsertMode)));
+
+  if AMode = EditMode then
+    AIDStudyPlan := A[0];
 
   frm := TfrmCourseStudyPlanEdit.Create(Self,
-    FCourceStudyPlanViewI.GetCourseStudyPlanEditI(a[0]), AMode);
+    FCourceStudyPlanViewI.GetCourseStudyPlanEditI(AIDStudyPlan), AMode);
   try
     frm.ShowModal;
   finally

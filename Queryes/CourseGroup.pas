@@ -20,8 +20,9 @@ type
     procedure CancelCourceEdit;
     function ApplyCourseName(ACourseNameI: ICourseName): Integer;
     procedure ApplyCourseStudyPlan;
-    function ApplyDisciplines(ADiscNameI: IDiscName): Integer;
+    function ApplyDisciplines(ADiscNameI: IDiscName; AMode: TMode): Integer;
     procedure CancelCourseStudyPlan;
+    procedure DeleteCourse(AIDSpecialityEducationArr: TArray<Integer>);
     function GetAdmissionsW: TAdmissionsW;
     function GetAfterLoadData: TNotifyEventsEx;
     function GetAllCourseStudyPlanW: TCourseStudyPlanW;
@@ -212,10 +213,11 @@ begin
   Assert(FqCourseStudyPlan.FDQuery.ChangeCount = 0);
 end;
 
-function TCourseGroup.ApplyDisciplines(ADiscNameI: IDiscName): Integer;
+function TCourseGroup.ApplyDisciplines(ADiscNameI: IDiscName; AMode: TMode):
+    Integer;
 begin
-  // Тут у нас пока может ID = NULL
-  qDiscName.W.Save(ADiscNameI, EditMode);
+  // Тут у нас пока может ID = NULL если InsertMode
+  qDiscName.W.Save(ADiscNameI, AMode);
 
   // Наконец-то сохраняем сделанные изменения в БД
   qDiscName.FDQuery.ApplyUpdates(0);
@@ -236,6 +238,19 @@ begin
   Assert(FqCourseStudyPlan.FDQuery.ChangeCount = 0);
 end;
 
+procedure TCourseGroup.DeleteCourse(AIDSpecialityEducationArr: TArray<Integer>);
+var
+  AIDSpecialityEducation: Integer;
+begin
+  Assert(Length(AIDSpecialityEducationArr) > 0);
+  for AIDSpecialityEducation in AIDSpecialityEducationArr do
+  begin
+    qAdmissions.W.ID_SpecialityEducation.Locate(AIDSpecialityEducation,
+      [], True);
+    qAdmissions.W.DataSet.Delete;
+  end;
+end;
+
 procedure TCourseGroup.DoAfterDisciplinesApplyUpdates(ADataSet: TFDDataSet;
   AErrorCount: Integer);
 var
@@ -243,9 +258,9 @@ var
   I: Integer;
 begin
   // Создаём курсор дисциплин учебного плана курсов
-  // Всё, что запишем в этот курсор, отобразится и в qCourseStudyPlan
-  // даже если qCourseStudyPlan использует CahedUpdates
-  AW := TCourseStudyPlanW.Create(qCourseStudyPlan.W.AddClone(''));
+  // Всё, что запишем в этот курсор, отобразится и в qAllCourseStudyPlan
+  // даже если qAllCourseStudyPlan использует CahedUpdates
+  AW := TCourseStudyPlanW.Create(qAllCourseStudyPlan.W.AddClone(''));
 
   FqCourseStudyPlan.FDQuery.FilterChanges := [FireDAC.Comp.DataSet.rtModified,
     FireDAC.Comp.DataSet.rtInserted];
@@ -343,7 +358,11 @@ end;
 function TCourseGroup.GetCourseStudyPlanEditI(AIDStudyPlan: Integer)
   : ICourseStudyPlanEdit;
 begin
-  Assert(AIDStudyPlan > 0);
+//  Assert(AIDStudyPlan > 0);
+
+  // Возможно мы будем добавлять запись в учебный план курсов!!!
+  // тогда AIDStudyPlan = 0!!!
+
   // Запоминаем, какую запись учебного плана мы будем редактировать
   FID_StudyPlan := AIDStudyPlan;
 
@@ -391,7 +410,8 @@ begin
 
   // Мы должны знать, какой набор на курсы мы редактируем
   Assert(FID_SpecialityEducation > 0);
-  qAdmissions.W.ID_SpecialityEducation.Locate(FID_SpecialityEducation, [], True);
+  qAdmissions.W.ID_SpecialityEducation.Locate(FID_SpecialityEducation,
+    [], True);
   Result := qAdmissions.W.IDChair.F.AsInteger;
 end;
 
@@ -491,7 +511,7 @@ begin
   if FID_SpecialityEducation = Value then
     Exit;
 
-  Assert(FID_SpecialityEducation = 0);
+//  Assert(FID_SpecialityEducation = 0);
   Assert(Value > 0);
   FID_SpecialityEducation := Value;
 end;

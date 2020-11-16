@@ -160,6 +160,8 @@ end;
 
 procedure TfrmCourseStudyPlanEdit.FormClose(Sender: TObject;
   var Action: TCloseAction);
+var
+  AMode: TMode;
 begin
   if ModalResult <> mrOK then
   begin
@@ -174,8 +176,15 @@ begin
     raise;
   end;
 
+  // Если код наименования дисциплины пустой - значит дисциплина новая
+  if FqDisciplineNameDumb.W.ID.F.AsInteger = 0 then
+    AMode := InsertMode
+  else
+    AMode := EditMode;
+
   // Сохраняем дисциплину и обновляем её код
-  FqDisciplineNameDumb.W.UpdateID(FCourseStudyPlanEditI.ApplyDisciplines(Self));
+  FqDisciplineNameDumb.W.UpdateID(FCourseStudyPlanEditI.ApplyDisciplines
+    (Self, AMode));
 
   // Сохраняем запись в учебном плане курсов
   FCourseStudyPlanEditI.CourseStudyPlanW.Save(Self, Mode);
@@ -183,7 +192,7 @@ end;
 
 function TfrmCourseStudyPlanEdit.GetDisciplineName: string;
 begin
-  cxdblcbDisciplineName.Text;
+  Result := cxdblcbDisciplineName.Text;
 end;
 
 function TfrmCourseStudyPlanEdit.GetExam: Boolean;
@@ -283,7 +292,8 @@ begin
     EditMode:
       begin
         Assert(FCourseStudyPlanEditI.ID_StudyPlan > 0);
-        FCourseStudyPlanEditI.CourseStudyPlanW.ID_StudyPlan.Locate(FCourseStudyPlanEditI.ID_StudyPlan, [], True);
+        FCourseStudyPlanEditI.CourseStudyPlanW.ID_StudyPlan.Locate
+          (FCourseStudyPlanEditI.ID_StudyPlan, [], True);
         with FCourseStudyPlanEditI do
         begin
           IDDisciplineName := CourseStudyPlanW.IDDisciplineName.F.AsInteger;

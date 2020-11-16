@@ -58,15 +58,11 @@ uses
 
 procedure TViewDiscName.actAddExecute(Sender: TObject);
 var
-  A: TArray<Integer>;
   F: TfrmEditDisciplineName;
 begin
   inherited;
-  A := GetSelectedIntValues(clID_DisciplineName);
-  if Length(A) = 0 then
-    Exit;
 
-  F := TfrmEditDisciplineName.Create(Self, DiscNameViewI.GetDiscNameEditI(A[0]),
+  F := TfrmEditDisciplineName.Create(Self, DiscNameViewI.GetDiscNameEditI(0),
     InsertMode);
   try
     F.ShowModal;
@@ -78,15 +74,17 @@ end;
 procedure TViewDiscName.actEditExecute(Sender: TObject);
 var
   A: TArray<Integer>;
+  AIDDisciplineName: Integer;
   F: TfrmEditDisciplineName;
 begin
   inherited;
   A := GetSelectedIntValues(clID_DisciplineName);
-  if Length(A) = 0 then
-    Exit;
+  Assert(Length(A) > 0);
 
-  F := TfrmEditDisciplineName.Create(Self, DiscNameViewI.GetDiscNameEditI(A[0]),
-    EditMode);
+  AIDDisciplineName := A[0];
+
+  F := TfrmEditDisciplineName.Create(Self,
+    DiscNameViewI.GetDiscNameEditI(AIDDisciplineName), EditMode);
   try
     F.ShowModal;
   finally
