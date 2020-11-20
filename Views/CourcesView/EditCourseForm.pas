@@ -36,6 +36,7 @@ type
     procedure cxPageControlChange(Sender: TObject);
     procedure cxPageControlPageChanging(Sender: TObject; NewPage: TcxTabSheet;
       var AllowChange: Boolean);
+    procedure FormShow(Sender: TObject);
   strict private
     function GetID_Speciality: Integer;
     function GetID_SpecialityEducation: Integer; stdcall;
@@ -108,6 +109,7 @@ begin
   begin
     FqChairDumb.W.UpdateID(StudyProcessOptions.IDChair);
     cxdblcbChair.Enabled := False;
+    // cxdblcbSpeciality.TabOrder := 0;
   end;
 
   TDBLCB.Init(cxdblcbChair, FqChairDumb.W.ID, FCourseEditI.ChairsW.Наименование,
@@ -262,6 +264,14 @@ begin
   except
     Action := caNone;
     raise;
+  end;
+end;
+
+procedure TfrmEditCourse.FormShow(Sender: TObject);
+begin
+  if (cxPageControl.ActivePage = cxtshPlan) and (not cxdblcbChair.Enabled) then
+  begin
+    cxdblcbSpeciality.SetFocus;
   end;
 end;
 
