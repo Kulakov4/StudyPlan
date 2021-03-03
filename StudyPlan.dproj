@@ -731,6 +731,21 @@
         <DCCReference Include="Interfaces\CourseViewInterface.pas"/>
         <DCCReference Include="Interfaces\CourseNameInterface.pas"/>
         <DCCReference Include="Interfaces\DiscNameViewInterface.pas"/>
+        <DCCReference Include="Queryes\CSEQry\CSEQry.pas">
+            <Form>QueryCSE</Form>
+            <FormType>dfm</FormType>
+            <DesignClass>TFrame</DesignClass>
+        </DCCReference>
+        <DCCReference Include="Views\CSEView\ViewCSE.pas">
+            <Form>ViewCSEFrame</Form>
+            <FormType>dfm</FormType>
+            <DesignClass>TFrame</DesignClass>
+        </DCCReference>
+        <DCCReference Include="Queryes\cycles\CyclesQry.pas">
+            <Form>QueryCycles</Form>
+            <FormType>dfm</FormType>
+            <DesignClass>TFrame</DesignClass>
+        </DCCReference>
         <None Include="StudyPlan.todo"/>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>

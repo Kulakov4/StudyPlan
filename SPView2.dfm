@@ -104,6 +104,7 @@ inherited viewSP: TviewSP
       Left = 0
       Top = 0
       Caption = 'TBToolbar2'
+      DockPos = 0
       Images = TBImageList1
       TabOrder = 1
       object TBSubmenuItem2: TTBSubmenuItem
@@ -121,7 +122,7 @@ inherited viewSP: TviewSP
         end
       end
       object TBItem4: TTBItem
-        Action = actStructure
+        Action = actStructure2
         DisplayMode = nbdmImageAndText
       end
       object TBItem18: TTBItem
@@ -311,6 +312,12 @@ inherited viewSP: TviewSP
       ImageIndex = 8
       OnExecute = actStructureExecute
     end
+    object actStructure2: TAction
+      Caption = #1057#1090#1088#1091#1082#1090#1091#1088#1072
+      Hint = #1057#1090#1088#1091#1082#1090#1091#1088#1072' '#1091#1095#1077#1073#1085#1086#1075#1086' '#1087#1083#1072#1085#1072
+      ImageIndex = 8
+      OnExecute = actStructure2Execute
+    end
     object actStudyPlanReport: TAction
       Caption = #1059#1095#1077#1073#1085#1099#1081' '#1087#1083#1072#1085
       Hint = #1054#1090#1095#1105#1090' '#1091#1095#1077#1073#1085#1099#1081' '#1087#1083#1072#1085
@@ -339,7 +346,7 @@ inherited viewSP: TviewSP
     Left = 344
     Top = 145
     Bitmap = {
-      494C01010B00B801780118001800FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      494C01010B00B801880118001800FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       000000000000360000002800000060000000480000000100200000000000006C
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000008C5A5A008C5A5A008C5A5A008C5A

@@ -1,5 +1,6 @@
 inherited vwdbtrlstCSE: TvwdbtrlstCSE
   Width = 989
+  ExplicitWidth = 989
   inherited cxdbtlView: TcxDBTreeList
     Width = 989
     Bands = <
@@ -11,12 +12,14 @@ inherited vwdbtrlstCSE: TvwdbtrlstCSE
     OptionsBehavior.ImmediateEditor = False
     OptionsBehavior.IncSearch = True
     OptionsBehavior.IncSearchItem = cxdbtlViewcxDBTreeListColumn1
+    OptionsData.Appending = True
     OptionsData.Inserting = True
     OptionsSelection.CellSelect = False
     OptionsSelection.HideFocusRect = False
     OptionsSelection.InvertSelect = False
     OnCompare = cxdbtlViewCompare
     OnDblClick = cxdbtlViewDblClick
+    ExplicitWidth = 989
     object cxdbtlViewcxDBTreeListColumn1: TcxDBTreeListColumn
       PropertiesClassName = 'TcxButtonEditProperties'
       Properties.Buttons = <

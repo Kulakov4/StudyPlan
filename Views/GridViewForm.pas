@@ -10,6 +10,8 @@ uses
   cxClasses, cxPropertiesStore, GridFrame, Vcl.ActnList;
 
 type
+  TFrameClass = class of TFrame;
+
   TfrmGridView = class(TForm)
     pnlMain: TPanel;
     cxbtnOK: TcxButton;
@@ -17,19 +19,18 @@ type
     cxbtnCancel: TcxButton;
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
   private
-    FGridView: TfrmGrid;
-    FGridViewClass: TGridViewClass;
+    FGridView: TFrame;
+    FGridViewClass: TFrameClass;
     FOKAction: TAction;
-    procedure SetGridViewClass(const Value: TGridViewClass);
+    procedure SetGridViewClass(const Value: TFrameClass);
     { Private declarations }
   public
     constructor Create(AOwner: TComponent; const ACaption, AStorageFileName:
         string; MsgDlgButtons: TMsgDlgButtons; AWidth: Cardinal = 0; AHeight:
         Cardinal = 0); reintroduce;
     procedure AfterConstruction; override;
-    property GridView: TfrmGrid read FGridView;
-    property GridViewClass: TGridViewClass read FGridViewClass
-      write SetGridViewClass;
+    property GridView: TFrame read FGridView;
+    property GridViewClass: TFrameClass read FGridViewClass write SetGridViewClass;
     property OKAction: TAction read FOKAction write FOKAction;
     { Public declarations }
   end;
@@ -82,7 +83,7 @@ begin
   end;
 end;
 
-procedure TfrmGridView.SetGridViewClass(const Value: TGridViewClass);
+procedure TfrmGridView.SetGridViewClass(const Value: TFrameClass);
 begin
   if FGridViewClass = Value then
     Exit;
@@ -90,7 +91,8 @@ begin
   FGridViewClass := Value;
   FreeAndNil(FGridView);
   FGridView := FGridViewClass.Create(nil);
-  FGridView.Place(pnlMain);
+  FGridView.Parent := pnlMain;
+  FGridView.Align := alClient;
 end;
 
 end.

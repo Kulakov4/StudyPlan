@@ -6,6 +6,7 @@ object FireDACDM: TFireDACDM
     Params.Strings = (
       'User_Name=cdb_win_studyplan'
       'Password=studyplan'
+      'Database=ORACLE'
       'DriverID=Ora')
     LoginPrompt = False
     AfterConnect = FDConnectionAfterConnect

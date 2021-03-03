@@ -109,6 +109,7 @@ type
     TBItem17: TTBItem;
     actSpecialitySessions: TAction;
     TBItem18: TTBItem;
+    actStructure2: TAction;
     procedure actAdditionExecute(Sender: TObject);
     procedure actAuditorExecute(Sender: TObject);
     procedure actBaseExecute(Sender: TObject);
@@ -142,6 +143,7 @@ type
     procedure actPracticalLessonsExecute(Sender: TObject);
     procedure actShowSummaryExecute(Sender: TObject);
     procedure actSpecialitySessionsExecute(Sender: TObject);
+    procedure actStructure2Execute(Sender: TObject);
     procedure actStructureExecute(Sender: TObject);
     procedure actStudyPlanReportExecute(Sender: TObject);
     procedure actTotal2Execute(Sender: TObject);
@@ -214,7 +216,7 @@ uses SPEditForm, DB, SPEditView, SPViewDM, cxDBTL, cxStyles, cxCustomData,
   DisciplineCompetence, DisciplineCompetenceView, ProgressBarForm,
   StudyPlanInfo, System.IOUtils, UMKDataModule, System.UITypes, DisciplineLit,
   DisciplineLitView, CSEView, OptionsHelper, SpecSessGroup, GridViewForm,
-  SpecSessView, FR3, ReportFilesUpdater, MyDir;
+  SpecSessView, FR3, ReportFilesUpdater, MyDir, ViewCSE;
 
 {$R *.dfm}
 
@@ -728,6 +730,23 @@ begin
     FreeAndNil(frmSpecialitySessions);
     end;
   }
+end;
+
+procedure TviewSP.actStructure2Execute(Sender: TObject);
+var
+  F: TfrmGridView;
+begin
+  F := TfrmGridView.Create(Self, 'Структура учебного плана',
+    TMyDir.AppDataDirFile('NewCSEForm.ini'), [mbOk], 500);
+  try
+    F.GridViewClass := TViewCSEFrame;
+    (F.GridView as TViewCSEFrame).W := Document.qCSE.W;
+
+    F.ShowModal;
+    Document.CSE.Refresh;
+  finally
+    FreeAndNil(F);
+  end;
 end;
 
 procedure TviewSP.actStructureExecute(Sender: TObject);

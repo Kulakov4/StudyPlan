@@ -235,7 +235,10 @@ uses
   CoursesView in 'Views\CourcesView\CoursesView.pas' {ViewCourses: TFrame},
   CourseViewInterface in 'Interfaces\CourseViewInterface.pas',
   CourseNameInterface in 'Interfaces\CourseNameInterface.pas',
-  DiscNameViewInterface in 'Interfaces\DiscNameViewInterface.pas';
+  DiscNameViewInterface in 'Interfaces\DiscNameViewInterface.pas',
+  CSEQry in 'Queryes\CSEQry\CSEQry.pas' {QueryCSE: TFrame},
+  ViewCSE in 'Views\CSEView\ViewCSE.pas' {ViewCSEFrame: TFrame},
+  CyclesQry in 'Queryes\cycles\CyclesQry.pas' {QueryCycles: TFrame};
 
 {$R *.res}
 
