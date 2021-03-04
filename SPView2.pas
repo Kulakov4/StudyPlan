@@ -98,7 +98,6 @@ type
     actDisciplineLit: TAction;
     TBItem3: TTBItem;
     TBToolbar2: TTBToolbar;
-    actStructure: TAction;
     TBItem4: TTBItem;
     TBSubmenuItem2: TTBSubmenuItem;
     actStudyPlanReport: TAction;
@@ -109,7 +108,7 @@ type
     TBItem17: TTBItem;
     actSpecialitySessions: TAction;
     TBItem18: TTBItem;
-    actStructure2: TAction;
+    actStructure: TAction;
     procedure actAdditionExecute(Sender: TObject);
     procedure actAuditorExecute(Sender: TObject);
     procedure actBaseExecute(Sender: TObject);
@@ -143,7 +142,6 @@ type
     procedure actPracticalLessonsExecute(Sender: TObject);
     procedure actShowSummaryExecute(Sender: TObject);
     procedure actSpecialitySessionsExecute(Sender: TObject);
-    procedure actStructure2Execute(Sender: TObject);
     procedure actStructureExecute(Sender: TObject);
     procedure actStudyPlanReportExecute(Sender: TObject);
     procedure actTotal2Execute(Sender: TObject);
@@ -215,7 +213,7 @@ uses SPEditForm, DB, SPEditView, SPViewDM, cxDBTL, cxStyles, cxCustomData,
   ETP, ETPView, EssenceGridView, MyDataAccess, CommissionOptions,
   DisciplineCompetence, DisciplineCompetenceView, ProgressBarForm,
   StudyPlanInfo, System.IOUtils, UMKDataModule, System.UITypes, DisciplineLit,
-  DisciplineLitView, CSEView, OptionsHelper, GridViewForm,
+  DisciplineLitView, OptionsHelper, GridViewForm,
   SpecSessView, FR3, ReportFilesUpdater, CSEForm, MyDir, SpecSessForm;
 
 {$R *.dfm}
@@ -642,8 +640,6 @@ end;
 
 procedure TviewSP.actPlanGraphByAdmissionReportExecute(Sender: TObject);
 begin
-  // TMyFR.Create(Self).Show('study_plan\plan_graph_by_admission2.fr3',
-  // ['idspecialityeducation'], [Document.IDSpecEducation]);
   TFR3.Create.Show(TReportFilesUpdater.TryUpdate
     ('study_plan\plan_graph_by_admission2.fr3'), ['idspecialityeducation'],
     [Document.IDSpecEducation]);
@@ -695,28 +691,9 @@ begin
   TSpecSessForm.ShowModal(Document.SpecSessService);
 end;
 
-procedure TviewSP.actStructure2Execute(Sender: TObject);
+procedure TviewSP.actStructureExecute(Sender: TObject);
 begin
   TCSEForm.ShowModal(Document.CSEService);
-end;
-
-procedure TviewSP.actStructureExecute(Sender: TObject);
-var
-  frmCSEView: TfrmViewEx;
-begin
-  Assert(Document <> nil);
-  Assert(Document.CSE <> nil);
-
-  frmCSEView := TfrmViewEx.Create(Self, 'Структура учебного плана',
-    'CSEForm', [mbOk]);
-  try
-    frmCSEView.ViewClass := TviewCSE;
-    frmCSEView.View.SetDocument(Document.CSE);
-    frmCSEView.ShowModal;
-  finally
-    FreeAndNil(frmCSEView);
-  end;
-
   // Если не перейти на первую запись, то FviewSP.FviewDBTreeListSP глючит
   Document.StudyPlanCDS.First;
 end;

@@ -15,7 +15,6 @@ uses
   GridComboBox in 'C:\Users\Public\Documents\Embarcadero\Studio\Components\Kulakov\ComboBox\GridComboBox.pas' {cxGridComboBoxView: TView_Ex},
   CSE in 'CSE.pas',
   CSEDBTreeListView in 'CSEDBTreeListView.pas',
-  CSEView in 'CSEView.pas',
   DisciplineNames in 'DisciplineNames.pas',
   GridComboBoxViewEx in 'GridComboBoxViewEx.pas' {cxGridCBViewEx},
   Main in 'Main.pas' {frmMain},

@@ -139,7 +139,6 @@
         </DCCReference>
         <DCCReference Include="CSE.pas"/>
         <DCCReference Include="CSEDBTreeListView.pas"/>
-        <DCCReference Include="CSEView.pas"/>
         <DCCReference Include="DisciplineNames.pas"/>
         <DCCReference Include="GridComboBoxViewEx.pas">
             <Form>cxGridCBViewEx</Form>
