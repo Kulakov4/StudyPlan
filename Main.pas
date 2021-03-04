@@ -15,7 +15,7 @@ uses
   dxBarBuiltInMenu, System.Actions, cxClasses, cxLocalization,
   System.ImageList, cxMaskEdit, cxDropDownEdit, cxLookupEdit, cxDBLookupEdit,
   cxDBLookupComboBox, DisciplineLit, KDBClient, CourseGroup,
-  SpecEdGroup, SpecEdView, SPGroup, SPMainView, System.Contnrs, SPOView, VOView,
+  SPGroup, SPMainView, System.Contnrs, SPOView, VOView,
   RetrainingView, SpecEdSimpleQuery, SpecEdSimpleQuery2, CommissionOptions,
   Vcl.Menus, CoursesView;
 

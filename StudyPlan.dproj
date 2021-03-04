@@ -483,7 +483,6 @@
             <FormType>dfm</FormType>
             <DesignClass>TFrame</DesignClass>
         </DCCReference>
-        <DCCReference Include="Queryes\SpecialityEducations\SpecEdGroup.pas"/>
         <DCCReference Include="Queryes\Educations2\EdQuery.pas">
             <Form>QueryEd</Form>
             <FormType>dfm</FormType>
@@ -755,6 +754,8 @@
         <DCCReference Include="Interfaces\SpecSessServiceInterface.pas"/>
         <DCCReference Include="Queryes\SpecSess\SpecSessService.pas"/>
         <DCCReference Include="Views\SpecSessView\SpecSessForm.pas"/>
+        <DCCReference Include="Queryes\SpecialityEducations\SpecEdService.pas"/>
+        <DCCReference Include="Interfaces\SpecEdServiceInterface.pas"/>
         <None Include="StudyPlan.todo"/>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>

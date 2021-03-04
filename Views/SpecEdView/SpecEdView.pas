@@ -13,27 +13,30 @@ uses
   System.Actions, Vcl.ActnList, cxClasses, dxBar, Vcl.ComCtrls, cxGridLevel,
   cxGridCustomView, cxGridCustomTableView, cxGridTableView,
   cxGridBandedTableView, cxGridDBBandedTableView, cxGrid, SpecEdQuery,
-  SpecEdGroup, dxDateRanges;
+  dxDateRanges, SpecEdServiceInterface;
 
 type
   TViewSpecEd = class(TfrmGrid)
   private
-    FSpecEdGr: TSpecEdGroup;
+    FSpecEdServiceI: ISpecEdService;
     function GetclIDChair: TcxGridDBBandedColumn;
     function GetclIDSpeciality: TcxGridDBBandedColumn;
     function GetclData: TcxGridDBBandedColumn;
     function GetclYear: TcxGridDBBandedColumn;
-    procedure SetSpecEdGr(const Value: TSpecEdGroup);
+    function GetW: TSpecEdW;
+    procedure SetSpecEdServiceI(const Value: ISpecEdService);
     { Private declarations }
   protected
     procedure InitColumns(AView: TcxGridDBBandedTableView); override;
+    property W: TSpecEdW read GetW;
   public
     procedure InitView(AView: TcxGridDBBandedTableView); override;
     property clIDChair: TcxGridDBBandedColumn read GetclIDChair;
     property clIDSpeciality: TcxGridDBBandedColumn read GetclIDSpeciality;
     property clData: TcxGridDBBandedColumn read GetclData;
     property clYear: TcxGridDBBandedColumn read GetclYear;
-    property SpecEdGr: TSpecEdGroup read FSpecEdGr write SetSpecEdGr;
+    property SpecEdServiceI: ISpecEdService read FSpecEdServiceI write
+        SetSpecEdServiceI;
     { Public declarations }
   end;
 
@@ -46,31 +49,35 @@ uses
 
 function TViewSpecEd.GetclIDChair: TcxGridDBBandedColumn;
 begin
-  Result := MainView.GetColumnByFieldName
-    (FSpecEdGr.qSpecEd.W.IDChair.FieldName);
+  Result := MainView.GetColumnByFieldName(W.IDChair.FieldName);
 end;
 
 function TViewSpecEd.GetclIDSpeciality: TcxGridDBBandedColumn;
 begin
-  Result := MainView.GetColumnByFieldName
-    (FSpecEdGr.qSpecEd.W.IDSpeciality.FieldName);
+  Result := MainView.GetColumnByFieldName(W.IDSpeciality.FieldName);
 end;
 
 function TViewSpecEd.GetclData: TcxGridDBBandedColumn;
 begin
-  Result := MainView.GetColumnByFieldName(FSpecEdGr.qSpecEd.W.Data.FieldName);
+  Result := MainView.GetColumnByFieldName(W.Data.FieldName);
 end;
 
 function TViewSpecEd.GetclYear: TcxGridDBBandedColumn;
 begin
-  Result := MainView.GetColumnByFieldName(FSpecEdGr.qSpecEd.W.Year.FieldName);
+  Result := MainView.GetColumnByFieldName(W.Year.FieldName);
+end;
+
+function TViewSpecEd.GetW: TSpecEdW;
+begin
+  Assert(FSpecEdServiceI <> nil);
+  Result := FSpecEdServiceI.SpecEdW;
 end;
 
 procedure TViewSpecEd.InitColumns(AView: TcxGridDBBandedTableView);
 begin
   inherited;
   // Настраиваем подстановочную колонку Кафедра
-  TDBLCB.InitColumn(clIDChair, FSpecEdGr.qChairs.W.Short_Name, lsFixedList);
+  TDBLCB.InitColumn(clIDChair, FSpecEdServiceI.ChairsW.Short_Name, lsFixedList);
 
   // Группируем планы по году
   // clYear.GroupIndex := 0;
@@ -87,7 +94,7 @@ begin
 
   // Сортируем по году
   ApplySort(MainView, clYear);
-  FocusTopLeft(FSpecEdGr.qSpecEd.W.IDSpeciality.FieldName);
+  FocusTopLeft(W.IDSpeciality.FieldName);
 
   clYear.GroupIndex := 0;
   clYear.Visible := False;
@@ -103,20 +110,17 @@ begin
   MainView.OptionsView.ColumnAutoWidth := False;
 end;
 
-procedure TViewSpecEd.SetSpecEdGr(const Value: TSpecEdGroup);
+procedure TViewSpecEd.SetSpecEdServiceI(const Value: ISpecEdService);
 begin
-  if FSpecEdGr = Value then
-    Exit;
+  FSpecEdServiceI := Value;
 
-  FSpecEdGr := Value;
-
-  if FSpecEdGr = nil then
+  if FSpecEdServiceI = nil then
   begin
     DSWrap := nil;
     Exit;
   end;
 
-  DSWrap := FSpecEdGr.qSpecEd.W;
+  DSWrap := FSpecEdServiceI.SpecEdW;
 
   UpdateView;
 end;

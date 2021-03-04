@@ -156,7 +156,6 @@ uses
   CourseEdTypesQuery in 'Queryes\CourseEdTypes\CourseEdTypesQuery.pas' {QueryCourseEdType: TFrame},
   SpecEdQuery in 'Queryes\SpecialityEducations\SpecEdQuery.pas' {QuerySpecEd: TFrame},
   SpecEdView in 'Views\SpecEdView\SpecEdView.pas' {ViewSpecEd: TFrame},
-  SpecEdGroup in 'Queryes\SpecialityEducations\SpecEdGroup.pas',
   EdQuery in 'Queryes\Educations2\EdQuery.pas' {QueryEd: TFrame},
   EdLevelQuery in 'Queryes\Education_Level\EdLevelQuery.pas' {QueryEdLevel: TFrame},
   SPMainView in 'Views\SPView\SPMainView.pas' {ViewSPMain: TFrame},
@@ -242,7 +241,9 @@ uses
   CSEForm in 'Views\CSEView\CSEForm.pas',
   SpecSessServiceInterface in 'Interfaces\SpecSessServiceInterface.pas',
   SpecSessService in 'Queryes\SpecSess\SpecSessService.pas',
-  SpecSessForm in 'Views\SpecSessView\SpecSessForm.pas';
+  SpecSessForm in 'Views\SpecSessView\SpecSessForm.pas',
+  SpecEdService in 'Queryes\SpecialityEducations\SpecEdService.pas',
+  SpecEdServiceInterface in 'Interfaces\SpecEdServiceInterface.pas';
 
 {$R *.res}
 
