@@ -14,7 +14,7 @@ uses
   SpecEducationGridComboBoxView, Cromis.Comm.IPC, Cromis.Comm.Custom,
   dxBarBuiltInMenu, System.Actions, cxClasses, cxLocalization,
   System.ImageList, cxMaskEdit, cxDropDownEdit, cxLookupEdit, cxDBLookupEdit,
-  cxDBLookupComboBox, DisciplineLit, KDBClient, CourseGroup,
+  cxDBLookupComboBox, DisciplineLit, KDBClient, CourseService,
   SPGroup, SPMainView, System.Contnrs, SPOView, VOView,
   RetrainingView, SpecEdSimpleQuery, SpecEdSimpleQuery2, CommissionOptions,
   Vcl.Menus, CoursesView;
@@ -60,8 +60,8 @@ type
     procedure cxpcStudyPlanChange(Sender: TObject);
     procedure cxpgcntrlMainChange(Sender: TObject);
   private
-    FCourseGrpDO: TCourseGroup;
-    FCourseGrpDPO: TCourseGroup;
+    FDOCourseService: TCourseService;
+    FDPOCourseService: TCourseService;
     FDisciplineListIDs: String;
     FEvents: TObjectList;
     FIPCServer: TIPCServer;
@@ -624,9 +624,9 @@ begin
   begin
     if FViewCoursesDO = nil then
     begin
-      FCourseGrpDO := TCourseGroup.Create(Self, TOptions.SP.AcademicYear, 4);
+      FDOCourseService := TCourseService.Create(Self, TOptions.SP.AcademicYear, 4);
 
-      TNotifyEventWrap.Create(FCourseGrpDO.OnYearChange,
+      TNotifyEventWrap.Create(FDOCourseService.OnYearChange,
         DoOnDOYearChange, FEvents);
 
       FViewCoursesDO := TViewCourses.Create(Self);
@@ -636,11 +636,11 @@ begin
         AccessLevel := TOptions.AccessLevel;
         Place(cxtshDO);
 
-        CourseViewI := FCourseGrpDO;
+        CourseViewI := FDOCourseService;
       end;
     end
     else
-      FCourseGrpDO.Year := TOptions.SP.AcademicYear;
+      FDOCourseService.Year := TOptions.SP.AcademicYear;
 
     TOptions.SP.IDEducationLevel := 4;
   end;
@@ -652,9 +652,9 @@ begin
   begin
     if FViewCoursesDPO = nil then
     begin
-      FCourseGrpDPO := TCourseGroup.Create(Self, TOptions.SP.AcademicYear, 6);
+      FDPOCourseService := TCourseService.Create(Self, TOptions.SP.AcademicYear, 6);
 
-      TNotifyEventWrap.Create(FCourseGrpDPO.OnYearChange,
+      TNotifyEventWrap.Create(FDPOCourseService.OnYearChange,
         DoOnDPOYearChange, FEvents);
 
       FViewCoursesDPO := TViewCourses.Create(Self);
@@ -663,11 +663,11 @@ begin
         Name := 'ViewCourcesDPO';
         AccessLevel := TOptions.AccessLevel;
         Place(cxtshNewDPO);
-        CourseViewI := FCourseGrpDPO;
+        CourseViewI := FDPOCourseService;
       end;
     end
     else
-      FCourseGrpDPO.Year := TOptions.SP.AcademicYear;
+      FDPOCourseService.Year := TOptions.SP.AcademicYear;
 
     TOptions.SP.IDEducationLevel := 6;
   end;
@@ -734,11 +734,11 @@ end;
 
 procedure TfrmMain.DoOnDOYearChange(Sender: TObject);
 begin
-  if TOptions.SP.AcademicYear = FCourseGrpDO.Year then
+  if TOptions.SP.AcademicYear = FDOCourseService.Year then
     Exit;
 
   // Произошёл переход на новый год!
-  TOptions.SP.AcademicYear := FCourseGrpDO.Year;
+  TOptions.SP.AcademicYear := FDOCourseService.Year;
   TOptions.SP.IDSpecEdVO := 0;
   TOptions.SP.IDSpecEdSPO := 0;
   TOptions.SP.IDSpecEdRetraining := 0;
@@ -746,11 +746,11 @@ end;
 
 procedure TfrmMain.DoOnDPOYearChange(Sender: TObject);
 begin
-  if TOptions.SP.AcademicYear = FCourseGrpDPO.Year then
+  if TOptions.SP.AcademicYear = FDPOCourseService.Year then
     Exit;
 
   // Произошёл переход на новый год!
-  TOptions.SP.AcademicYear := FCourseGrpDPO.Year;
+  TOptions.SP.AcademicYear := FDPOCourseService.Year;
   TOptions.SP.IDSpecEdVO := 0;
   TOptions.SP.IDSpecEdSPO := 0;
   TOptions.SP.IDSpecEdRetraining := 0;

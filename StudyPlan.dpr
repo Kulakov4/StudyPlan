@@ -128,7 +128,7 @@ uses
   Dumb in 'Dumb.pas',
   SpecEducSimple in 'SpecEducSimple.pas',
   GridFrame in 'Views\GridFrame.pas' {frmGrid: TFrame},
-  CourseGroup in 'Queryes\CourseGroup.pas',
+  CourseService in 'Queryes\CourseService.pas',
   DragHelper in 'helpers\DragHelper.pas',
   TextRectHelper in 'helpers\TextRectHelper.pas',
   DialogUnit in 'helpers\DialogUnit.pas',

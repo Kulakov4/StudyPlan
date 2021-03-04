@@ -8,7 +8,7 @@ uses
   cxGraphics, cxControls, cxLookAndFeels, cxLookAndFeelPainters, cxContainer,
   cxEdit, cxTextEdit, cxMaskEdit, cxDropDownEdit, cxLookupEdit, cxDBLookupEdit,
   cxDBLookupComboBox, Vcl.StdCtrls, cxSpinEdit, cxCheckBox, Vcl.Menus,
-  cxButtons, CourseGroup, Data.DB, InsertEditMode, FireDAC.Comp.Client,
+  cxButtons, Data.DB, InsertEditMode, FireDAC.Comp.Client,
   cxLabel, DiscNameQry, DiscNameInt, CourseStudyPlanInterface, FDDumb,
   CourseStudyPlanEditInterface;
 
