@@ -30,8 +30,6 @@ uses
   SPViewDM in 'SPViewDM.pas' {DM: TDataModule},
   SS in 'SS.pas',
   Admissions in 'Admissions.pas',
-  DPOStudyPlan in 'DPOStudyPlan.pas',
-  StudGroups in 'StudGroups.pas',
   Lessons in 'Lessons.pas',
   LessonsView in 'LessonsView.pas',
   GFLTeachers in 'GFLTeachers.pas',

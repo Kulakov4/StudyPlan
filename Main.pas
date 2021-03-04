@@ -8,7 +8,7 @@ uses
   SpecEducation, cxControls, cxContainer, cxEdit, cxTextEdit, cxDBEdit, CSE,
   SPUnit, LessonTypes, ExtCtrls, ActnList, ImgList, cxCheckBox, dxSkinsCore,
   dxSkinsDefaultPainters, cxLabel, cxDBLabel, dxSkinscxPCPainter, cxPC,
-  cxSplitter, Admissions, StudGroups, DPOStudyPlan, SPView2, cxGraphics,
+  cxSplitter, Admissions, StudGroups, SPView2, cxGraphics,
   cxLookAndFeels, cxLookAndFeelPainters, cxPCdxBarPopupMenu, Vcl.ComCtrls,
   StudyPlanFactors, dxDockControl, dxDockPanel, GridComboBox,
   SpecEducationGridComboBoxView, Cromis.Comm.IPC, Cromis.Comm.Custom,

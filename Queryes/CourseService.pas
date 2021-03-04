@@ -3,7 +3,7 @@ unit CourseService;
 interface
 
 uses
-  System.Classes, Admissions, DPOStudyPlan, Years, AdmissionsQuery, ChairsQuery,
+  System.Classes, Admissions, Years, AdmissionsQuery, ChairsQuery,
   CourseNameQuery, System.Contnrs, NotifyEvents, StudentGroupsQuery,
   CourseEdTypesQuery, YearsQry, EdLvlQry, Data.DB, FireDAC.Comp.DataSet,
   DiscNameQry, CourseStudyPlanQry, FDDumb, CourseViewInterface,

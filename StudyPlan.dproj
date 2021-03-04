@@ -163,8 +163,6 @@
         </DCCReference>
         <DCCReference Include="SS.pas"/>
         <DCCReference Include="Admissions.pas"/>
-        <DCCReference Include="DPOStudyPlan.pas"/>
-        <DCCReference Include="StudGroups.pas"/>
         <DCCReference Include="Lessons.pas"/>
         <DCCReference Include="LessonsView.pas"/>
         <DCCReference Include="GFLTeachers.pas"/>
