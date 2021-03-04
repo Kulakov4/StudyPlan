@@ -157,7 +157,7 @@ uses
   EdQuery in 'Queryes\Educations2\EdQuery.pas' {QueryEd: TFrame},
   EdLevelQuery in 'Queryes\Education_Level\EdLevelQuery.pas' {QueryEdLevel: TFrame},
   SPMainView in 'Views\SPView\SPMainView.pas' {ViewSPMain: TFrame},
-  SPGroup in 'Queryes\SP\SPGroup.pas',
+  SPService in 'Queryes\SP\SPService.pas',
   SpecEdPopupView in 'Views\SPView\SpecEdPopupView.pas' {ViewSpecEdPopup: TFrame},
   SpecEdSimpleQuery in 'Queryes\SpecEdSimple\SpecEdSimpleQuery.pas' {QuerySpecEdSimple: TFrame},
   DBLookupComboBoxHelper in 'helpers\DBLookupComboBoxHelper.pas',

@@ -15,9 +15,9 @@ uses
   dxBarBuiltInMenu, System.Actions, cxClasses, cxLocalization,
   System.ImageList, cxMaskEdit, cxDropDownEdit, cxLookupEdit, cxDBLookupEdit,
   cxDBLookupComboBox, DisciplineLit, KDBClient, CourseService,
-  SPGroup, SPMainView, System.Contnrs, SPOView, VOView,
-  RetrainingView, SpecEdSimpleQuery, SpecEdSimpleQuery2, CommissionOptions,
-  Vcl.Menus, CoursesView;
+  SPMainView, System.Contnrs, SPOView, VOView, RetrainingView,
+  SpecEdSimpleQuery, SpecEdSimpleQuery2, CommissionOptions,
+  Vcl.Menus, CoursesView, SPService;
 
 const
   WM_SelectStudyPlan = WM_USER + 123;
@@ -65,9 +65,9 @@ type
     FEvents: TObjectList;
     FIPCServer: TIPCServer;
     FqSpecEdSimple: TQuerySpecEdSimple;
-    FSPGrpVO: TSPGroup;
-    FSPGrpSPO: TSPGroup;
-    FSPGrpRetraining: TSPGroup;
+    FVOSPService: TSPService;
+    FSPOSPService: TSPService;
+    FRetrainingSPService: TSPService;
     // FStudyPlanFactors: TStudyPlanFactors;
     FViewCoursesDO: TViewCourses;
     FViewCoursesDPO: TViewCourses;
@@ -475,15 +475,15 @@ begin
   // *************************************************
   if (cxpgcntrlMain.ActivePage = cxtshRetraining2) then
   begin
-    if (FSPGrpRetraining = nil) then
+    if (FRetrainingSPService = nil) then
     begin
-      Assert(FSPGrpRetraining = nil);
-      FSPGrpRetraining := TSPGroup.Create(Self, TOptions.SP.AcademicYear,
+      Assert(FRetrainingSPService = nil);
+      FRetrainingSPService := TSPService.Create(Self, TOptions.SP.AcademicYear,
         TOptions.SP.IDSpecEdRetraining, sptRetraining);
 
-      TNotifyEventWrap.Create(FSPGrpRetraining.OnYearChange,
+      TNotifyEventWrap.Create(FRetrainingSPService.OnYearChange,
         DoOnRetrainingYearChange, FEvents);
-      TNotifyEventWrap.Create(FSPGrpRetraining.OnSpecEdChange,
+      TNotifyEventWrap.Create(FRetrainingSPService.OnSpecEdChange,
         DoOnRetrainingSpecEdChange, FEvents);
 
       FViewRetraining := TViewRetraining.Create(Self);
@@ -493,11 +493,11 @@ begin
         Name := 'ViewRetraining';
         Align := alClient;
         Parent := cxtshRetraining2;
-        SPRetViewI := FSPGrpRetraining;
+        SPRetViewI := FRetrainingSPService;
       end;
     end
     else
-      FSPGrpRetraining.Year := TOptions.SP.AcademicYear;
+      FRetrainingSPService.Year := TOptions.SP.AcademicYear;
 
     TOptions.SP.IDEducationLevel := 5;
   end;
@@ -507,15 +507,15 @@ begin
   // *************************************************
   if (cxpgcntrlMain.ActivePage = cxtshSPO2) then
   begin
-    if FSPGrpSPO = nil then
+    if FSPOSPService = nil then
     begin
-      Assert(FSPGrpSPO = nil);
-      FSPGrpSPO := TSPGroup.Create(Self, TOptions.SP.AcademicYear,
+      Assert(FSPOSPService = nil);
+      FSPOSPService := TSPService.Create(Self, TOptions.SP.AcademicYear,
         TOptions.SP.IDSpecEdSPO, sptSPO);
 
-      TNotifyEventWrap.Create(FSPGrpSPO.OnYearChange,
+      TNotifyEventWrap.Create(FSPOSPService.OnYearChange,
         DoOnSPOYearChange, FEvents);
-      TNotifyEventWrap.Create(FSPGrpSPO.OnSpecEdChange,
+      TNotifyEventWrap.Create(FSPOSPService.OnSpecEdChange,
         DoOnSPOSpecEdChange, FEvents);
 
       FViewSPO := TViewSPO.Create(Self);
@@ -525,11 +525,11 @@ begin
         Name := 'ViewSPO';
         Align := alClient;
         Parent := cxtshSPO2;
-        SPViewI := FSPGrpSPO;
+        SPViewI := FSPOSPService;
       end;
     end
     else
-      FSPGrpSPO.Year := TOptions.SP.AcademicYear;
+      FSPOSPService.Year := TOptions.SP.AcademicYear;
 
     TOptions.SP.IDEducationLevel := 3;
   end;
@@ -539,14 +539,14 @@ begin
   // *************************************************
   if cxpgcntrlMain.ActivePage = cxtshVO2 then
   begin
-    if (FSPGrpVO = nil) then
+    if (FVOSPService = nil) then
     begin
-      Assert(FSPGrpVO = nil);
-      FSPGrpVO := TSPGroup.Create(Self, TOptions.SP.AcademicYear,
+      Assert(FVOSPService = nil);
+      FVOSPService := TSPService.Create(Self, TOptions.SP.AcademicYear,
         TOptions.SP.IDSpecEdVO, sptVO);
 
-      TNotifyEventWrap.Create(FSPGrpVO.OnYearChange, DoOnVOYearChange, FEvents);
-      TNotifyEventWrap.Create(FSPGrpVO.OnSpecEdChange,
+      TNotifyEventWrap.Create(FVOSPService.OnYearChange, DoOnVOYearChange, FEvents);
+      TNotifyEventWrap.Create(FVOSPService.OnSpecEdChange,
         DoOnVOSpecEdChange, FEvents);
 
       FViewVO := TViewVO.Create(Self);
@@ -556,11 +556,11 @@ begin
         Name := 'ViewVO';
         Align := alClient;
         Parent := cxtshVO2;
-        SPViewI := FSPGrpVO;
+        SPViewI := FVOSPService;
       end;
     end
     else
-      FSPGrpVO.Year := TOptions.SP.AcademicYear;
+      FVOSPService.Year := TOptions.SP.AcademicYear;
 
     TOptions.SP.IDEducationLevel := 1;
   end;
@@ -646,11 +646,11 @@ end;
 
 procedure TfrmMain.DoOnVOYearChange(Sender: TObject);
 begin
-  if TOptions.SP.AcademicYear = FSPGrpVO.Year then
+  if TOptions.SP.AcademicYear = FVOSPService.Year then
     Exit;
 
   // Произошёл переход на новый год!
-  TOptions.SP.AcademicYear := FSPGrpVO.Year;
+  TOptions.SP.AcademicYear := FVOSPService.Year;
   TOptions.SP.IDSpecEdVO := 0;
   TOptions.SP.IDSpecEdSPO := 0;
   TOptions.SP.IDSpecEdRetraining := 0;
@@ -658,11 +658,11 @@ end;
 
 procedure TfrmMain.DoOnSPOYearChange(Sender: TObject);
 begin
-  if TOptions.SP.AcademicYear = FSPGrpSPO.Year then
+  if TOptions.SP.AcademicYear = FSPOSPService.Year then
     Exit;
 
   // Произошёл переход на новый год!
-  TOptions.SP.AcademicYear := FSPGrpSPO.Year;
+  TOptions.SP.AcademicYear := FSPOSPService.Year;
   TOptions.SP.IDSpecEdVO := 0;
   TOptions.SP.IDSpecEdSPO := 0;
   TOptions.SP.IDSpecEdRetraining := 0;
@@ -670,11 +670,11 @@ end;
 
 procedure TfrmMain.DoOnRetrainingYearChange(Sender: TObject);
 begin
-  if TOptions.SP.AcademicYear = FSPGrpRetraining.Year then
+  if TOptions.SP.AcademicYear = FRetrainingSPService.Year then
     Exit;
 
   // Произошёл переход на новый год!
-  TOptions.SP.AcademicYear := FSPGrpRetraining.Year;
+  TOptions.SP.AcademicYear := FRetrainingSPService.Year;
   TOptions.SP.IDSpecEdVO := 0;
   TOptions.SP.IDSpecEdSPO := 0;
   TOptions.SP.IDSpecEdRetraining := 0;
@@ -707,19 +707,19 @@ end;
 procedure TfrmMain.DoOnRetrainingSpecEdChange(Sender: TObject);
 begin
   // Запоминаем выбранный план
-  TOptions.SP.IDSpecEdRetraining := FSPGrpRetraining.IDSpecialityEducation;
+  TOptions.SP.IDSpecEdRetraining := FRetrainingSPService.IDSpecialityEducation;
 end;
 
 procedure TfrmMain.DoOnSPOSpecEdChange(Sender: TObject);
 begin
   // Запоминаем выбранный план
-  TOptions.SP.IDSpecEdSPO := FSPGrpSPO.IDSpecialityEducation;
+  TOptions.SP.IDSpecEdSPO := FSPOSPService.IDSpecialityEducation;
 end;
 
 procedure TfrmMain.DoOnVOSpecEdChange(Sender: TObject);
 begin
   // Запоминаем выбранный план
-  TOptions.SP.IDSpecEdVO := FSPGrpVO.IDSpecialityEducation;
+  TOptions.SP.IDSpecEdVO := FVOSPService.IDSpecialityEducation;
 end;
 
 function TfrmMain.GetqSpecEdSimple: TQuerySpecEdSimple;

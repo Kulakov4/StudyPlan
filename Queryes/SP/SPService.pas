@@ -1,4 +1,4 @@
-unit SPGroup;
+unit SPService;
 
 interface
 
@@ -14,8 +14,8 @@ uses
 type
   TSPType = (sptVO, sptSPO, sptRetraining);
 
-  TSPGroup = class(TComponent, ISPView, ISPEdit, ISpecEdit, ISPRetView,
-    ISPRetrainingEdit)
+  TSPService = class(TComponent, ISPView, ISPEdit, ISpecEdit, ISPRetView,
+      ISPRetrainingEdit)
   strict private
     function GetAllChairsW: TChairsW;
     function GetAreasW: TAreasW; stdcall;
@@ -64,11 +64,15 @@ type
     FqSS: TQuerySpecialitySessions;
     FqYears: TQryYears;
     FSP: TStudyPlan;
-    FSpecEdDumb: TFDDumb;
+    FIDSpecEd: TFDDumb;
     FSPType: TSPType;
-    FYearDumb: TFDDumb;
+    FIDYear: TFDDumb;
+    procedure Cancel;
+    procedure CopyStudyPlan(AYear: Integer);
+    procedure DeleteStudyPlan;
     procedure DoAfterSpecEdPost(Sender: TObject);
     procedure DoAfterYearPost(Sender: TObject);
+    procedure DoOnReportPlanGraphBySpecExec;
     procedure DoOnSpecialityEducationChange;
     procedure DoOnYearChange;
     function GetActivePlansOnly: Boolean;
@@ -84,45 +88,33 @@ type
     function GetqSPStandart: TQuerySPStandart;
     function GetSP: TStudyPlan;
     function GetYear: Integer;
+    procedure LockAllStudyPlans;
+    procedure Save(ASpecEdSimple: ISpecEdSimple; AMode: TMode; ASpec: ISpec);
     procedure SetActivePlansOnly(const Value: Boolean);
     procedure SetYear(const Value: Integer);
+    property ActivePlansOnly: Boolean read GetActivePlansOnly write
+        SetActivePlansOnly;
+    property qAllChairs: TQueryChairs read FqAllChairs;
+    property qAreas: TQryAreas read GetqAreas;
+    property qCourseName: TQueryCourseName read FqCourseName;
+    property qEd: TQueryEd read GetqEd;
+    property qEnabledChairs: TQueryChairs read FqEnabledChairs;
+    property qQualifications: TQryQualifications read GetqQualifications;
+    property qSpec: TQrySpec read GetqSpec;
+    property qSpecByChair: TQrySpecByChair read GetqSpecByChair;
+    property qSpecChiper: TQrySpecChiper read GetqSpecChiper;
+    property qSpecEdBaseForm: TQrySpecEdBaseForm read GetqSpecEdBaseForm;
+    property qSpecName: TQrySpecName read GetqSpecName;
+    property qSPStandart: TQuerySPStandart read GetqSPStandart;
+    property SP: TStudyPlan read GetSP;
   public
     constructor Create(AOwner: TComponent;
       AYear, AIDSpecialityEducation: Integer; ASPType: TSPType); reintroduce;
     destructor Destroy; override;
-    procedure Cancel;
-    procedure CopyStudyPlan(AYear: Integer);
-    procedure DeleteStudyPlan;
-    procedure DoOnReportPlanGraphBySpecExec;
-    procedure LockAllStudyPlans;
-    procedure Save(ASpecEdSimple: ISpecEdSimple; AMode: TMode; ASpec: ISpec);
     property OnYearChange: TNotifyEventsEx read FOnYearChange;
     property OnSpecEdChange: TNotifyEventsEx read FOnSpecEdChange;
-    property ActivePlansOnly: Boolean read GetActivePlansOnly
-      write SetActivePlansOnly;
-    property qEd: TQueryEd read GetqEd;
     property IDSpecialityEducation: Integer read GetIDSpecialityEducation;
-    property qAreas: TQryAreas read GetqAreas;
-    property qEnabledChairs: TQueryChairs read FqEnabledChairs;
-    property qAllChairs: TQueryChairs read FqAllChairs;
-    property qCourseName: TQueryCourseName read FqCourseName;
-    property qQualifications: TQryQualifications read GetqQualifications;
-    property qSP: TQrySP read FqSP;
-    property qSpec: TQrySpec read GetqSpec;
-    property qSpecChiper: TQrySpecChiper read GetqSpecChiper;
-    property qSpecName: TQrySpecName read GetqSpecName;
-    property qSpecByChair: TQrySpecByChair read GetqSpecByChair;
-    property qSpecEd: TQuerySpecEd read FqSpecEd;
-    property qSpecEdBaseForm: TQrySpecEdBaseForm read GetqSpecEdBaseForm;
-    property qSpecEdSimple: TQuerySpecEdSimple read FqSpecEdSimple;
-    property qSPStandart: TQuerySPStandart read GetqSPStandart;
-    property qSS: TQuerySpecialitySessions read FqSS;
-    property qYears: TQryYears read FqYears;
-    property SP: TStudyPlan read GetSP;
-    property SpecEdDumb: TFDDumb read FSpecEdDumb;
-    property SPType: TSPType read FSPType;
     property Year: Integer read GetYear write SetYear;
-    property YearDumb: TFDDumb read FYearDumb;
   end;
 
 implementation
@@ -130,7 +122,7 @@ implementation
 uses
   MyFR, System.SysUtils, CopyStudyPlanQuery, FR3, ReportFilesUpdater, LockSPQry;
 
-constructor TSPGroup.Create(AOwner: TComponent;
+constructor TSPService.Create(AOwner: TComponent;
   AYear, AIDSpecialityEducation: Integer; ASPType: TSPType);
 begin
   inherited Create(AOwner);
@@ -144,21 +136,21 @@ begin
   FEvents := TObjectList.Create;
 
   // Текущий план
-  FSpecEdDumb := TFDDumb.Create(Self);
-  TNotifyEventWrap.Create(FSpecEdDumb.W.AfterPost, DoAfterSpecEdPost, FEvents);
+  FIDSpecEd := TFDDumb.Create(Self);
+  TNotifyEventWrap.Create(FIDSpecEd.W.AfterPost, DoAfterSpecEdPost, FEvents);
 
   // Года
   FqYears := TQryYears.Create(Self);
   FqYears.W.RefreshQuery;
 
   // Текущий год
-  FYearDumb := TFDDumb.Create(Self);
-  TNotifyEventWrap.Create(FYearDumb.W.AfterPost, DoAfterYearPost, FEvents);
-  FYearDumb.W.RefreshQuery;
+  FIDYear := TFDDumb.Create(Self);
+  TNotifyEventWrap.Create(FIDYear.W.AfterPost, DoAfterYearPost, FEvents);
+  FIDYear.W.RefreshQuery;
 
   // Учебные планы (наборы)
   FqSpecEd := TQuerySpecEd.Create(Self);
-  FSpecEdDumb.W.RefreshQuery;
+  FIDSpecEd.W.RefreshQuery;
 
   // Кафедры
   FqEnabledChairs := TQueryChairs.Create(Self);
@@ -202,7 +194,7 @@ begin
   Year := AYear;
 end;
 
-destructor TSPGroup.Destroy;
+destructor TSPService.Destroy;
 begin
   FreeAndNil(FEvents);
   FreeAndNil(FOnYearChange);
@@ -210,7 +202,7 @@ begin
   inherited;
 end;
 
-procedure TSPGroup.Cancel;
+procedure TSPService.Cancel;
 begin
   // Отменяем сделанные изменения в специальностях кафедры
   Assert(qSpecByChair.FDQuery.CachedUpdates);
@@ -225,54 +217,50 @@ begin
   qAreas.FDQuery.CancelUpdates;
 end;
 
-procedure TSPGroup.CopyStudyPlan(AYear: Integer);
+procedure TSPService.CopyStudyPlan(AYear: Integer);
 begin
   Assert(AYear > 0);
-  Assert(qSpecEd.FDQuery.RecordCount > 0);
+  Assert(FqSpecEd.FDQuery.RecordCount > 0);
 
-  TQueryCopyStudyPlan.Copy([FSpecEdDumb.W.ID.F.AsInteger], AYear);
+  TQueryCopyStudyPlan.Copy([FIDSpecEd.W.ID.F.AsInteger], AYear);
 end;
 
-procedure TSPGroup.DeleteStudyPlan;
+procedure TSPService.DeleteStudyPlan;
 begin
-  Assert(FSpecEdDumb.W.ID.F.AsInteger > 0);
-  Assert(qSpecEdSimple.W.PK.AsInteger > 0);
+  Assert(FIDSpecEd.W.ID.F.AsInteger > 0);
+  Assert(FqSpecEdSimple.W.PK.AsInteger > 0);
 
-  qSpecEdSimple.FDQuery.Delete;
-  qSpecEd.W.LocateByPK(FSpecEdDumb.W.ID.F.AsInteger);
-  qSpecEd.DeleteFromClient;
-  FSpecEdDumb.W.UpdateID(qSpecEd.W.PK.AsInteger);
+  FqSpecEdSimple.FDQuery.Delete;
+  FqSpecEd.W.LocateByPK(FIDSpecEd.W.ID.F.AsInteger);
+  FqSpecEd.DeleteFromClient;
+  FIDSpecEd.W.UpdateID(FqSpecEd.W.PK.AsInteger);
 end;
 
-procedure TSPGroup.DoOnReportPlanGraphBySpecExec;
+procedure TSPService.DoOnReportPlanGraphBySpecExec;
 begin
-  // TMyFR.Create(Self).Show('study_plan\plan_graph_by_spec2.fr3',
-  // ['year_', 'id_specialityeducation'], [qSpecEdSimple.W.Year.F.AsInteger,
-  // qSpecEdSimple.W.ID_SPECIALITYEDUCATION.F.AsInteger]);
-
   TFR3.Create.Show(TReportFilesUpdater.TryUpdate
     ('study_plan\plan_graph_by_spec2.fr3'), ['year_', 'id_specialityeducation'],
-    [qSpecEdSimple.W.Year.F.AsInteger,
-    qSpecEdSimple.W.ID_SPECIALITYEDUCATION.F.AsInteger]);
+    [FqSpecEdSimple.W.Year.F.AsInteger,
+    FqSpecEdSimple.W.ID_SPECIALITYEDUCATION.F.AsInteger]);
 end;
 
-procedure TSPGroup.DoOnSpecialityEducationChange;
+procedure TSPService.DoOnSpecialityEducationChange;
 begin
   // Ищем именно эту запись об уч. плане
-  qSpecEdSimple.SearchByPK(IDSpecialityEducation);
+  FqSpecEdSimple.SearchByPK(IDSpecialityEducation);
 
   // Ищем базовую форму обучения
   qSpecEdBaseForm.SearchByPK(IDSpecialityEducation);
 
   // Выбираем дисциплины этого учебного плана
-  SP.DoOnMasterChange(qSpecEdSimple.W.ID_SPECIALITYEDUCATION.F.AsInteger,
-    qSpecEdSimple.W.IDEDUCATION2.F.AsInteger,
-    qSpecEdSimple.W.IDEducationLevel.F.AsInteger);
+  SP.DoOnMasterChange(FqSpecEdSimple.W.ID_SPECIALITYEDUCATION.F.AsInteger,
+    FqSpecEdSimple.W.IDEDUCATION2.F.AsInteger,
+    FqSpecEdSimple.W.IDEducationLevel.F.AsInteger);
 
   FOnSpecEdChange.CallEventHandlers(Self);
 end;
 
-procedure TSPGroup.DoOnYearChange;
+procedure TSPService.DoOnYearChange;
 var
   OK: Boolean;
 begin
@@ -293,57 +281,57 @@ begin
     FqSpecEd.W.LocateByPK(FIDSpecialityEducation);
 
   // Выбираем в выпадающем списке план
-  FSpecEdDumb.W.UpdateID(qSpecEd.W.PK.AsInteger);
+  FIDSpecEd.W.UpdateID(FqSpecEd.W.PK.AsInteger);
 
   FOnYearChange.CallEventHandlers(Self);
 end;
 
-procedure TSPGroup.DoAfterSpecEdPost(Sender: TObject);
+procedure TSPService.DoAfterSpecEdPost(Sender: TObject);
 begin
   DoOnSpecialityEducationChange;
 end;
 
-procedure TSPGroup.DoAfterYearPost(Sender: TObject);
+procedure TSPService.DoAfterYearPost(Sender: TObject);
 begin
   DoOnYearChange;
 end;
 
-function TSPGroup.GetActivePlansOnly: Boolean;
+function TSPService.GetActivePlansOnly: Boolean;
 begin
   Result := FActivePlansOnly;
 end;
 
-function TSPGroup.GetAllChairsW: TChairsW;
+function TSPService.GetAllChairsW: TChairsW;
 begin
   Result := qAllChairs.W;
 end;
 
-function TSPGroup.GetAreasW: TAreasW;
+function TSPService.GetAreasW: TAreasW;
 begin
   Result := qAreas.W;
 end;
 
-function TSPGroup.GetCourseNameW: TCourseNameW;
+function TSPService.GetCourseNameW: TCourseNameW;
 begin
   Result := qCourseName.W;
 end;
 
-function TSPGroup.GetEdW: TEdW;
+function TSPService.GetEdW: TEdW;
 begin
   Result := qEd.W;
 end;
 
-function TSPGroup.GetEnabledChairsW: TChairsW;
+function TSPService.GetEnabledChairsW: TChairsW;
 begin
   Result := qEnabledChairs.W;
 end;
 
-function TSPGroup.GetIDSpecEdW: TDumbW;
+function TSPService.GetIDSpecEdW: TDumbW;
 begin
-  Result := SpecEdDumb.W;
+  Result := FIDSpecEd.W;
 end;
 
-function TSPGroup.GetqEd: TQueryEd;
+function TSPService.GetqEd: TQueryEd;
 begin
   if FqEd = nil then
   begin
@@ -354,17 +342,17 @@ begin
   Result := FqEd;
 end;
 
-function TSPGroup.GetIDSpecialityEducation: Integer;
+function TSPService.GetIDSpecialityEducation: Integer;
 begin
-  Result := FSpecEdDumb.W.ID.F.AsInteger;
+  Result := FIDSpecEd.W.ID.F.AsInteger;
 end;
 
-function TSPGroup.GetIDYearW: TDumbW;
+function TSPService.GetIDYearW: TDumbW;
 begin
-  Result := YearDumb.W;
+  Result := FIDYear.W;
 end;
 
-function TSPGroup.GetqAreas: TQryAreas;
+function TSPService.GetqAreas: TQryAreas;
 begin
   if FqAreas = nil then
   begin
@@ -374,7 +362,7 @@ begin
   Result := FqAreas;
 end;
 
-function TSPGroup.GetqQualifications: TQryQualifications;
+function TSPService.GetqQualifications: TQryQualifications;
 begin
   if FqQualifications = nil then
   begin
@@ -384,7 +372,7 @@ begin
   Result := FqQualifications;
 end;
 
-function TSPGroup.GetqSpec: TQrySpec;
+function TSPService.GetqSpec: TQrySpec;
 begin
   if FqSpec = nil then
   begin
@@ -394,7 +382,7 @@ begin
   Result := FqSpec;
 end;
 
-function TSPGroup.GetqSpecChiper: TQrySpecChiper;
+function TSPService.GetqSpecChiper: TQrySpecChiper;
 begin
   if FqSpecChiper = nil then
   begin
@@ -406,7 +394,7 @@ begin
   Result := FqSpecChiper;
 end;
 
-function TSPGroup.GetqSpecName: TQrySpecName;
+function TSPService.GetqSpecName: TQrySpecName;
 begin
   if FqSpecName = nil then
   begin
@@ -418,7 +406,7 @@ begin
   Result := FqSpecName;
 end;
 
-function TSPGroup.GetqSpecByChair: TQrySpecByChair;
+function TSPService.GetqSpecByChair: TQrySpecByChair;
 begin
   if FqSpecByChair = nil then
   begin
@@ -429,7 +417,7 @@ begin
   Result := FqSpecByChair;
 end;
 
-function TSPGroup.GetqSpecEdBaseForm: TQrySpecEdBaseForm;
+function TSPService.GetqSpecEdBaseForm: TQrySpecEdBaseForm;
 begin
   if FqSpecEdBaseForm = nil then
     FqSpecEdBaseForm := TQrySpecEdBaseForm.Create(Self);
@@ -437,7 +425,7 @@ begin
   Result := FqSpecEdBaseForm;
 end;
 
-function TSPGroup.GetqSPStandart: TQuerySPStandart;
+function TSPService.GetqSPStandart: TQuerySPStandart;
 begin
   if FqSPStandart = nil then
   begin
@@ -447,77 +435,77 @@ begin
   Result := FqSPStandart;
 end;
 
-function TSPGroup.GetQualificationsW: TQualificationsW;
+function TSPService.GetQualificationsW: TQualificationsW;
 begin
   Result := qQualifications.W;
 end;
 
-function TSPGroup.GetSP: TStudyPlan;
+function TSPService.GetSP: TStudyPlan;
 begin
   Result := FSP;
 end;
 
-function TSPGroup.GetSpecByChairW: TSpecByChairW;
+function TSPService.GetSpecByChairW: TSpecByChairW;
 begin
   Result := qSpecByChair.W;
 end;
 
-function TSPGroup.GetSpecChiperW: TSpecChiperW;
+function TSPService.GetSpecChiperW: TSpecChiperW;
 begin
   Result := qSpecChiper.W;
 end;
 
-function TSPGroup.GetSpecEditI: ISpecEdit;
+function TSPService.GetSpecEditI: ISpecEdit;
 begin
   Result := Self;
 end;
 
-function TSPGroup.GetSpecEdSimpleW: TSpecEdSimpleW;
+function TSPService.GetSpecEdSimpleW: TSpecEdSimpleW;
 begin
-  Result := qSpecEdSimple.W;
+  Result := FqSpecEdSimple.W;
 end;
 
-function TSPGroup.GetSpecEdW: TSpecEdW;
+function TSPService.GetSpecEdW: TSpecEdW;
 begin
-  Result := qSpecEd.W;
+  Result := FqSpecEd.W;
 end;
 
-function TSPGroup.GetSpecNameUniqueW: TSpecNameUniqueW;
+function TSPService.GetSpecNameUniqueW: TSpecNameUniqueW;
 begin
   Result := qSpecName.W;
 end;
 
-function TSPGroup.GetSpecW: TSpecW;
+function TSPService.GetSpecW: TSpecW;
 begin
   Result := qSpec.W;
 end;
 
-function TSPGroup.GetSPEditInterface: ISPEdit;
+function TSPService.GetSPEditInterface: ISPEdit;
 begin
   Result := Self;
 end;
 
-function TSPGroup.GetSPRetrainingEditI: ISPRetrainingEdit;
+function TSPService.GetSPRetrainingEditI: ISPRetrainingEdit;
 begin
   Result := Self;
 end;
 
-function TSPGroup.GetSPStandartW: TSPStandartW;
+function TSPService.GetSPStandartW: TSPStandartW;
 begin
   Result := qSPStandart.W;
 end;
 
-function TSPGroup.GetYear: Integer;
+function TSPService.GetYear: Integer;
 begin
-  Result := FYearDumb.W.ID.F.AsInteger;
+  Result := FIDYear.W.ID.F.AsInteger;
 end;
 
-function TSPGroup.GetYearsW: TYearsW;
+function TSPService.GetYearsW: TYearsW;
 begin
-  Result := qYears.W;
+  Result := FqYears.W;
 end;
 
-procedure TSPGroup.LockAllStudyPlans;
+procedure TSPService.LockAllStudyPlans;
 begin
   case FSPType of
     sptVO:
@@ -528,11 +516,11 @@ begin
       TQryLockSP.Lock_All([5]); // Переподготовка;
   end;
 
-  qSpecEd.LockAllOnClient;
+  FqSpecEd.LockAllOnClient;
 end;
 
-procedure TSPGroup.Save(ASpecEdSimple: ISpecEdSimple; AMode: TMode;
-  ASpec: ISpec);
+procedure TSPService.Save(ASpecEdSimple: ISpecEdSimple; AMode: TMode; ASpec:
+    ISpec);
 var
   ASpecEdSimpleEx: ISpecEdSimpleEx;
 begin
@@ -582,55 +570,55 @@ begin
   end;
 
   // Сохраняем учебный план
-  qSpecEdSimple.W.Save(ASpecEdSimple, AMode,
+  FqSpecEdSimple.W.Save(ASpecEdSimple, AMode,
     qSpec.W.QUALIFICATION_ID.F.AsInteger);
 
   if AMode = EditMode then
   begin
-    qSpecEd.FDQuery.RefreshRecord();
+    FqSpecEd.FDQuery.RefreshRecord();
     // Если после обновления, запись исчезла (план деактивировался)
-    if qSpecEd.W.PK.AsInteger <> FSpecEdDumb.W.ID.F.AsInteger then
+    if FqSpecEd.W.PK.AsInteger <> FIDSpecEd.W.ID.F.AsInteger then
     begin
       // Выбираем другой активный план
-      FSpecEdDumb.W.UpdateID(qSpecEd.W.PK.AsInteger);
+      FIDSpecEd.W.UpdateID(FqSpecEd.W.PK.AsInteger);
     end;
   end
   else
   begin
     // Чтобы созданный план появился в выпадающем списке
-    qSpecEd.W.RefreshQuery;
+    FqSpecEd.W.RefreshQuery;
     // Выбираем созданный план
-    FSpecEdDumb.W.UpdateID(qSpecEdSimple.W.PK.AsInteger);
+    FIDSpecEd.W.UpdateID(FqSpecEdSimple.W.PK.AsInteger);
   end;
 end;
 
-function TSPGroup.SearchSpecByChair(AIDEducationLevel,
+function TSPService.SearchSpecByChair(AIDEducationLevel,
   AIDChair: Integer): Integer;
 begin
   Result := qSpecByChair.Search(AIDEducationLevel, AIDChair);
 end;
 
-procedure TSPGroup.SetActivePlansOnly(const Value: Boolean);
+procedure TSPService.SetActivePlansOnly(const Value: Boolean);
 begin
   FActivePlansOnly := Value;
-  qSpecEd.W.ApplyEnabledFilter(FActivePlansOnly);
+  FqSpecEd.W.ApplyEnabledFilter(FActivePlansOnly);
 end;
 
-procedure TSPGroup.SetYear(const Value: Integer);
+procedure TSPService.SetYear(const Value: Integer);
 begin
   if Year = Value then
     Exit;
 
   // Выбираем нужный нам год
-  FYearDumb.W.UpdateID(Value);
+  FIDYear.W.UpdateID(Value);
 end;
 
-function TSPGroup.SpecSearchByChiper(const AChiper: string): Integer;
+function TSPService.SpecSearchByChiper(const AChiper: string): Integer;
 begin
   Result := qSpec.SearchByChiper(AChiper);
 end;
 
-function TSPGroup.SpecSearchByChiperAndName(const AChiper,
+function TSPService.SpecSearchByChiperAndName(const AChiper,
   ASpeciality: string): Integer;
 begin
   Result := qSpec.SearchByChiperAndName(AChiper, ASpeciality);

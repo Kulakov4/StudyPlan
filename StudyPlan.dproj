@@ -496,7 +496,7 @@
             <FormType>dfm</FormType>
             <DesignClass>TFrame</DesignClass>
         </DCCReference>
-        <DCCReference Include="Queryes\SP\SPGroup.pas"/>
+        <DCCReference Include="Queryes\SP\SPService.pas"/>
         <DCCReference Include="Views\SPView\SpecEdPopupView.pas">
             <Form>ViewSpecEdPopup</Form>
             <FormType>dfm</FormType>
