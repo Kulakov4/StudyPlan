@@ -86,7 +86,6 @@
         <DCC_RemoteDebug>false</DCC_RemoteDebug>
         <AppEnableRuntimeThemes>true</AppEnableRuntimeThemes>
         <BT_BuildType>Debug</BT_BuildType>
-        <Debugger_RunParams>/qqq</Debugger_RunParams>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_2)'!=''">
         <DCC_LocalDebugSymbols>false</DCC_LocalDebugSymbols>
@@ -100,7 +99,7 @@
         <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
         <AppEnableRuntimeThemes>true</AppEnableRuntimeThemes>
         <BT_BuildType>Debug</BT_BuildType>
-        <Debugger_RunParams>/qqq</Debugger_RunParams>
+        <DCC_ExeOutput>.\BIN</DCC_ExeOutput>
     </PropertyGroup>
     <ItemGroup>
         <DelphiCompile Include="$(MainSource)">
@@ -746,6 +745,19 @@
             <FormType>dfm</FormType>
             <DesignClass>TFrame</DesignClass>
         </DCCReference>
+        <DCCReference Include="Queryes\CycleTypes\CycleTypesQuery.pas">
+            <Form>QueryCycleTypes</Form>
+            <FormType>dfm</FormType>
+            <DesignClass>TFrame</DesignClass>
+        </DCCReference>
+        <DCCReference Include="Views\CyclesView\CyclesView.pas">
+            <Form>ViewCycles</Form>
+            <FormType>dfm</FormType>
+            <DesignClass>TFrame</DesignClass>
+        </DCCReference>
+        <DCCReference Include="Interfaces\CycleServiceInterface.pas"/>
+        <DCCReference Include="Interfaces\CSEServiceInterface.pas"/>
+        <DCCReference Include="Queryes\CSEQry\CSEService.pas"/>
         <None Include="StudyPlan.todo"/>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>
@@ -808,7 +820,7 @@
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
-                <DeployFile LocalName="Win32\Release\StudyPlan.exe" Configuration="Release" Class="ProjectOutput">
+                <DeployFile LocalName="BIN\StudyPlan.exe" Configuration="Release" Class="ProjectOutput">
                     <Platform Name="Win32">
                         <RemoteName>StudyPlan.exe</RemoteName>
                         <Overwrite>true</Overwrite>

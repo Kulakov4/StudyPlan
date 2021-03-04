@@ -6,7 +6,7 @@ uses KDBClient, EssenceEx, DocumentView, K_Params, SS, LessonTypes,
   NotifyEvents, CSE, SpecEducation, DisciplineNames,
   DBRecordHolder, SQLTools, KParamsCollection, Chairs, HourViewTypes,
   Winapi.Windows, Winapi.Messages, System.Classes, Data.DB,
-  System.Generics.Collections, CSEQry;
+  System.Generics.Collections, CSEQry, CSEService;
 
 const
   WM_AttachViews = WM_USER + 125;
@@ -92,6 +92,7 @@ type
     FBeforeDeleteEvent: TNotifyEventWrap;
     FChairs: TChairs;
     FCSE: TCSE;
+    FCSEService: TCSEService;
     FDetailCSE: TCSE;
     // FMasterCSE: TCSE;
     FDisciplineNames: TDisciplineNames;
@@ -101,7 +102,6 @@ type
     FLessonTypes: TLessonTypes;
     FMultiSelect: Boolean;
     FOnEditEvents: TNotifyEvents;
-    FqCSE: TQueryCSE;
     FRecordHolder: TRecordHolder;
     FSpecialitySessions: TSpecialitySessions;
     FStudyPlanCDS: TStudyPlanCDS;
@@ -133,13 +133,13 @@ type
     property StudyPlanCDS: TStudyPlanCDS read FStudyPlanCDS;
     property StudyPlanQuery: TStudyPlanQuery read FStudyPlanQuery;
     property CSE: TCSE read FCSE;
+    property CSEService: TCSEService read FCSEService;
     // property MasterCSE: TCSE read FMasterCSE;
     property DisciplineNames: TDisciplineNames read FDisciplineNames;
     property IDSpecEducation: Integer read GetIDSpecEducation;
     // property HourViewTypes: THourViewTypes read FHourViewTypes;
     // property DisciplineTypes: TDisciplineTypes read FDisciplineTypes;
     property MultiSelect: Boolean read FMultiSelect write FMultiSelect;
-    property qCSE: TQueryCSE read FqCSE;
   public
     constructor Create(AOwner: TComponent); reintroduce;
     destructor Destroy; override;
@@ -349,9 +349,9 @@ begin
   FCSE.DataSetWrap.MultiSelectDSWrap.UseInactiveStyle := False;
   // FCSE.SpecialityEducationParam.Master := FSpecEducation;
 
-  FqCSE := TQueryCSE.Create(Self);
-  TNotifyEventWrap.Create(FqCSE.W.AfterPost, OnStudyPlanQueryChange);
-  TNotifyEventWrap.Create(FqCSE.W.AfterDelete, OnStudyPlanQueryChange);
+  FCSEService := TCSEService.Create(Self);
+  TNotifyEventWrap.Create(FCSEService.CSEWrap.AfterPost, OnStudyPlanQueryChange);
+  TNotifyEventWrap.Create(FCSEService.CSEWrap.AfterDelete, OnStudyPlanQueryChange);
 
   // Реагируем на изменение структуры учебного плана
   TNotifyEventWrap.Create(FCSE.Wrap.AfterPost, OnStudyPlanQueryChange);
@@ -432,7 +432,7 @@ begin
   FCSE.EndUpdate;
 
   // Фильтруем циклы специализации по идентификатору набора
-  FqCSE.SearchByIDSpecEd(AIDSpecialityEducation);
+  FCSEService.SearchByIDSpecEd(AIDSpecialityEducation);
 
   FDetailCSE.BeginUpdate;
   FDetailCSE.SpecialityEducationParam.ParamValue := AIDSpecialityEducation;

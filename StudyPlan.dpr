@@ -238,7 +238,12 @@ uses
   DiscNameViewInterface in 'Interfaces\DiscNameViewInterface.pas',
   CSEQry in 'Queryes\CSEQry\CSEQry.pas' {QueryCSE: TFrame},
   ViewCSE in 'Views\CSEView\ViewCSE.pas' {ViewCSEFrame: TFrame},
-  CyclesQry in 'Queryes\cycles\CyclesQry.pas' {QueryCycles: TFrame};
+  CyclesQry in 'Queryes\cycles\CyclesQry.pas' {QueryCycles: TFrame},
+  CycleTypesQuery in 'Queryes\CycleTypes\CycleTypesQuery.pas' {QueryCycleTypes: TFrame},
+  CyclesView in 'Views\CyclesView\CyclesView.pas' {ViewCycles: TFrame},
+  CycleServiceInterface in 'Interfaces\CycleServiceInterface.pas',
+  CSEServiceInterface in 'Interfaces\CSEServiceInterface.pas',
+  CSEService in 'Queryes\CSEQry\CSEService.pas';
 
 {$R *.res}
 

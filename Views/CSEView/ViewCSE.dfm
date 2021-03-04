@@ -35,10 +35,6 @@ object ViewCSEFrame: TViewCSEFrame
     RootValue = -1
     TabOrder = 0
     OnExpanded = cxDBTreeListExpanded
-    ExplicitLeft = 3
-    ExplicitTop = 3
-    ExplicitWidth = 732
-    ExplicitHeight = 382
   end
   object TBDock1: TTBDock
     Left = 0
@@ -49,7 +45,10 @@ object ViewCSEFrame: TViewCSEFrame
       Left = 0
       Top = 0
       Caption = 'TBToolbar1'
+      DockPos = 0
       Images = cxImageList
+      ParentShowHint = False
+      ShowHint = True
       TabOrder = 0
       object TBItem1: TTBItem
         Action = actAdd
@@ -65,6 +64,9 @@ object ViewCSEFrame: TViewCSEFrame
       end
       object TBItem4: TTBItem
         Action = actMoveDown
+      end
+      object TBItem6: TTBItem
+        Action = actCycle
       end
     end
   end
@@ -86,6 +88,7 @@ object ViewCSEFrame: TViewCSEFrame
     end
     object actDelete: TAction
       Caption = #1059#1076#1072#1083#1080#1090#1100
+      Hint = #1059#1076#1072#1083#1080#1090#1100
       ImageIndex = 5
       OnExecute = actDeleteExecute
     end
@@ -100,6 +103,12 @@ object ViewCSEFrame: TViewCSEFrame
       Hint = #1055#1077#1088#1077#1084#1077#1089#1090#1080#1090#1100' '#1074#1085#1080#1079
       ImageIndex = 1
       OnExecute = actMoveDownExecute
+    end
+    object actCycle: TAction
+      Caption = #1062#1080#1082#1083#1099
+      Hint = #1062#1080#1082#1083#1099
+      ImageIndex = 3
+      OnExecute = actCycleExecute
     end
   end
   object cxImageList: TcxImageList

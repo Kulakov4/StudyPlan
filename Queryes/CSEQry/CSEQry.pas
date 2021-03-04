@@ -90,6 +90,8 @@ procedure TCSEWrap.AddLevel(ACycleID, AIDCSE: Integer; ASubLevel: Boolean);
 var
   AIDParent: Variant;
 begin
+  Assert(ACycleID > 0);
+
   AIDParent := NULL;
   if AIDCSE > 0 then
   begin
@@ -132,7 +134,7 @@ end;
 
 function TQueryCSE.SearchByIDSpecEd(AIDSpecEd: Integer): Integer;
 begin
-  Assert(AIDSpecEd > 0);
+  // AIDSpecEd будет = 0 если за какой-то год нет учебных планов
 
   Result := SearchEx([TParamRec.Create(W.IDSpecialityEducation.FullName,
     AIDSpecEd)]);

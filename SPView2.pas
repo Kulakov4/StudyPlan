@@ -740,7 +740,7 @@ begin
     TMyDir.AppDataDirFile('NewCSEForm.ini'), [mbOk], 500);
   try
     F.GridViewClass := TViewCSEFrame;
-    (F.GridView as TViewCSEFrame).W := Document.qCSE.W;
+    (F.GridView as TViewCSEFrame).CSEServiceI := Document.CSEService;
 
     F.ShowModal;
     Document.CSE.Refresh;
