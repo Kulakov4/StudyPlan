@@ -6,7 +6,8 @@ uses KDBClient, EssenceEx, DocumentView, K_Params, SS, LessonTypes,
   NotifyEvents, CSE, SpecEducation, DisciplineNames,
   DBRecordHolder, SQLTools, KParamsCollection, Chairs, HourViewTypes,
   Winapi.Windows, Winapi.Messages, System.Classes, Data.DB,
-  System.Generics.Collections, CSEQry, CSEService;
+  System.Generics.Collections, CSEQry, CSEService, SpecSessServiceInterface,
+  SpecSessService;
 
 const
   WM_AttachViews = WM_USER + 125;
@@ -104,6 +105,7 @@ type
     FOnEditEvents: TNotifyEvents;
     FRecordHolder: TRecordHolder;
     FSpecialitySessions: TSpecialitySessions;
+    FSpecSessService: TSpecSessService;
     FStudyPlanCDS: TStudyPlanCDS;
     FStudyPlanQuery: TStudyPlanQuery;
     FStudyPlanQueryRefresh: TStudyPlanQueryRefresh;
@@ -111,6 +113,7 @@ type
     procedure BeforeStudyPlanCDSDelete(Sender: TObject);
     procedure DeleteFromStudyPlan(AIDStudyPlan: Integer);
     function GetIDSpecEducation: Integer;
+    function GetSpecSessService: ISpecSessService;
     procedure RefreshSelfHours;
     procedure UpdateStudyPlan;
     procedure WndProc(var Msg: TMessage);
@@ -128,11 +131,11 @@ type
       AOldValue, ANewValue: Variant);
   public
     property Chairs: TChairs read FChairs;
+    property CSE: TCSE read FCSE;
     property LessonTypes: TLessonTypes read FLessonTypes;
     property SpecialitySessions: TSpecialitySessions read FSpecialitySessions;
     property StudyPlanCDS: TStudyPlanCDS read FStudyPlanCDS;
     property StudyPlanQuery: TStudyPlanQuery read FStudyPlanQuery;
-    property CSE: TCSE read FCSE;
     property CSEService: TCSEService read FCSEService;
     // property MasterCSE: TCSE read FMasterCSE;
     property DisciplineNames: TDisciplineNames read FDisciplineNames;
@@ -140,6 +143,7 @@ type
     // property HourViewTypes: THourViewTypes read FHourViewTypes;
     // property DisciplineTypes: TDisciplineTypes read FDisciplineTypes;
     property MultiSelect: Boolean read FMultiSelect write FMultiSelect;
+    property SpecSessService: ISpecSessService read GetSpecSessService;
   public
     constructor Create(AOwner: TComponent); reintroduce;
     destructor Destroy; override;
@@ -456,6 +460,17 @@ end;
 function TStudyPlan.GetIDSpecEducation: Integer;
 begin
   Result := SpecialitySessions.SpecialityEducationParam.ParamValue;
+end;
+
+function TStudyPlan.GetSpecSessService: ISpecSessService;
+begin
+  if FSpecSessService = nil then
+    FSpecSessService := TSpecSessService.Create(Self);
+
+  // »щем по коду набора
+  FSpecSessService.SearchBySpecEd(IDSpecEducation);
+
+  Result := FSpecSessService;
 end;
 
 procedure TStudyPlan.OnLessonTypeFieldGetText(AField: TField; var Text: string;

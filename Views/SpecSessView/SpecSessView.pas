@@ -12,9 +12,9 @@ uses
   dxBarBuiltInMenu, cxGridCustomPopupMenu, cxGridPopupMenu, Vcl.Menus,
   System.Actions, Vcl.ActnList, cxClasses, dxBar, Vcl.ComCtrls, cxGridLevel,
   cxGridCustomView, cxGridCustomTableView, cxGridTableView,
-  cxGridBandedTableView, cxGridDBBandedTableView, cxGrid, SpecSessGroup,
-  SpecSessQry, Vcl.StdCtrls, cxTextEdit, cxContainer, System.ImageList,
-  Vcl.ImgList, cxImageList, dxDateRanges;
+  cxGridBandedTableView, cxGridDBBandedTableView, cxGrid, SpecSessQry,
+  Vcl.StdCtrls, cxTextEdit, cxContainer, System.ImageList,
+  Vcl.ImgList, cxImageList, dxDateRanges, SpecSessServiceInterface;
 
 type
   TViewSpecSess = class(TfrmGrid)
@@ -56,14 +56,14 @@ type
   private
     FEditingFieldName: string;
     FEditingValue: Variant;
-    FSpecSessGroup: TSpecSessGroup;
+    FSpecSessServiceI: ISpecSessService;
     function GetCellEdit: TcxTextEdit;
     function GetclSession: TcxGridDBBandedColumn;
     function GetclLevel: TcxGridDBBandedColumn;
     function GetclID_SpecialitySession: TcxGridDBBandedColumn;
     function GetclLevel_Year: TcxGridDBBandedColumn;
     function GetW: TSpecSessW;
-    procedure SetSpecSessGroup(const Value: TSpecSessGroup);
+    procedure SetSpecSessServiceI(const Value: ISpecSessService);
     procedure ShowCellEdit;
     { Private declarations }
   protected
@@ -79,8 +79,8 @@ type
     property clID_SpecialitySession: TcxGridDBBandedColumn
       read GetclID_SpecialitySession;
     property clLevel_Year: TcxGridDBBandedColumn read GetclLevel_Year;
-    property SpecSessGroup: TSpecSessGroup read FSpecSessGroup
-      write SetSpecSessGroup;
+    property SpecSessServiceI: ISpecSessService read FSpecSessServiceI write
+        SetSpecSessServiceI;
     { Public declarations }
   end;
 
@@ -102,27 +102,27 @@ end;
 procedure TViewSpecSess.actAddLevelExecute(Sender: TObject);
 begin
   inherited;
-  SpecSessGroup.qSpecSess.W.AppendSpecSess := assLevel;
+  W.AppendSpecSess := assLevel;
   MainView.Controller.ClearSelection;
   MainView.DataController.Append;
-  FocusColumnEditor(MainView, SpecSessGroup.qSpecSess.W.Session_.FieldName);
+  FocusColumnEditor(MainView, W.Session_.FieldName);
   UpdateView;
 end;
 
 procedure TViewSpecSess.actAddSessionExecute(Sender: TObject);
 begin
   inherited;
-  SpecSessGroup.qSpecSess.W.AppendSpecSess := assSession;
+  W.AppendSpecSess := assSession;
   MainView.Controller.ClearSelection;
   MainView.DataController.Append;
-  FocusColumnEditor(MainView, SpecSessGroup.qSpecSess.W.Session_.FieldName);
+  FocusColumnEditor(MainView, W.Session_.FieldName);
   UpdateView;
 end;
 
 procedure TViewSpecSess.actCancelExecute(Sender: TObject);
 begin
   inherited;
-  SpecSessGroup.qSpecSess.W.TryCancel;
+  W.TryCancel;
   UpdateView;
 end;
 
@@ -160,7 +160,7 @@ end;
 procedure TViewSpecSess.actSaveExecute(Sender: TObject);
 begin
   inherited;
-  SpecSessGroup.qSpecSess.W.TryPost;
+  W.TryPost;
   UpdateView;
 end;
 
@@ -189,7 +189,7 @@ begin
     Exit;
 
   // Обновляем значение поля в БД
-  SpecSessGroup.qSpecSess.W.Update(FEditingFieldName, FEditingValue, AValue);
+  W.Update(FEditingFieldName, FEditingValue, AValue);
   AcxTextEdit.Hide;
   cxGrid.SetFocus;
 end;
@@ -278,8 +278,8 @@ end;
 
 function TViewSpecSess.GetW: TSpecSessW;
 begin
-  Assert(FSpecSessGroup <> nil);
-  Result := FSpecSessGroup.qSpecSess.W;
+  Assert(FSpecSessServiceI <> nil);
+  Result := FSpecSessServiceI.SpecSessW;
 end;
 
 procedure TViewSpecSess.InitColumns(AView: TcxGridDBBandedTableView);
@@ -288,7 +288,7 @@ var
 begin
   inherited;
   // Настраиваем подстановочную наименование сессии
-  TDBLCB.InitColumn(clSession, FSpecSessGroup.qSessType.W.SessionType,
+  TDBLCB.InitColumn(clSession,  FSpecSessServiceI.SessTypeW.SessionType,
     lsFixedList);
 
   // Группируем планы по году
@@ -319,20 +319,16 @@ begin
   MainView.OptionsData.Deleting := False;
 end;
 
-procedure TViewSpecSess.SetSpecSessGroup(const Value: TSpecSessGroup);
+procedure TViewSpecSess.SetSpecSessServiceI(const Value: ISpecSessService);
 begin
-  if FSpecSessGroup = Value then
-    Exit;
-
-  FSpecSessGroup := Value;
-
-  if FSpecSessGroup = nil then
+  FSpecSessServiceI := Value;
+  if FSpecSessServiceI = nil then
   begin
     DSWrap := nil;
     Exit;
   end;
 
-  DSWrap := FSpecSessGroup.qSpecSess.W;
+  DSWrap := FSpecSessServiceI.SpecSessW;
 
   UpdateView;
 end;
@@ -383,14 +379,14 @@ var
   OK: Boolean;
 begin
   inherited;
-  OK := (SpecSessGroup <> nil) and (SpecSessGroup.qSpecSess.FDQuery.Active);
-  actAddLevel.Enabled := OK and (not SpecSessGroup.qSpecSess.W.HaveAnyChanges);
+  OK := (FSpecSessServiceI <> nil) and (W.DataSet.Active);
+  actAddLevel.Enabled := OK and (not W.HaveAnyChanges);
   actAddSession.Enabled := actAddLevel.Enabled;
 
-  actSave.Enabled := OK and SpecSessGroup.qSpecSess.W.HaveAnyChanges;
+  actSave.Enabled := OK and W.HaveAnyChanges;
   actCancel.Enabled := actSave.Enabled;
 
-  ADeleteEnabled := OK and (not SpecSessGroup.qSpecSess.W.HaveAnyChanges) and
+  ADeleteEnabled := OK and (not W.HaveAnyChanges) and
     (MainView.Controller.SelectedRowCount = 1) and
     (MainView.Controller.SelectedColumnCount > 0);
 

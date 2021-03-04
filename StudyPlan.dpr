@@ -195,7 +195,6 @@ uses
   SpecEdSimpleInt in 'Queryes\SpecEdSimple\SpecEdSimpleInt.pas',
   SpecSessQry in 'Queryes\SpecSess\SpecSessQry.pas' {QrySpecSess: TFrame},
   SessTypeQry in 'Queryes\SessType\SessTypeQry.pas' {QrySessType: TFrame},
-  SpecSessGroup in 'Queryes\SpecSess\SpecSessGroup.pas',
   SpecSessView in 'Views\SpecSessView\SpecSessView.pas' {ViewSpecSess: TFrame},
   MaxSpecSessQry in 'Queryes\SpecSess\MaxSpecSessQry.pas' {QryMaxSpecSess: TFrame},
   EditSpecFrm in 'Views\SpecView\EditSpecFrm.pas' {frmEditSpec},
@@ -239,7 +238,12 @@ uses
   CyclesView in 'Views\CyclesView\CyclesView.pas' {ViewCycles: TFrame},
   CycleServiceInterface in 'Interfaces\CycleServiceInterface.pas',
   CSEServiceInterface in 'Interfaces\CSEServiceInterface.pas',
-  CSEService in 'Queryes\CSEQry\CSEService.pas';
+  CSEService in 'Queryes\CSEQry\CSEService.pas',
+  SPEditView2 in 'Views\SPView\SPEditView2.pas' {Frame1: TFrame},
+  CSEForm in 'Views\CSEView\CSEForm.pas',
+  SpecSessServiceInterface in 'Interfaces\SpecSessServiceInterface.pas',
+  SpecSessService in 'Queryes\SpecSess\SpecSessService.pas',
+  SpecSessForm in 'Views\SpecSessView\SpecSessForm.pas';
 
 {$R *.res}
 

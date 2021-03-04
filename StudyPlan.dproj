@@ -637,7 +637,6 @@
             <FormType>dfm</FormType>
             <DesignClass>TFrame</DesignClass>
         </DCCReference>
-        <DCCReference Include="Queryes\SpecSess\SpecSessGroup.pas"/>
         <DCCReference Include="Views\SpecSessView\SpecSessView.pas">
             <Form>ViewSpecSess</Form>
             <FormType>dfm</FormType>
@@ -748,6 +747,15 @@
         <DCCReference Include="Interfaces\CycleServiceInterface.pas"/>
         <DCCReference Include="Interfaces\CSEServiceInterface.pas"/>
         <DCCReference Include="Queryes\CSEQry\CSEService.pas"/>
+        <DCCReference Include="Views\SPView\SPEditView2.pas">
+            <Form>Frame1</Form>
+            <FormType>dfm</FormType>
+            <DesignClass>TFrame</DesignClass>
+        </DCCReference>
+        <DCCReference Include="Views\CSEView\CSEForm.pas"/>
+        <DCCReference Include="Interfaces\SpecSessServiceInterface.pas"/>
+        <DCCReference Include="Queryes\SpecSess\SpecSessService.pas"/>
+        <DCCReference Include="Views\SpecSessView\SpecSessForm.pas"/>
         <None Include="StudyPlan.todo"/>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>

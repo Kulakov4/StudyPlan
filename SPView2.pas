@@ -215,8 +215,8 @@ uses SPEditForm, DB, SPEditView, SPViewDM, cxDBTL, cxStyles, cxCustomData,
   ETP, ETPView, EssenceGridView, MyDataAccess, CommissionOptions,
   DisciplineCompetence, DisciplineCompetenceView, ProgressBarForm,
   StudyPlanInfo, System.IOUtils, UMKDataModule, System.UITypes, DisciplineLit,
-  DisciplineLitView, CSEView, OptionsHelper, SpecSessGroup, GridViewForm,
-  SpecSessView, FR3, ReportFilesUpdater, MyDir, ViewCSE;
+  DisciplineLitView, CSEView, OptionsHelper, GridViewForm,
+  SpecSessView, FR3, ReportFilesUpdater, CSEForm, MyDir, SpecSessForm;
 
 {$R *.dfm}
 
@@ -691,62 +691,13 @@ begin
 end;
 
 procedure TviewSP.actSpecialitySessionsExecute(Sender: TObject);
-{
-  var
-  frmSpecialitySessions: TfrmViewEx;
-  ASpecialitySessions: TSpecialitySessions;
-}
-var
-  ASpecSessGroup: TSpecSessGroup;
-  F: TfrmGridView;
 begin
-
-  ASpecSessGroup := TSpecSessGroup.Create(Self, Document.IDSpecEducation);
-  F := TfrmGridView.Create(Self, 'Сессии / семестры',
-    TMyDir.AppDataDirFile('NewSessionForm.ini'), [mbOk], 500);
-  try
-    F.GridViewClass := TViewSpecSess;
-    (F.GridView as TViewSpecSess).SpecSessGroup := ASpecSessGroup;
-
-    // Действие при нажатии кнопки OK
-    F.OKAction := (F.GridView as TViewSpecSess).actSave;
-
-    F.ShowModal;
-  finally
-    FreeAndNil(F);
-    FreeAndNil(ASpecSessGroup);
-  end;
-  {
-    ASpecialitySessions := TSpecialitySessions.Create(Self);
-    frmSpecialitySessions := TfrmViewEx.Create(Self, 'Сессии / Семестры',
-    'SpecialitySessionsForm', [mbOk]);
-    try
-    ASpecialitySessions.IDAdmissionParam.ParamValue := Document.IDSpecEducation;
-    ASpecialitySessions.Refresh;
-    frmSpecialitySessions.ViewClass := TgvSpecialitySessions;
-    frmSpecialitySessions.View.SetDocument(ASpecialitySessions);
-    frmSpecialitySessions.ShowModal;
-    finally
-    FreeAndNil(frmSpecialitySessions);
-    end;
-  }
+  TSpecSessForm.ShowModal(Document.SpecSessService);
 end;
 
 procedure TviewSP.actStructure2Execute(Sender: TObject);
-var
-  F: TfrmGridView;
 begin
-  F := TfrmGridView.Create(Self, 'Структура учебного плана',
-    TMyDir.AppDataDirFile('NewCSEForm.ini'), [mbOk], 500);
-  try
-    F.GridViewClass := TViewCSEFrame;
-    (F.GridView as TViewCSEFrame).CSEServiceI := Document.CSEService;
-
-    F.ShowModal;
-    Document.CSE.Refresh;
-  finally
-    FreeAndNil(F);
-  end;
+  TCSEForm.ShowModal(Document.CSEService);
 end;
 
 procedure TviewSP.actStructureExecute(Sender: TObject);
@@ -772,9 +723,6 @@ end;
 
 procedure TviewSP.actStudyPlanReportExecute(Sender: TObject);
 begin
-  // TMyFR.Create(Self).Show('study_plan\Study_plan2.fr3',
-  // ['idspecialityeducation'],
-  // [Document.SpecialitySessions.SpecialityEducationParam.ParamValue]);
   TFR3.Create.Show(TReportFilesUpdater.TryUpdate('study_plan\Study_plan2.fr3'),
     ['idspecialityeducation'],
     [Document.SpecialitySessions.SpecialityEducationParam.ParamValue]);
