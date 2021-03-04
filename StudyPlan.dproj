@@ -169,8 +169,6 @@
         <DCCReference Include="Lessons.pas"/>
         <DCCReference Include="LessonsView.pas"/>
         <DCCReference Include="GFLTeachers.pas"/>
-        <DCCReference Include="CourcesNames.pas"/>
-        <DCCReference Include="DPODisciplineNames.pas"/>
         <DCCReference Include="StudyPlanFactors.pas"/>
         <DCCReference Include="QuerysView.pas">
             <Form>dsgvQuerys</Form>
@@ -231,10 +229,6 @@
         </DCCReference>
         <DCCReference Include="CyclesView2.pas">
             <Form>dsgvCycles</Form>
-            <DesignClass>TFrame</DesignClass>
-        </DCCReference>
-        <DCCReference Include="DPOPlanView.pas">
-            <Form>dsgvDPOStudyPlan</Form>
             <DesignClass>TFrame</DesignClass>
         </DCCReference>
         <DCCReference Include="C:\Users\Public\Documents\Embarcadero\Studio\Components\Study_process\CommissionOptions.pas"/>
@@ -358,10 +352,6 @@
         <DCCReference Include="ThemeUnionLessonFeatures.pas"/>
         <DCCReference Include="technologies.pas"/>
         <DCCReference Include="THEMEUNIONTECHNOLOGIES.pas"/>
-        <DCCReference Include="AdmissionGridView2.pas">
-            <Form>AdmissionGV</Form>
-            <DesignClass>TFrame</DesignClass>
-        </DCCReference>
         <DCCReference Include="ThemeUnionDetails.pas"/>
         <DCCReference Include="ETPCatalog.pas"/>
         <DCCReference Include="ThemeQuestionTypes.pas"/>
