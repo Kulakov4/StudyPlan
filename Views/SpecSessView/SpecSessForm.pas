@@ -14,7 +14,8 @@ type
 implementation
 
 uses
-  GridViewForm, MyDir, Vcl.Dialogs, SpecSessView, System.SysUtils;
+  GridViewForm, MyDir, Vcl.Dialogs, SpecSessView, System.SysUtils,
+  System.UITypes;
 
 class function TSpecSessForm.ShowModal(SpecSessServiceI: ISpecSessService):
     Boolean;
@@ -30,7 +31,7 @@ begin
     // Действие при нажатии кнопки OK
     F.OKAction := (F.GridView as TViewSpecSess).actSave;
 
-    F.ShowModal;
+    Result := F.ShowModal = mrOK;
   finally
     FreeAndNil(F);
   end;

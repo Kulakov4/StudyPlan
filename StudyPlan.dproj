@@ -607,7 +607,7 @@
             <FormType>dfm</FormType>
             <DesignClass>TFrame</DesignClass>
         </DCCReference>
-        <DCCReference Include="Queryes\DisciplineNames\DiscNameGroup.pas"/>
+        <DCCReference Include="Queryes\DisciplineNames\DiscNameService.pas"/>
         <DCCReference Include="Views\DiscNameView\DiscNameView.pas">
             <Form>ViewDiscName</Form>
             <FormType>dfm</FormType>
@@ -754,6 +754,7 @@
         <DCCReference Include="Views\SpecSessView\SpecSessForm.pas"/>
         <DCCReference Include="Queryes\SpecialityEducations\SpecEdService.pas"/>
         <DCCReference Include="Interfaces\SpecEdServiceInterface.pas"/>
+        <DCCReference Include="Views\DiscNameView\DisciplineNameForm.pas"/>
         <None Include="StudyPlan.todo"/>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>
@@ -816,12 +817,6 @@
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
-                <DeployFile LocalName="BIN\StudyPlan.exe" Configuration="Release" Class="ProjectOutput">
-                    <Platform Name="Win32">
-                        <RemoteName>StudyPlan.exe</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
                 <DeployFile LocalName="StudyPlan.todo" Configuration="Debug" Class="ProjectFile">
                     <Platform Name="Win32">
                         <RemoteDir>.\</RemoteDir>
@@ -829,6 +824,12 @@
                     </Platform>
                 </DeployFile>
                 <DeployFile LocalName="Win32\Debug\StudyPlan.exe" Configuration="Debug" Class="ProjectOutput">
+                    <Platform Name="Win32">
+                        <RemoteName>StudyPlan.exe</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="BIN\StudyPlan.exe" Configuration="Release" Class="ProjectOutput">
                     <Platform Name="Win32">
                         <RemoteName>StudyPlan.exe</RemoteName>
                         <Overwrite>true</Overwrite>

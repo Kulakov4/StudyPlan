@@ -49,7 +49,6 @@ type
     N1: TMenuItem;
     N2: TMenuItem;
     procedure actDisciplinesExecute(Sender: TObject);
-    procedure actEducationalStandartsExecute(Sender: TObject);
     procedure actQualificationsExecute(Sender: TObject);
     procedure actReportExecute(Sender: TObject);
     procedure actSoftwareExecute(Sender: TObject);
@@ -130,8 +129,8 @@ uses DBServConnectionPooler, MyDataAccess, MyConnection, CMdLine,
   EssenceGridView, SqlExpr, StudyPlanFactorsView2, Qualifications,
   System.Win.Registry, System.IOUtils, EducationalStandarts, AdoptionDatesForm,
   StudyPlanAdoption, UMKAdoption, SoftwareDocument, SoftwareView,
-  SpecEducSimple, DisciplineNames, OptionsHelper, GridViewForm, DiscNameGroup,
-  DiscNameView, MyDir, GetSpecEdBySP;
+  SpecEducSimple, DisciplineNames, OptionsHelper, GridViewForm, DiscNameService,
+  DiscNameView, MyDir, GetSpecEdBySP, DisciplineNameForm;
 
 {$R *.dfm}
 
@@ -168,65 +167,14 @@ end;
 
 procedure TfrmMain.actDisciplinesExecute(Sender: TObject);
 var
-  ADiscNameGroup: TDiscNameGroup;
-  F: TfrmGridView;
+  ADiscNameService: TDiscNameService;
 begin
-  ADiscNameGroup := TDiscNameGroup.Create(Self);
-  F := TfrmGridView.Create(Self, 'Дисциплины',
-    TMyDir.AppDataDirFile('DisciplineNameForm.ini'), [mbOk]);
+  ADiscNameService := TDiscNameService.Create(Self);
   try
-    F.GridViewClass := TViewDiscName;
-    (F.GridView as TViewDiscName).DiscNameViewI := ADiscNameGroup;
-    F.ShowModal;
+    TDisciplineNameForm.ShowModal(ADiscNameService);
   finally
-    FreeAndNil(F);
-    FreeAndNil(ADiscNameGroup);
+    FreeAndNil(ADiscNameService);
   end;
-end;
-
-procedure TfrmMain.actEducationalStandartsExecute(Sender: TObject);
-(*
-  var
-  AfrmAdoptionDates: TfrmAdoptionDates;
-  AEducationalStandarts: TEducationalStandarts;
-  AStudyPlanAdoption: TStudyPlanAdoption;
-  AUMKAdoption: TUMKAdoption;
-  // frmEducationalStandarts: TfrmViewEx;
-*)
-begin
-  (*
-    Assert(FAllSpecEducation <> nil);
-
-    AfrmAdoptionDates := TfrmAdoptionDates.Create(Self, 'Даты утверждения',
-    'AdoptionDateForm', [mbOk]);
-    try
-    AEducationalStandarts := TEducationalStandarts.Create(Self);
-    AStudyPlanAdoption := TStudyPlanAdoption.Create(Self);
-    AUMKAdoption := TUMKAdoption.Create(Self);
-    try
-    // Привязываем даты утверждения учебных планов к году
-    AStudyPlanAdoption.YearParam.ParamValue := FAllSpecEducation.Year.Value;
-    AStudyPlanAdoption.Refresh;
-
-    AEducationalStandarts.Refresh;
-
-    AUMKAdoption.YearParam.ParamValue := FAllSpecEducation.Year.Value;
-    AUMKAdoption.Refresh;
-
-    AfrmAdoptionDates.EducationalStandartsView.SetDocument
-    (AEducationalStandarts);
-    AfrmAdoptionDates.StudyPlanAdoptionView.SetDocument(AStudyPlanAdoption);
-    AfrmAdoptionDates.UMKAdoptionView.SetDocument(AUMKAdoption);
-    AfrmAdoptionDates.ShowModal;
-    finally
-    FreeAndNil(AUMKAdoption);
-    FreeAndNil(AStudyPlanAdoption);
-    FreeAndNil(AEducationalStandarts);
-    end;
-    finally
-    FreeAndNil(AfrmAdoptionDates);
-    end;
-  *)
 end;
 
 procedure TfrmMain.actReportExecute(Sender: TObject);

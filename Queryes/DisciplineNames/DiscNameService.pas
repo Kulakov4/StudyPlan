@@ -1,4 +1,4 @@
-unit DiscNameGroup;
+unit DiscNameService;
 
 interface
 
@@ -7,7 +7,7 @@ uses
   DiscNameViewInterface;
 
 type
-  TDiscNameGroup = class(TComponent, IDiscNameEdit, IDiscNameView)
+  TDiscNameService = class(TComponent, IDiscNameEdit, IDiscNameView)
   strict private
     function GetChairsW: TChairsW;
     function GetDiscNameEditI(AID_DisciplineName: Integer): IDiscNameEdit;
@@ -23,7 +23,7 @@ type
 
 implementation
 
-constructor TDiscNameGroup.Create(AOwner: TComponent);
+constructor TDiscNameService.Create(AOwner: TComponent);
 begin
   inherited;
   FqChairs := TQueryChairs.Create(Self);
@@ -33,24 +33,24 @@ begin
   FqDiscName.SearchByType([1, 2]);
 end;
 
-function TDiscNameGroup.GetChairsW: TChairsW;
+function TDiscNameService.GetChairsW: TChairsW;
 begin
   Result := FqChairs.W;
 end;
 
-function TDiscNameGroup.GetDiscNameEditI(AID_DisciplineName: Integer):
+function TDiscNameService.GetDiscNameEditI(AID_DisciplineName: Integer):
     IDiscNameEdit;
 begin
   FID_DisciplineName := AID_DisciplineName;
   Result := Self;
 end;
 
-function TDiscNameGroup.GetDiscNameW: TDiscNameW;
+function TDiscNameService.GetDiscNameW: TDiscNameW;
 begin
   Result := FqDiscName.W;
 end;
 
-function TDiscNameGroup.GetID_DisciplineName: Integer;
+function TDiscNameService.GetID_DisciplineName: Integer;
 begin
   Result := FID_DisciplineName;
 end;

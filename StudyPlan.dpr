@@ -183,7 +183,7 @@ uses
   OptionsHelper in 'helpers\OptionsHelper.pas',
   SPStandartQuery in 'Queryes\SPStandart\SPStandartQuery.pas' {QuerySPStandart: TFrame},
   DiscNameQry in 'Queryes\DisciplineNames\DiscNameQry.pas' {QryDiscName: TFrame},
-  DiscNameGroup in 'Queryes\DisciplineNames\DiscNameGroup.pas',
+  DiscNameService in 'Queryes\DisciplineNames\DiscNameService.pas',
   DiscNameView in 'Views\DiscNameView\DiscNameView.pas' {ViewDiscName: TFrame},
   GridViewForm in 'Views\GridViewForm.pas' {frmGridView},
   EditDisciplineFrm in 'Views\DiscNameView\EditDisciplineFrm.pas' {frmEditDisciplineName},
@@ -241,7 +241,8 @@ uses
   SpecSessService in 'Queryes\SpecSess\SpecSessService.pas',
   SpecSessForm in 'Views\SpecSessView\SpecSessForm.pas',
   SpecEdService in 'Queryes\SpecialityEducations\SpecEdService.pas',
-  SpecEdServiceInterface in 'Interfaces\SpecEdServiceInterface.pas';
+  SpecEdServiceInterface in 'Interfaces\SpecEdServiceInterface.pas',
+  DisciplineNameForm in 'Views\DiscNameView\DisciplineNameForm.pas';
 
 {$R *.res}
 
